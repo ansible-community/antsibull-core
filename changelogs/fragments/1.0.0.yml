@@ -1,0 +1,3 @@
+release_summary: First stable release.
+major_changes:
+  - "From version 1.0.0 on, antsibull-core is sticking to semantic versioning and aims at providing no backwards compatibility breaking changes during a major release cycle (https://github.com/ansible-community/antsibull-core/pull/2)."
