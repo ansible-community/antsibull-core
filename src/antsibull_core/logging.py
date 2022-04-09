@@ -219,20 +219,6 @@ mlog = log.fields(mod=__name__)
 mlog.debug('logging loaded')
 
 
-def plugin_filter():
-    """
-    Filter out messages which come from plugin error output.
-
-    :arg msg: A :twiggy:obj:`twiggy.message.Message` object which would be filtered
-    """
-    def wrapped(msg):
-        return (
-            msg.fields['func'] == 'write_plugin_rst' and
-            msg.fields['mod'] == 'antsibull.write_docs'
-        )
-    return wrapped
-
-
 def initialize_app_logging():
     """
     Change log settings to make sense for an application.
@@ -251,4 +237,4 @@ def initialize_app_logging():
     twiggy.quick_setup(min_level=_level)
 
 
-__all__ = ('log', 'initialize_app_logging', 'plugin_filter')
+__all__ = ('log', 'initialize_app_logging')
