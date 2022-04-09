@@ -12,6 +12,10 @@ General Public License v3 or, at your option, later.
 
 antsibull-core is covered by the [Ansible Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html).
 
+## Versioning and compatibility
+
+From version 1.0.0 on, antsibull-core sticks to semantic versioning and aims at providing no backwards compatibility breaking changes during a major release cycle. We might make exceptions from this in case of security fixes for vulnerabilities that are severe enough.
+
 ## Creating a new release:
 
 If you want to create a new release::
