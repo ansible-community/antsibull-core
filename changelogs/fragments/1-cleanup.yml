@@ -1,2 +1,4 @@
 minor_changes:
   - "Remove unused code (https://github.com/ansible-community/antsibull-core/pull/1)."
+removed_features:
+  - "Remove package ``antsibull_core.utils.transformations`` (https://github.com/ansible-community/antsibull-core/pull/1)."
