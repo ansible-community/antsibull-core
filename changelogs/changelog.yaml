@@ -6,3 +6,18 @@ releases:
     fragments:
     - initial_release.yml
     release_date: '2022-04-06'
+  1.0.0:
+    changes:
+      major_changes:
+      - From version 1.0.0 on, antsibull-core is sticking to semantic versioning and
+        aims at providing no backwards compatibility breaking changes during a major
+        release cycle (https://github.com/ansible-community/antsibull-core/pull/2).
+      minor_changes:
+      - Remove unused code (https://github.com/ansible-community/antsibull-core/pull/1).
+      release_summary: First stable release.
+      removed_features:
+      - Remove package ``antsibull_core.utils.transformations`` (https://github.com/ansible-community/antsibull-core/pull/1).
+    fragments:
+    - 1-cleanup.yml
+    - 1.0.0.yml
+    release_date: '2022-04-10'
