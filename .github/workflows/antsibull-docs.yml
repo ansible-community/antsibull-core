@@ -52,6 +52,12 @@ jobs:
           poetry run antsibull-docs sphinx-init --lenient --dest-dir . --use-current --sphinx-theme sphinx_rtd_theme
         working-directory: antsibull-docs
 
+      - name: Patch build.sh to use poetry run
+        run: |
+          sed -i build.sh -e 's!antsibull-docs !poetry run antsibull-docs !g'
+          sed -i build.sh -e 's!sphinx-build !poetry run sphinx-build !g'
+        working-directory: antsibull-docs
+
       - name: Install dependencies
         run: |
           poetry run pip install ansible-core
