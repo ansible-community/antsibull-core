@@ -1,0 +1,69 @@
+# Run some antsibull 0.44.0 tests against the current development version of antsibull-core
+# to make sure we don't accidentally break compatibility.
+
+name: antsibull compatibility
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Run once per week (Monday at 04:00 UTC)
+  schedule:
+    - cron: '0 4 * * 1'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out antsibull-core
+        uses: actions/checkout@v3
+        with:
+          path: antsibull-core
+
+      # antsibull 0.44.0 depends on antsibull-docs >= 1.0.0 as well, so install 1.0.0 of that
+      - name: Check out antsibull-docs 1.0.0
+        uses: actions/checkout@v3
+        with:
+          repository: ansible-community/antsibull-docs
+          ref: 1.0.0
+          path: antsibull-docs
+
+      # antsibull 0.44.0 depends on antsibull-changelog >= 0.14.0 as well, so install 0.14.0 of that
+      - name: Check out antsibull-changelog 0.14.0
+        uses: actions/checkout@v3
+        with:
+          repository: ansible-community/antsibull-changelog
+          ref: 0.14.0
+          path: antsibull-changelog
+
+      - name: Check out antsibull 0.44.0
+        uses: actions/checkout@v3
+        with:
+          repository: ansible-community/antsibull
+          ref: 0.44.0
+          path: antsibull
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install poetry
+          poetry install
+          poetry update
+        working-directory: antsibull
+
+      # pyre should complain if a signature changed in an incompatible way
+      - name: Lint with pyre
+        run: |
+          ./lint-pyre.sh
+        working-directory: antsibull
+
+      - name: "Test building a release: Ansible 6 with ansible-core devel"
+        run: |
+          ansible-playbook -vv playbooks/build-single-release.yaml -e 'antsibull_build_command="poetry run antsibull-build"' -e antsibull_ansible_version=6.99.0 -e antsibull_build_file=ansible-6.build -e antsibull_data_dir="{{ antsibull_data_git_dir }}/6" -e antsibull_ansible_git_version=devel
+        working-directory: antsibull

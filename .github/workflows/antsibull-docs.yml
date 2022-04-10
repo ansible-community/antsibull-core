@@ -1,0 +1,80 @@
+# Run some antsibull-docs 1.0.0 tests against the current development version of antsibull-core
+# to make sure we don't accidentally break compatibility.
+
+name: antsibull-docs compatibility
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Run once per week (Monday at 04:00 UTC)
+  schedule:
+    - cron: '0 4 * * 1'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out antsibull-core
+        uses: actions/checkout@v3
+        with:
+          path: antsibull-core
+
+      - name: Check out antsibull-docs 1.0.0
+        uses: actions/checkout@v3
+        with:
+          repository: ansible-community/antsibull-docs
+          ref: 1.0.0
+          path: antsibull-docs
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install poetry
+          poetry install
+          poetry update
+        working-directory: antsibull-docs
+
+      # pyre should complain if a signature changed in an incompatible way
+      - name: Lint with pyre
+        run: |
+          ./lint-pyre.sh
+        working-directory: antsibull-docs
+
+      - name: Use antsibull-docs sphinx-init
+        run: |
+          poetry run antsibull-docs sphinx-init --lenient --dest-dir . --use-current --sphinx-theme sphinx_rtd_theme
+        working-directory: antsibull-docs
+
+      - name: Patch build.sh to use poetry run
+        run: |
+          sed -i build.sh -e 's!antsibull-docs !poetry run antsibull-docs !g'
+          sed -i build.sh -e 's!sphinx-build !poetry run sphinx-build !g'
+        working-directory: antsibull-docs
+
+      - name: Install dependencies
+        run: |
+          poetry run pip install ansible-core
+          poetry run pip install -r requirements.txt
+        working-directory: antsibull-docs
+
+      - name: Install collections
+        run: |
+          ansible-galaxy collection install community.docker sensu.sensu_go
+          git clone https://github.com/ansible-collections/community.crypto.git ~/.ansible/collections/ansible_collections/community/crypto
+
+      - name: Lint collection docs
+        run: |
+          poetry run antsibull-docs lint-collection-docs ~/.ansible/collections/ansible_collections/community/docker
+        working-directory: antsibull-docs
+
+      - name: Build docsite
+        run: |
+          ./build.sh
+        working-directory: antsibull-docs
