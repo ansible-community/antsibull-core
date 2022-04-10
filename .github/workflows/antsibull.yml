@@ -21,7 +21,7 @@ jobs:
         with:
           path: antsibull-core
 
-      # antsibull 0.44.0 depends on antsibull-docs as well, so install 1.0.0 of that
+      # antsibull 0.44.0 depends on antsibull-docs >= 1.0.0 as well, so install 1.0.0 of that
       - name: Check out antsibull-docs 1.0.0
         uses: actions/checkout@v3
         with:
@@ -29,20 +29,20 @@ jobs:
           ref: 1.0.0
           path: antsibull-docs
 
+      # antsibull 0.44.0 depends on antsibull-changelog >= 0.14.0 as well, so install 0.14.0 of that
+      - name: Check out antsibull-changelog 0.14.0
+        uses: actions/checkout@v3
+        with:
+          repository: ansible-community/antsibull-changelog
+          ref: 0.14.0
+          path: antsibull-changelog
+
       - name: Check out antsibull 0.44.0
         uses: actions/checkout@v3
         with:
           repository: ansible-community/antsibull
           ref: 0.44.0
           path: antsibull
-
-      # antsibull 0.44.0 depends on antsibull-changelog 0.14.0
-      - name: Check out dependent project antsibull-changelog
-        uses: actions/checkout@v3
-        with:
-          repository: ansible-community/antsibull-changelog
-          ref: 0.14.0
-          path: antsibull-changelog
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v2
