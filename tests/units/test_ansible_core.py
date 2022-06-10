@@ -16,3 +16,11 @@ def test_get_core_package_name_returns_ansible_base(version):
 def test_get_core_package_name_returns_ansible_core(version):
     assert ac.get_ansible_core_package_name(version) == 'ansible-core'
     assert ac.get_ansible_core_package_name(Version(version)) == 'ansible-core'
+
+
+@pytest.mark.parametrize('version, is_devel', [
+    ('2.14.0dev0', True),
+    ('2.14.0', False),
+])
+def test_get_core_package_name_returns_ansible_core(version, is_devel):
+    assert ac._version_is_devel(Version(version)) == is_devel

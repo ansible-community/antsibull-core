@@ -1,0 +1,2 @@
+bugfixes:
+  - "Fix detection of ansible-core devel checkouts (https://github.com/ansible-community/antsibull-core/pull/4)."
