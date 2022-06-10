@@ -192,6 +192,11 @@ def _get_source_version(ansible_core_source: str) -> PypiVer:
     return PypiVer(source_version)
 
 
+def _version_is_devel(version: PypiVer) -> bool:
+    dev_version = re.compile('.*[.]dev[0-9]+$')
+    return bool(dev_version.match(version.public))
+
+
 def source_is_devel(ansible_core_source: t.Optional[str]) -> bool:
     """
     :arg ansible_core_source: A path to an Ansible-core checkout or expanded sdist or None.
@@ -207,11 +212,7 @@ def source_is_devel(ansible_core_source: t.Optional[str]) -> bool:
     except Exception:  # pylint:disable=broad-except
         return False
 
-    dev_version = re.compile('[.]dev[0-9]+$')
-    if dev_version.match(source_version.public):
-        return True
-
-    return False
+    return _version_is_devel(source_version)
 
 
 def source_is_correct_version(ansible_core_source: t.Optional[str],
