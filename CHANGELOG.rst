@@ -5,6 +5,19 @@ antsibull-core Release Notes
 .. contents:: Topics
 
 
+v1.0.1
+======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- Fix detection of ansible-core devel checkouts (https://github.com/ansible-community/antsibull-core/pull/4).
+
 v1.0.0
 ======
 

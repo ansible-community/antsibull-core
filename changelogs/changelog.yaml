@@ -21,3 +21,12 @@ releases:
     - 1-cleanup.yml
     - 1.0.0.yml
     release_date: '2022-04-10'
+  1.0.1:
+    changes:
+      bugfixes:
+      - Fix detection of ansible-core devel checkouts (https://github.com/ansible-community/antsibull-core/pull/4).
+      release_summary: Bugfix release.
+    fragments:
+    - 1.0.1.yml
+    - 4-devel-detection.yml
+    release_date: '2022-06-10'
