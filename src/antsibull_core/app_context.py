@@ -1,7 +1,8 @@
 # coding: utf-8
 # Author: Toshio Kuratomi <tkuratom@redhat.com>
 # License: GPLv3+
-# Copyright: Toshio Kuratomi, 2019
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2019, Toshio Kuratomi
 """
 Setup an application context to save global data which is set on program start.
 

@@ -1,7 +1,8 @@
 # coding: utf-8
 # Author: Toshio Kuratomi <tkuratom@redhat.com>
 # License: GPLv3+
-# Copyright: Toshio Kuratomi, 2021
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2021, Toshio Kuratomi
 """Schemas for app and lib contexts."""
 
 import typing as t

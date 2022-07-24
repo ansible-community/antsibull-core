@@ -1,3 +1,8 @@
+# coding: utf-8
+# License: GPLv3+
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: Ansible Project
+
 from packaging.version import Version as PypiVer
 from semantic_version import Version as SemVer
 

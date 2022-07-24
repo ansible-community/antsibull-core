@@ -1,7 +1,7 @@
-# Copyright: (c) 2018, Sviatoslav Sydorenko <ssydoren@redhat.com>
-# Copyright: (c) 2018, Ansible Project
-# Simplified BSD License (see licenses/simplified_bsd.txt or
-# https://opensource.org/licenses/BSD-2-Clause)
+# Copyright (c) 2018, Sviatoslav Sydorenko <ssydoren@redhat.com>
+# Copyright (c) 2018, Ansible Project
+# Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
+# SPDX-License-Identifier: BSD-2-Clause
 """Collection of low-level utility functions."""
 
 # pylint:disable=consider-using-f-string,consider-iterating-dictionary,use-dict-literal
