@@ -1,6 +1,7 @@
 # coding: utf-8
-# SPDX-License-Identifier: GPL-3.0-or-later
-# SPDX-FileCopyrightText: Ansible Project
+# Copied from https://raw.githubusercontent.com/python/typeshed/master/stdlib/argparse.pyi
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: The typeshed contributors
 
 import sys
 from typing import (
