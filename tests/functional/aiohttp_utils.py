@@ -2,6 +2,8 @@
 # This program is distributed under the MIT license, a copy of which you should
 # have receveived along with it. If not, see <https://opensource.org/licenses/MIT>.
 #
+# SPDX-License-Identifier: MIT
+#
 # https://github.com/solid-abstractions/python/tree/master/testing-aiohttp-clients
 
 import aiohttp
