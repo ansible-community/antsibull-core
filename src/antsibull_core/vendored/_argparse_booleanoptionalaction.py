@@ -3,6 +3,9 @@
 # It is licensed under the Python Software Foundation License:
 # https://github.com/python/cpython/blob/main/LICENSE
 #
+# SPDX-FileCopyrightText: 2001-2020 Python Software Foundation
+# SPDX-License-Identifier: PSF-2.0
+#
 # A bug that affects our usage of BoolanOptionalAction was discovered (it displays default: SUPPRESS
 # in the help message).  I have added a bugix for that here and will open a PR upstream once
 # a maintainer answers a question for me:
