@@ -30,3 +30,13 @@ releases:
     - 1.0.1.yml
     - 4-devel-detection.yml
     release_date: '2022-06-10'
+  1.1.0:
+    changes:
+      minor_changes:
+      - The files in the source repository now follow the `REUSE Specification <https://reuse.software/spec/>`_.
+        The only exceptions are changelog fragments in ``changelogs/fragments/`` (https://github.com/ansible-community/antsibull-core/pull/5).
+      release_summary: Maintenance release.
+    fragments:
+    - 1.1.0.yml
+    - 5-licenses.yml
+    release_date: '2022-07-31'
