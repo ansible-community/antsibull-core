@@ -86,7 +86,7 @@ _FIELDS_IN_LIB_CTX = frozenset(
 #: for tweaking via a value saved in lib_ctx.  All values in lib_ctx need to have a default value
 #: so that code which uses it can fallback to something if the application or user did not
 #: specify a value.
-lib_ctx = contextvars.ContextVar('lib_ctx')
+lib_ctx: 'contextvars.ContextVar[LibContext]' = contextvars.ContextVar('lib_ctx')
 
 #: Values in app_ctx are things that form defaults in the application.  Even though it may be
 #: tempting to use them for library API, they should not be used there.  Instead, these values
@@ -106,7 +106,7 @@ lib_ctx = contextvars.ContextVar('lib_ctx')
 #: server, the library can provide a class which takes the server's URL as a parameter and stores
 #: as an attribute and the functions can be converted into methods of the object.  Then the
 #: application code can initialize the object once and thereafter call the object's methods.
-app_ctx = contextvars.ContextVar('app_ctx')
+app_ctx: 'contextvars.ContextVar[AppContext]' = contextvars.ContextVar('app_ctx')
 
 
 class ContextReturn(t.NamedTuple):
@@ -218,7 +218,7 @@ def create_contexts(args: t.Optional[argparse.Namespace] = None,
         app_ctx=local_app_ctx, lib_ctx=local_lib_ctx, args=unused_args, cfg=unused_cfg)
 
 
-def _copy_lib_context():
+def _copy_lib_context() -> LibContext:
     try:
         old_context = lib_ctx.get()
     except LookupError:
@@ -228,7 +228,7 @@ def _copy_lib_context():
     return old_context.copy()
 
 
-def _copy_app_context():
+def _copy_app_context() -> AppContext:
     try:
         old_context = app_ctx.get()
     except LookupError:
@@ -239,7 +239,7 @@ def _copy_app_context():
 
 
 @contextmanager
-def lib_context(new_context: t.Optional[LibContext] = None):
+def lib_context(new_context: t.Optional[LibContext] = None) -> t.Generator[LibContext, None, None]:
     """
     Set up a new lib_context.
 
@@ -256,7 +256,7 @@ def lib_context(new_context: t.Optional[LibContext] = None):
 
 
 @contextmanager
-def app_context(new_context: t.Optional[AppContext] = None):
+def app_context(new_context: t.Optional[AppContext] = None) -> t.Generator[AppContext, None, None]:
     """
     Set up a new app_context.
 
@@ -273,7 +273,8 @@ def app_context(new_context: t.Optional[AppContext] = None):
 
 
 @contextmanager
-def app_and_lib_context(context_data: ContextReturn):
+def app_and_lib_context(context_data: ContextReturn
+                        ) -> t.Generator[t.Tuple[AppContext, LibContext], None, None]:
     """
     Set the app and lib context at the same time.
 
