@@ -1,2 +1,4 @@
 minor_changes:
   - "Improve typing (https://github.com/ansible-community/antsibull-core/pull/6)."
+bugfixes:
+  - "Adjust signature of ``DepsFile.write()`` to work around bug in antsibull (https://github.com/ansible-community/antsibull-core/pull/6)."

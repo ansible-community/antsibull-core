@@ -14,7 +14,7 @@ When we initially build an Ansible major release, we'll use certain versions of 
 don't want to install backwards incompatible collections until the next major Ansible release.
 """
 
-from typing import TYPE_CHECKING, Dict, List, Mapping, NamedTuple, Optional
+from typing import TYPE_CHECKING, Dict, List, Mapping, NamedTuple, Optional, Union
 
 from packaging.version import Version as PypiVer
 
@@ -113,8 +113,9 @@ class DepsFile:
         """Parse the deps from a dependency file."""
         return _parse_name_version_spec_file(self.filename)
 
-    def write(self, ansible_version: str, ansible_core_version: str,
-              included_versions: Mapping[str, str]) -> None:
+    def write(self, ansible_version: Union[str, 'PypiVer'],
+              ansible_core_version: Union[str, 'PypiVer'],
+              included_versions: Union[Mapping[str, str], Mapping[str, 'SemVer']]) -> None:
         """
         Write a list of all the dependent collections included in this Ansible release.
 
@@ -122,15 +123,22 @@ class DepsFile:
         :arg ansible_core_version: The version of Ansible-core that will be depended on.
         :arg included_versions: Dictionary mapping collection names to the version range in this
             version of Ansible.
+
+        WARNING: This function will no longer accept version objects in the ansible_core_version
+                 and included_versions parameters, and will require a PypiVer object in the
+                 ansible_version parameter in antsibull-core 2.0.0.
         """
         records = []
         for dep, version in included_versions.items():
             records.append(f'{dep}: {version}')
         records.sort()
 
+        if not isinstance(ansible_version, PypiVer):
+            ansible_version = PypiVer(ansible_version)
+
         with open(self.filename, 'w', encoding='utf-8') as f:
             f.write(f'_ansible_version: {ansible_version}\n')
-            if PypiVer(ansible_version).major > 5:
+            if ansible_version.major > 5:
                 f.write(f'_ansible_core_version: {ansible_core_version}\n')
             else:
                 f.write(f'_ansible_base_version: {ansible_core_version}\n')
