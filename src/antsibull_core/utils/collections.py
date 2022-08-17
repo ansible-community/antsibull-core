@@ -64,7 +64,7 @@ def compare_all_but(dict_a: t.Mapping, dict_b: t.Mapping,
     return True
 
 
-def _make_contained_containers_immutable(obj):
+def _make_contained_containers_immutable(obj: t.Union[Set, Sequence]) -> t.List:
     """
     Make contained containers into immutable containers.
 

@@ -220,7 +220,7 @@ mlog = log.fields(mod=__name__)
 mlog.debug('logging loaded')
 
 
-def initialize_app_logging():
+def initialize_app_logging() -> None:
     """
     Change log settings to make sense for an application.
 
