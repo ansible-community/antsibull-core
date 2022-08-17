@@ -2,3 +2,5 @@ minor_changes:
   - "Improve typing (https://github.com/ansible-community/antsibull-core/pull/6)."
 bugfixes:
   - "Adjust signature of ``DepsFile.write()`` to work around bug in antsibull (https://github.com/ansible-community/antsibull-core/pull/6)."
+deprecated_features:
+  - "The ``DepsFile.write()`` method will require the first parameter to be a ``packaging.version.Version`` object, the second parameter to be a string, and the third parameter a mapping of strings to strings, from antsibull-core 2.0.0 on (https://github.com/ansible-community/antsibull-core/pull/6)."
