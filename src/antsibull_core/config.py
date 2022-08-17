@@ -10,6 +10,7 @@ import os.path
 import typing as t
 
 import perky  # type: ignore[import]
+import pydantic as p
 
 from .logging import log
 from .schemas.config import ConfigModel
@@ -22,6 +23,10 @@ SYSTEM_CONFIG_FILE = '/etc/antsibull.cfg'
 
 #: Per-user config file location.
 USER_CONFIG_FILE = '~/.antsibull.cfg'
+
+
+class ConfigError(Exception):
+    pass
 
 
 def find_config_files(conf_files: t.Iterable[str]) -> t.List[str]:
@@ -70,7 +75,8 @@ def read_config(filename: str) -> ConfigModel:
     return raw_config_data
 
 
-def load_config(conf_files: t.Union[t.Iterable[str], str, None] = None) -> t.Dict:
+def load_config(conf_files: t.Union[t.Iterable[str], str, None] = None,
+                config_model: t.Type[ConfigModel] = ConfigModel) -> t.Dict:
     """
     Load configuration.
 
@@ -106,13 +112,24 @@ def load_config(conf_files: t.Union[t.Iterable[str], str, None] = None) -> t.Dic
     # but we can just add that as a new feature when perky gets it working.
     cfg = {}
     for filename in includes:
-        new_cfg = perky.load(filename)
+        try:
+            new_cfg = perky.load(filename)
+        except OSError as exc:
+            raise ConfigError(
+                f"Error while loading configuration from {filename}: {exc}") from exc
+        except perky.PerkyFormatError as exc:
+            raise ConfigError(
+                f"Error while parsing configuration from {filename}:\n{exc}") from exc
         cfg.update(new_cfg)
 
     flog.debug('validating configuration')
     # Note: We parse the object but discard the model because we want to validate the config but let
     # the context handle all setting of defaults
-    ConfigModel.parse_obj(cfg)
+    try:
+        config_model.parse_obj(cfg)
+    except p.ValidationError as exc:
+        raise ConfigError(
+            f"Error while parsing configuration from {', '.join(includes)}:\n{exc}") from exc
 
     flog.fields(config=cfg).debug('Leave')
     return cfg
