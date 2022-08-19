@@ -202,8 +202,8 @@ Once those steps are taken, any further logging calls will obey the user's confi
 """
 import os
 
-import twiggy
-import twiggy.levels
+import twiggy  # type: ignore[import]
+import twiggy.levels  # type: ignore[import]
 
 #: The standard log to use everywhere.  The name of the logger for all of the antsibull libraries
 #: is antsibull so that it is easy to setup an emitter for all of antsibull.  For those used to

@@ -9,7 +9,7 @@ import sh
 
 try:
     # We fallback to /usr/bin/getfacl so we can ignore failure to import this
-    import posix1e  # pyre-ignore[21]
+    import posix1e  # type: ignore[import] # pyre-ignore[21]
 except ImportError:
     posix1e = None
 

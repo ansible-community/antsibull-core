@@ -9,8 +9,8 @@ import os.path
 import typing as t
 
 import pydantic as p
-import twiggy.formats
-import twiggy.outputs
+import twiggy.formats  # type: ignore[import]
+import twiggy.outputs  # type: ignore[import]
 
 from .validators import convert_bool, convert_none, convert_path
 
@@ -118,18 +118,18 @@ DEFAULT_LOGGING_CONFIG = LoggingModel.parse_obj(
 
 class ConfigModel(BaseModel):
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    ansible_base_url: p.HttpUrl = 'https://github.com/ansible/ansible'
+    ansible_base_url: p.HttpUrl = 'https://github.com/ansible/ansible'  # type: ignore[assignment]
     breadcrumbs: p.StrictBool = True
     chunksize: int = 4096
     doc_parsing_backend: str = DOC_PARSING_BACKEND_CHOICES_F
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    galaxy_url: p.HttpUrl = 'https://galaxy.ansible.com/'
+    galaxy_url: p.HttpUrl = 'https://galaxy.ansible.com/'  # type: ignore[assignment]
     indexes: p.StrictBool = True
     logging_cfg: LoggingModel = DEFAULT_LOGGING_CONFIG
     max_retries: int = 10
     process_max: t.Optional[int] = None
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    pypi_url: p.HttpUrl = 'https://pypi.org/'
+    pypi_url: p.HttpUrl = 'https://pypi.org/'  # type: ignore[assignment]
     use_html_blobs: p.StrictBool = False
     thread_max: int = 8
     file_check_content: int = 262144

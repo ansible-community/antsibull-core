@@ -62,14 +62,14 @@ class AppContext(BaseModel):
 
     extra: ContextDict = ContextDict()
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    ansible_base_url: p.HttpUrl = 'https://github.com/ansible/ansible/'
+    ansible_base_url: p.HttpUrl = 'https://github.com/ansible/ansible/'  # type: ignore[assignment]
     breadcrumbs: p.StrictBool = True
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    galaxy_url: p.HttpUrl = 'https://galaxy.ansible.com/'
+    galaxy_url: p.HttpUrl = 'https://galaxy.ansible.com/'  # type: ignore[assignment]
     indexes: p.StrictBool = True
     logging_cfg: LoggingModel = LoggingModel.parse_obj(DEFAULT_LOGGING_CONFIG)
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    pypi_url: p.HttpUrl = 'https://pypi.org/'
+    pypi_url: p.HttpUrl = 'https://pypi.org/'  # type: ignore[assignment]
     use_html_blobs: p.StrictBool = False
     collection_cache: t.Optional[str] = None
 

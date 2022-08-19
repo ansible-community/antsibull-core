@@ -47,10 +47,10 @@ class RetryGetManager:
         flog = mlog.fields(func='RetryGetManager.__aenter__')
         flog.debug('Enter')
 
-        error_codes = []
+        errors = []
         for retry in range(self.max_retries):
             flog.debug('Execute {0}', self.call_string)
-            wait_factor = 5
+            wait_factor: float = 5
             try:
                 response = await self.aio_session.get(*self.args, **self.kwargs, timeout=20)
                 status_code = response.status
@@ -59,21 +59,20 @@ class RetryGetManager:
                     self.response = response
                     flog.debug('Leave')
                     return response
-                error_codes.append(status_code)
+                status = str(status_code)
                 response.close()
             except asyncio.TimeoutError:
                 flog.trace()
-                status_code = 'timeout'
-                error_codes.append(status_code)
+                status = 'timeout'
                 wait_factor = 0.5
             except Exception as error:  # pylint:disable=broad-except
                 flog.trace()
-                status_code = str(error)
-                error_codes.append(status_code)
+                status = str(error)
 
+            errors.append(status)
             failed = retry + 1 == self.max_retries
             warnings.warn(
-                f'{self.call_string} failed with status code {status_code}'
+                f'{self.call_string} failed with status code {status}'
                 f'{", finally failed." if failed else ", retrying..."}')
             if failed:
                 break
@@ -83,7 +82,7 @@ class RetryGetManager:
         flog.debug('Raise error')
         raise Exception(
             f'Repeated error when calling {self.call_string}: received status codes '
-            f'{", ".join([str(error) for error in error_codes])}')
+            f'{", ".join(errors)}')
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
         flog = mlog.fields(func='RetryGetManager.__aexit__')
@@ -108,5 +107,4 @@ def retry_get(aio_session: 'aiohttp.client.ClientSession',
     # Make sure max_retries is at least 1
     max_retries = max(max_retries, 1)
 
-    # pyre-ignore[7]: no idea how to make pyre see that RetryGetManager has correct type
     return RetryGetManager(aio_session, args, kwargs, max_retries, acceptable_error_codes or ())

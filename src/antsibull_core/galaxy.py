@@ -182,12 +182,12 @@ class GalaxyClient:
             latest release, whether stable or prerelease was returned when pre was True.
         """
         versions = await self.get_versions(collection)
-        versions = [semver.Version(v) for v in versions]
-        versions.sort(reverse=True)
+        sem_versions = [semver.Version(v) for v in versions]
+        sem_versions.sort(reverse=True)
 
         spec = semver.SimpleSpec(version_spec)
         prereleases = []
-        for version in (v for v in versions if v in spec):
+        for version in (v for v in sem_versions if v in spec):
             # If this is a pre-release, first check if there's a non-pre-release that
             # will satisfy the version_spec.
             if version.prerelease:
@@ -274,7 +274,7 @@ class CollectionDownloader(GalaxyClient):
         # Copy downloaded collection into cache
         if self.collection_cache:
             # TODO: PY3.8: We can use t.Final in __init__ instead of cast here.
-            cached_copy = os.path.join(t.cast(str, self.collection_cache),
+            cached_copy = os.path.join(self.collection_cache,
                                        release_info['artifact']['filename'])
             shutil.copyfile(download_filename, cached_copy)
 
