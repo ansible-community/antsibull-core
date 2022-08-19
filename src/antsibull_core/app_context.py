@@ -208,14 +208,14 @@ def create_contexts(args: t.Optional[argparse.Namespace] = None,
         unused_cfg = {}
         unused_args = {}
 
-    unused_args = argparse.Namespace(**unused_args)
+    unused_args_ns = argparse.Namespace(**unused_args)
 
     # create new app and lib ctxt from the application's arguments and config.
     local_app_ctx = AppContext(**app_values)
     local_lib_ctx = LibContext(**lib_values)
 
     return ContextReturn(
-        app_ctx=local_app_ctx, lib_ctx=local_lib_ctx, args=unused_args, cfg=unused_cfg)
+        app_ctx=local_app_ctx, lib_ctx=local_lib_ctx, args=unused_args_ns, cfg=unused_cfg)
 
 
 def _copy_lib_context() -> LibContext:

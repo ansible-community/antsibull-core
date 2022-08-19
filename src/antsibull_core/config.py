@@ -9,7 +9,7 @@ import itertools
 import os.path
 import typing as t
 
-import perky
+import perky  # type: ignore[import]
 
 from .logging import log
 from .schemas.config import ConfigModel

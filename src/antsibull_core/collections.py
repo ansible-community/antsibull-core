@@ -45,7 +45,7 @@ async def install_together(collection_tarballs: List[str],
 
 async def install_separately(collection_tarballs: List[str], collection_dir: str) -> List[str]:
     installers = []
-    collection_dirs = []
+    collection_dirs: List[str] = []
 
     if not collection_tarballs:
         return collection_dirs

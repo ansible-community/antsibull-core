@@ -181,8 +181,8 @@ def _get_source_version(ansible_core_source: str) -> PypiVer:
         if isinstance(node, ast.Assign):
             for name in node.targets:
                 # These attributes are dynamic so pyre cannot check them
-                if name.id == '__version__':  # pyre-ignore[16]
-                    source_version = node.value.s  # pyre-ignore[16]
+                if name.id == '__version__':  # type: ignore[attr-defined] # pyre-ignore[16]
+                    source_version = node.value.s  # type: ignore[attr-defined] # pyre-ignore[16]
                     break
 
         if source_version:
@@ -335,17 +335,18 @@ async def get_ansible_core(aio_session: 'aiohttp.client.ClientSession',
         install_file = await create_sdist(source_location, tmpdir)
     else:
         pypi_client = AnsibleCorePyPiClient(aio_session)
+        ansible_core_pypi_version: PypiVer
         if ansible_core_version == '@latest':
-            ansible_core_version: PypiVer = await pypi_client.get_latest_version()
+            ansible_core_pypi_version = await pypi_client.get_latest_version()
         else:
-            ansible_core_version: PypiVer = PypiVer(ansible_core_version)
+            ansible_core_pypi_version = PypiVer(ansible_core_version)
 
         # is the source the asked for version?
-        if source_is_correct_version(ansible_core_source, ansible_core_version):
+        if source_is_correct_version(ansible_core_source, ansible_core_pypi_version):
             assert ansible_core_source is not None
             # Create an sdist from the source that can be installed
             install_file = await create_sdist(ansible_core_source, tmpdir)
         else:
-            install_file = await pypi_client.retrieve(ansible_core_version.public, tmpdir)
+            install_file = await pypi_client.retrieve(ansible_core_pypi_version.public, tmpdir)
 
     return install_file
