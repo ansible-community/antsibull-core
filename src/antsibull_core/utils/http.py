@@ -82,7 +82,7 @@ class RetryGetManager:
         flog.debug('Raise error')
         raise Exception(
             f'Repeated error when calling {self.call_string}: received status codes '
-            f'{", ".join([error for error in errors])}')
+            f'{", ".join(errors)}')
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
         flog = mlog.fields(func='RetryGetManager.__aexit__')
