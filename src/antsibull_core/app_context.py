@@ -29,14 +29,18 @@ targets Python3.7 and above, there is no such limitation.
 Setup
 =====
 
-Importing antsibull.app_context will setup a default context with default values for the library to
-use.  The application should initialize a new context with user overriding values by calling
-:func:`antsibull.app_context.create_contexts` with command line args and configuration data.  The
-data from those will be used to initialize a new app_ctx and new lib_ctx.  The application can then
-use the context managers to utilize these contexts before calling any further antsibull code.  An
-example:
+Importing antsibull_core.app_context will setup a default context with default values for the
+library to use.  The application should initialize a new context with user overriding values by
+calling :func:`antsibull_core.app_context.create_contexts` with command line args and
+configuration data.  The data from those will be used to initialize a new ``app_ctx`` and new
+``lib_ctx``.  The application can then use the context managers to utilize these contexts before
+calling any further antsibull code.  An example:
 
 .. code-block:: python
+
+    from antsibull_core import app_context
+    from antsibull_core.config import load_config
+
 
     def do_something():
         app_ctx = app_context.app_ctx.get()
@@ -44,16 +48,61 @@ example:
         return core_filename
 
     def run(args):
-        args = parsre_args(args)
+        args = parse_args(args)
         cfg = load_config(args.config_file)
         context_data = app_context.create_contexts(args=args, cfg=cfg)
+        with app_context.app_and_lib_context(context_data):
+            do_something()
+
+Extending AppContext
+====================
+
+Since antsibull-core 1.2.0, applications using antsibull-core can use their own extension
+of AppContext to better handle command line arguments, or handle additional configuration
+values in explicitly specified configuration files.  (The implicitly specified configuration
+files, ``/etc/antsibull.cfg`` and ``~/.antsibull.cfg``, cannot have extra keys to prevent
+incompatibility with other antsibull-core based applications.)
+
+For this, the application needs to create a derived class of :obj:`AppContext`, and pass
+it to :func:`antsibull_core.config.load_config` when loading the configuration.  Please
+note that :func:`antsibull_core.app_context.app_ctx.get` always returns the :obj:`AppContext`
+view of that extended app context, so applications should create their own ``app_context``
+module that provides itself a way to obtain the extended app context.  For example in
+antsibull-docs this is done as follows:
+
+.. code-block:: python
+
+    from antsibull_core.app_context import AppContextWrapper
+    from antsibull_docs.schemas.app_context import DocsAppContext
+
+    app_ctx: AppContextWrapper[DocsAppContext] = AppContextWrapper()
+
+In antsibull-docs, the extended app context (``DocsAppContext``) is then used as follows:
+
+.. code-block:: python
+
+    from antsibull_core.app_context import app_and_lib_context, create_contexts
+    from antsibull_core.config import load_config
+
+    from antsibull_docs import app_context
+    from antsibull_docs.schemas.app_context import DocsAppContext
+
+
+    def do_something():
+        app_ctx = app_context.app_ctx.get()
+        # collection_url is an option in DocsAppContext
+        print(f'collection_url configuration: {app_ctx.collection_url}')
+
+    def run(args):
+        args = parse_args(args)
+        cfg = load_config(args.config_file, app_context_model=DocsAppContext)
+        context_data = create_contexts(args=args, cfg=cfg)
         with app_and_lib_context(context_data):
             do_something()
 """
 
 import argparse
 import contextvars
-import functools
 import sys
 import typing as t
 from contextlib import contextmanager
@@ -67,13 +116,8 @@ if sys.version_info < (3, 7):
     import aiocontextvars  # noqa: F401, pylint:disable=unused-import
 
 
-#: Field names in the args and config whose value will be added to the app_ctx
-_FIELDS_IN_APP_CTX = frozenset(('ansible_base_url', 'breadcrumbs', 'galaxy_url', 'indexes',
-                                'logging_cfg', 'pypi_url', 'use_html_blobs', 'collection_cache'))
+AppContextT = t.TypeVar('AppContextT', bound=AppContext)
 
-#: Field names in the args and config whose value will be added to the lib_ctx
-_FIELDS_IN_LIB_CTX = frozenset(
-    ('chunksize', 'doc_parsing_backend', 'max_retries', 'process_max', 'thread_max'))
 
 #: lib_ctx should be restricted to things which do not belong in the API but an application or
 #: user might want to tweak.  Global, internal, incidental values are good to store here.  Things
@@ -109,9 +153,9 @@ lib_ctx: 'contextvars.ContextVar[LibContext]' = contextvars.ContextVar('lib_ctx'
 app_ctx: 'contextvars.ContextVar[AppContext]' = contextvars.ContextVar('app_ctx')
 
 
-class ContextReturn(t.NamedTuple):
+class ContextReturn(t.Generic[AppContextT]):
     """
-    NamedTuple for the return value of :func:`create_contexts`.
+    NamedTuple-like object for the return value of :func:`create_contexts`.
 
     The :func:`create_contexts` returns quite a bit of information.  This data structure organizes
     the information.
@@ -122,12 +166,39 @@ class ContextReturn(t.NamedTuple):
     :ivar args: An :python:obj:`argparse.Namespace` containing command line arguments that were not
         used to construct the contexts
     :ivar cfg: Configuration values which were not used to construct the contexts.
+
+    .. note:: unfortunately generic ``NamedTuple`` objects are not possible, so this is a generic
+              class that tries to behave as close as possible to a named tuple. Right now it does
+              not support comparisons though, if that is needed please create an issue in the
+              antsibull-core repository.
     """
 
-    app_ctx: AppContext
+    app_ctx: AppContextT
     lib_ctx: LibContext
     args: argparse.Namespace
     cfg: t.Dict
+
+    # pylint: disable-next=redefined-outer-name
+    def __init__(self, app_ctx: AppContextT, lib_ctx: LibContext,
+                 args: argparse.Namespace, cfg: t.Dict):
+        self.app_ctx = app_ctx
+        self.lib_ctx = lib_ctx
+        self.args = args
+        self.cfg = cfg
+
+    def __getitem__(self, index: int) -> t.Any:
+        if index == 0:
+            return self.app_ctx
+        if index == 1:
+            return self.lib_ctx
+        if index == 2:
+            return self.args
+        if index == 3:
+            return self.cfg
+        raise IndexError('tuple index out of range')
+
+    def __iter__(self) -> t.Iterable:
+        return (self.app_ctx, self.lib_ctx, self.args, self.cfg).__iter__()
 
 
 def _extract_context_values(known_fields, args: t.Optional[argparse.Namespace],
@@ -152,13 +223,30 @@ def _extract_context_values(known_fields, args: t.Optional[argparse.Namespace],
     return context_values
 
 
-_extract_lib_context_values = functools.partial(_extract_context_values, _FIELDS_IN_LIB_CTX)
-_extract_app_context_values = functools.partial(_extract_context_values, _FIELDS_IN_APP_CTX)
+@t.overload
+def create_contexts(args: t.Optional[argparse.Namespace] = None,
+                    cfg: t.Mapping = ImmutableDict(),
+                    use_extra: bool = True,
+                    ) -> ContextReturn[AppContext]:
+    ...
+
+
+@t.overload
+def create_contexts(args: t.Optional[argparse.Namespace] = None,
+                    cfg: t.Mapping = ImmutableDict(),
+                    use_extra: bool = True,
+                    *,
+                    app_context_model: t.Type[AppContextT],
+                    ) -> ContextReturn[AppContextT]:
+    ...
 
 
 def create_contexts(args: t.Optional[argparse.Namespace] = None,
                     cfg: t.Mapping = ImmutableDict(),
-                    use_extra: bool = True) -> ContextReturn:
+                    use_extra: bool = True,
+                    *,
+                    app_context_model=AppContext,
+                    ) -> ContextReturn:
     """
     Create new contexts appropriate for setting the app and lib context.
 
@@ -172,7 +260,9 @@ def create_contexts(args: t.Optional[argparse.Namespace] = None,
     :kwarg use_extra: When True, the default, all extra arguments and config values will be set as
         fields in ``app_ctx.extra``.  When False, the extra arguments and config values will be
         returned as part of the ContextReturn.
-    :returns: A ContextReturn NamedTuple.
+    :kwarg app_context_model: The model to use for the app context. Must be derived from
+        :obj:`AppContext`. If not provided, will use :obj:`AppContext` itself.
+    :returns: A ``ContextReturn`` object.
 
     .. warning::
         We cannot tell whether a user set a value via the command line if :python:mod:`argparse`
@@ -185,13 +275,16 @@ def create_contexts(args: t.Optional[argparse.Namespace] = None,
         If the field is only used via the :attr:`AppContext.extra` mechanism (not explictly set),
         then you should ignore this section and use :python:mod:`argparse`'s default mechanism.
     """
-    lib_values = _extract_lib_context_values(args, cfg)
-    app_values = _extract_app_context_values(args, cfg)
+    fields_in_lib_ctx = set(LibContext.__fields__)
+    fields_in_app_ctx = set(app_context_model.__fields__)
+    known_fields = fields_in_app_ctx.union(fields_in_lib_ctx)
+
+    lib_values = _extract_context_values(fields_in_lib_ctx, args, cfg)
+    app_values = _extract_context_values(fields_in_app_ctx, args, cfg)
 
     #
     # Save the unused values
     #
-    known_fields = _FIELDS_IN_APP_CTX.union(_FIELDS_IN_LIB_CTX)
 
     unused_cfg = {}
     if cfg:
@@ -211,7 +304,7 @@ def create_contexts(args: t.Optional[argparse.Namespace] = None,
     unused_args_ns = argparse.Namespace(**unused_args)
 
     # create new app and lib ctxt from the application's arguments and config.
-    local_app_ctx = AppContext(**app_values)
+    local_app_ctx = app_context_model(**app_values)
     local_lib_ctx = LibContext(**lib_values)
 
     return ContextReturn(
@@ -255,13 +348,24 @@ def lib_context(new_context: t.Optional[LibContext] = None) -> t.Generator[LibCo
     lib_ctx.reset(reset_token)
 
 
+@t.overload
 @contextmanager
-def app_context(new_context: t.Optional[AppContext] = None) -> t.Generator[AppContext, None, None]:
+def app_context() -> t.ContextManager[AppContext]:
+    ...
+
+
+@t.overload
+@contextmanager
+def app_context(new_context: AppContextT) -> t.ContextManager[AppContextT]:
+    ...
+
+
+@contextmanager
+def app_context(new_context=None):
     """
     Set up a new app_context.
 
-    :kwarg new_context: New app context to setup.  If this is None, the context is set to a copy of
-        the old context.
+    :kwarg new_context: New app context to setup.
     """
     if new_context is None:
         new_context = _copy_app_context()
@@ -273,8 +377,8 @@ def app_context(new_context: t.Optional[AppContext] = None) -> t.Generator[AppCo
 
 
 @contextmanager
-def app_and_lib_context(context_data: ContextReturn
-                        ) -> t.Generator[t.Tuple[AppContext, LibContext], None, None]:
+def app_and_lib_context(context_data: ContextReturn[AppContextT]
+                        ) -> t.Generator[t.Tuple[AppContextT, LibContext], None, None]:
     """
     Set the app and lib context at the same time.
 
@@ -291,6 +395,19 @@ def app_and_lib_context(context_data: ContextReturn
     with lib_context(context_data.lib_ctx) as new_lib_ctx:
         with app_context(context_data.app_ctx) as new_app_ctx:
             yield (new_app_ctx, new_lib_ctx)
+
+
+class AppContextWrapper(t.Generic[AppContextT]):
+    def __repr__(self):
+        return "<ContextVarWrapper name='app_ctx'>"
+
+    @property
+    def name(self):
+        return 'app_ctx'
+
+    @staticmethod
+    def get() -> AppContextT:
+        return t.cast(AppContextT, app_ctx.get())
 
 
 #
