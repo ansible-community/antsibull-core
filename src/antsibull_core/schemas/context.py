@@ -73,8 +73,10 @@ class AppContext(BaseModel):
     use_html_blobs: p.StrictBool = False
     collection_cache: t.Optional[str] = None
 
+    # pylint: disable-next=unused-private-member
     __convert_bools = p.validator('breadcrumbs', 'indexes', 'use_html_blobs',
                                   pre=True, allow_reuse=True)(convert_bool)
+    # pylint: disable-next=unused-private-member
     __convert_paths = p.validator('collection_cache',
                                   pre=True, allow_reuse=True)(convert_path)
 
@@ -106,4 +108,5 @@ class LibContext(BaseModel):
     thread_max: int = 8
     file_check_content: int = 262144
 
+    # pylint: disable-next=unused-private-member
     __convert_nones = p.validator('process_max', pre=True, allow_reuse=True)(convert_none)
