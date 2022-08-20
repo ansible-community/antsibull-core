@@ -1,2 +1,0 @@
-minor_changes:
-  - "Make config file management more flexible to allow project-specific config file format extensions for the explicitly passed configuration files (https://github.com/ansible-community/antsibull-core/pull/7)."

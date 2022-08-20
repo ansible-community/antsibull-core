@@ -40,3 +40,21 @@ releases:
     - 1.1.0.yml
     - 5-licenses.yml
     release_date: '2022-07-31'
+  1.2.0:
+    changes:
+      bugfixes:
+      - Adjust signature of ``DepsFile.write()`` to work around bug in antsibull (https://github.com/ansible-community/antsibull-core/pull/6).
+      deprecated_features:
+      - The ``DepsFile.write()`` method will require the first parameter to be a ``packaging.version.Version``
+        object, the second parameter to be a string, and the third parameter a mapping
+        of strings to strings, from antsibull-core 2.0.0 on (https://github.com/ansible-community/antsibull-core/pull/6).
+      minor_changes:
+      - Improve typing (https://github.com/ansible-community/antsibull-core/pull/6).
+      - Make config file management more flexible to allow project-specific config
+        file format extensions for the explicitly passed configuration files (https://github.com/ansible-community/antsibull-core/pull/7).
+      release_summary: Feature release.
+    fragments:
+    - 1.2.0.yml
+    - 6-typing.yml
+    - 7-config.yml
+    release_date: '2022-08-20'
