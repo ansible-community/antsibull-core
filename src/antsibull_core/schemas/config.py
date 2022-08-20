@@ -116,6 +116,7 @@ DEFAULT_LOGGING_CONFIG = LoggingModel.parse_obj(
      })
 
 
+# This class is no longer needed, it will eventually be removed
 class ConfigModel(BaseModel):
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
     ansible_base_url: p.HttpUrl = 'https://github.com/ansible/ansible'  # type: ignore[assignment]

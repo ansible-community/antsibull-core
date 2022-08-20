@@ -73,10 +73,10 @@ class AppContext(BaseModel):
     use_html_blobs: p.StrictBool = False
     collection_cache: t.Optional[str] = None
 
-    _convert_bools = p.validator('breadcrumbs', 'indexes', 'use_html_blobs',
-                                 pre=True, allow_reuse=True)(convert_bool)
-    _convert_paths = p.validator('collection_cache',
-                                 pre=True, allow_reuse=True)(convert_path)
+    _antsibull_core_convert_bools = p.validator('breadcrumbs', 'indexes', 'use_html_blobs',
+                                                pre=True, allow_reuse=True)(convert_bool)
+    _antsibull_core_convert_paths = p.validator('collection_cache',
+                                                pre=True, allow_reuse=True)(convert_path)
 
 
 class LibContext(BaseModel):

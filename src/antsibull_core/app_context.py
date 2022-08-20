@@ -53,7 +53,6 @@ example:
 
 import argparse
 import contextvars
-import functools
 import sys
 import typing as t
 from contextlib import contextmanager
@@ -67,13 +66,8 @@ if sys.version_info < (3, 7):
     import aiocontextvars  # noqa: F401, pylint:disable=unused-import
 
 
-#: Field names in the args and config whose value will be added to the app_ctx
-_FIELDS_IN_APP_CTX = frozenset(('ansible_base_url', 'breadcrumbs', 'galaxy_url', 'indexes',
-                                'logging_cfg', 'pypi_url', 'use_html_blobs', 'collection_cache'))
+AppContextT = t.TypeVar('AppContextT', bound=AppContext)
 
-#: Field names in the args and config whose value will be added to the lib_ctx
-_FIELDS_IN_LIB_CTX = frozenset(
-    ('chunksize', 'doc_parsing_backend', 'max_retries', 'process_max', 'thread_max'))
 
 #: lib_ctx should be restricted to things which do not belong in the API but an application or
 #: user might want to tweak.  Global, internal, incidental values are good to store here.  Things
@@ -109,7 +103,7 @@ lib_ctx: 'contextvars.ContextVar[LibContext]' = contextvars.ContextVar('lib_ctx'
 app_ctx: 'contextvars.ContextVar[AppContext]' = contextvars.ContextVar('app_ctx')
 
 
-class ContextReturn(t.NamedTuple):
+class ContextReturn(t.Generic[AppContextT]):
     """
     NamedTuple for the return value of :func:`create_contexts`.
 
@@ -124,10 +118,18 @@ class ContextReturn(t.NamedTuple):
     :ivar cfg: Configuration values which were not used to construct the contexts.
     """
 
-    app_ctx: AppContext
+    app_ctx: AppContextT
     lib_ctx: LibContext
     args: argparse.Namespace
     cfg: t.Dict
+
+    # pylint: disable-next=redefined-outer-name
+    def __init__(self, app_ctx: AppContextT, lib_ctx: LibContext,
+                 args: argparse.Namespace, cfg: t.Dict):
+        self.app_ctx = app_ctx
+        self.lib_ctx = lib_ctx
+        self.args = args
+        self.cfg = cfg
 
 
 def _extract_context_values(known_fields, args: t.Optional[argparse.Namespace],
@@ -152,13 +154,30 @@ def _extract_context_values(known_fields, args: t.Optional[argparse.Namespace],
     return context_values
 
 
-_extract_lib_context_values = functools.partial(_extract_context_values, _FIELDS_IN_LIB_CTX)
-_extract_app_context_values = functools.partial(_extract_context_values, _FIELDS_IN_APP_CTX)
+@t.overload
+def create_contexts(args: t.Optional[argparse.Namespace] = None,
+                    cfg: t.Mapping = ImmutableDict(),
+                    use_extra: bool = True,
+                    ) -> ContextReturn[AppContext]:
+    ...
+
+
+@t.overload
+def create_contexts(args: t.Optional[argparse.Namespace] = None,
+                    cfg: t.Mapping = ImmutableDict(),
+                    use_extra: bool = True,
+                    *,
+                    app_context_model: t.Type[AppContextT],
+                    ) -> ContextReturn[AppContextT]:
+    ...
 
 
 def create_contexts(args: t.Optional[argparse.Namespace] = None,
                     cfg: t.Mapping = ImmutableDict(),
-                    use_extra: bool = True) -> ContextReturn:
+                    use_extra: bool = True,
+                    *,
+                    app_context_model=AppContext,
+                    ) -> ContextReturn:
     """
     Create new contexts appropriate for setting the app and lib context.
 
@@ -172,7 +191,9 @@ def create_contexts(args: t.Optional[argparse.Namespace] = None,
     :kwarg use_extra: When True, the default, all extra arguments and config values will be set as
         fields in ``app_ctx.extra``.  When False, the extra arguments and config values will be
         returned as part of the ContextReturn.
-    :returns: A ContextReturn NamedTuple.
+    :kwarg app_context_model: The model to use for the app context. Must be derived from
+        :obj:`AppContext`. If not provided, will use :obj:`AppContext` itself.
+    :returns: A ``ContextReturn`` object.
 
     .. warning::
         We cannot tell whether a user set a value via the command line if :python:mod:`argparse`
@@ -185,13 +206,16 @@ def create_contexts(args: t.Optional[argparse.Namespace] = None,
         If the field is only used via the :attr:`AppContext.extra` mechanism (not explictly set),
         then you should ignore this section and use :python:mod:`argparse`'s default mechanism.
     """
-    lib_values = _extract_lib_context_values(args, cfg)
-    app_values = _extract_app_context_values(args, cfg)
+    fields_in_lib_ctx = set(LibContext.__fields__)
+    fields_in_app_ctx = set(app_context_model.__fields__)
+    known_fields = fields_in_app_ctx.union(fields_in_lib_ctx)
+
+    lib_values = _extract_context_values(fields_in_lib_ctx, args, cfg)
+    app_values = _extract_context_values(fields_in_app_ctx, args, cfg)
 
     #
     # Save the unused values
     #
-    known_fields = _FIELDS_IN_APP_CTX.union(_FIELDS_IN_LIB_CTX)
 
     unused_cfg = {}
     if cfg:
@@ -211,7 +235,7 @@ def create_contexts(args: t.Optional[argparse.Namespace] = None,
     unused_args_ns = argparse.Namespace(**unused_args)
 
     # create new app and lib ctxt from the application's arguments and config.
-    local_app_ctx = AppContext(**app_values)
+    local_app_ctx = app_context_model(**app_values)
     local_lib_ctx = LibContext(**lib_values)
 
     return ContextReturn(
@@ -256,16 +280,12 @@ def lib_context(new_context: t.Optional[LibContext] = None) -> t.Generator[LibCo
 
 
 @contextmanager
-def app_context(new_context: t.Optional[AppContext] = None) -> t.Generator[AppContext, None, None]:
+def app_context(new_context: AppContextT) -> t.Generator[AppContextT, None, None]:
     """
     Set up a new app_context.
 
-    :kwarg new_context: New app context to setup.  If this is None, the context is set to a copy of
-        the old context.
+    :kwarg new_context: New app context to setup.
     """
-    if new_context is None:
-        new_context = _copy_app_context()
-
     reset_token = app_ctx.set(new_context)
     yield new_context
 
@@ -273,8 +293,8 @@ def app_context(new_context: t.Optional[AppContext] = None) -> t.Generator[AppCo
 
 
 @contextmanager
-def app_and_lib_context(context_data: ContextReturn
-                        ) -> t.Generator[t.Tuple[AppContext, LibContext], None, None]:
+def app_and_lib_context(context_data: ContextReturn[AppContextT]
+                        ) -> t.Generator[t.Tuple[AppContextT, LibContext], None, None]:
     """
     Set the app and lib context at the same time.
 
@@ -291,6 +311,19 @@ def app_and_lib_context(context_data: ContextReturn
     with lib_context(context_data.lib_ctx) as new_lib_ctx:
         with app_context(context_data.app_ctx) as new_app_ctx:
             yield (new_app_ctx, new_lib_ctx)
+
+
+class AppContextWrapper(t.Generic[AppContextT]):
+    def __repr__(self):
+        return "<ContextVarWrapper name='app_ctx'>"
+
+    @property
+    def name(self):
+        return 'app_ctx'
+
+    @staticmethod
+    def get() -> AppContextT:
+        return t.cast(AppContextT, app_ctx.get())
 
 
 #

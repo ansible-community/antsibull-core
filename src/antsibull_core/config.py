@@ -14,6 +14,7 @@ import pydantic as p
 
 from .logging import log
 from .schemas.config import ConfigModel
+from .schemas.context import AppContext, LibContext
 
 
 mlog = log.fields(mod=__name__)
@@ -75,8 +76,35 @@ def read_config(filename: str) -> ConfigModel:
     return raw_config_data
 
 
+def validate_config(config: t.Mapping, filenames: t.List[str],
+                    app_context_model: t.Type[AppContext]) -> None:
+    """
+    Validate configuration.
+
+    Given the configuration loaded from one or more configuration files and the app context model,
+    splits up the config into lib context and app context part and validates both parts with the
+    given model. Raises a :obj:`ConfigError` if validation fails.
+    """
+    lib_fields = set(LibContext.__fields__)
+    lib = {}
+    app = {}
+    for key, value in config.items():
+        if key in lib_fields:
+            lib[key] = value
+        else:
+            app[key] = value
+    # Note: We parse the object but discard the model because we want to validate the config but let
+    # the context handle all setting of defaults
+    try:
+        LibContext.parse_obj(lib)
+        app_context_model.parse_obj(app)
+    except p.ValidationError as exc:
+        raise ConfigError(
+            f"Error while parsing configuration from {', '.join(filenames)}:\n{exc}") from exc
+
+
 def load_config(conf_files: t.Union[t.Iterable[str], str, None] = None,
-                config_model: t.Type[ConfigModel] = ConfigModel) -> t.Dict:
+                app_context_model: t.Type[AppContext] = AppContext) -> t.Dict:
     """
     Load configuration.
 
@@ -99,19 +127,11 @@ def load_config(conf_files: t.Union[t.Iterable[str], str, None] = None,
     user_config_file = os.path.expanduser(USER_CONFIG_FILE)
     available_files = find_config_files(itertools.chain((SYSTEM_CONFIG_FILE, user_config_file),
                                                         conf_files))
-
-    includes = list(available_files)
+    flog.fields(filenames=available_files).debug('found config files')
 
     flog.debug('loading config files')
-    # Perky has some bugs that prevent this simple way from working:
-    # https://github.com/ansible-community/antsibull/pull/118
-    # cfg = {'includes': includes}
-    # cfg = perky.includes(cfg, recursive=True)
-
-    # Workaround for above bug.  Note that includes specified in the config files will not work
-    # but we can just add that as a new feature when perky gets it working.
     cfg = {}
-    for filename in includes:
+    for filename in available_files:
         try:
             new_cfg = perky.load(filename)
         except OSError as exc:
@@ -123,13 +143,7 @@ def load_config(conf_files: t.Union[t.Iterable[str], str, None] = None,
         cfg.update(new_cfg)
 
     flog.debug('validating configuration')
-    # Note: We parse the object but discard the model because we want to validate the config but let
-    # the context handle all setting of defaults
-    try:
-        config_model.parse_obj(cfg)
-    except p.ValidationError as exc:
-        raise ConfigError(
-            f"Error while parsing configuration from {', '.join(includes)}:\n{exc}") from exc
+    validate_config(cfg, available_files, app_context_model)
 
     flog.fields(config=cfg).debug('Leave')
     return cfg
