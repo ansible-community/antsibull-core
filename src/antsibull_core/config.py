@@ -5,7 +5,6 @@
 # SPDX-FileCopyrightText: 2020, Ansible Project
 """Functions to handle config files."""
 
-import itertools
 import os.path
 import typing as t
 
@@ -103,6 +102,20 @@ def validate_config(config: t.Mapping, filenames: t.List[str],
             f"Error while parsing configuration from {', '.join(filenames)}:\n{exc}") from exc
 
 
+def _load_config_file(filename: str) -> t.Mapping:
+    """
+    Load configuration from one file and return the raw data.
+    """
+    try:
+        return perky.load(filename)
+    except OSError as exc:
+        raise ConfigError(
+            f"Error while loading configuration from {filename}: {exc}") from exc
+    except perky.PerkyFormatError as exc:
+        raise ConfigError(
+            f"Error while parsing configuration from {filename}:\n{exc}") from exc
+
+
 def load_config(conf_files: t.Union[t.Iterable[str], str, None] = None,
                 app_context_model: t.Type[AppContext] = AppContext) -> t.Dict:
     """
@@ -124,26 +137,26 @@ def load_config(conf_files: t.Union[t.Iterable[str], str, None] = None,
     elif conf_files is None:
         conf_files = ()
 
-    user_config_file = os.path.expanduser(USER_CONFIG_FILE)
-    available_files = find_config_files(itertools.chain((SYSTEM_CONFIG_FILE, user_config_file),
-                                                        conf_files))
-    flog.fields(filenames=available_files).debug('found config files')
+    implicit_files = find_config_files((SYSTEM_CONFIG_FILE, os.path.expanduser(USER_CONFIG_FILE)))
+    explicit_files = find_config_files(conf_files)
 
-    flog.debug('loading config files')
+    flog.fields(implicit_files=implicit_files,
+                explicit_files=explicit_files).debug('found config files')
+
+    flog.debug('loading implicit config files')
     cfg = {}
-    for filename in available_files:
-        try:
-            new_cfg = perky.load(filename)
-        except OSError as exc:
-            raise ConfigError(
-                f"Error while loading configuration from {filename}: {exc}") from exc
-        except perky.PerkyFormatError as exc:
-            raise ConfigError(
-                f"Error while parsing configuration from {filename}:\n{exc}") from exc
-        cfg.update(new_cfg)
+    for filename in implicit_files:
+        cfg.update(_load_config_file(filename))
 
-    flog.debug('validating configuration')
-    validate_config(cfg, available_files, app_context_model)
+    flog.debug('validating implicit configuration')
+    validate_config(cfg, implicit_files, AppContext)
+
+    flog.debug('loading explicit config files')
+    for filename in explicit_files:
+        cfg.update(_load_config_file(filename))
+
+    flog.debug('validating combined configuration')
+    validate_config(cfg, implicit_files + explicit_files, app_context_model)
 
     flog.fields(config=cfg).debug('Leave')
     return cfg
