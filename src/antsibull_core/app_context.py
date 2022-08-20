@@ -131,6 +131,20 @@ class ContextReturn(t.Generic[AppContextT]):
         self.args = args
         self.cfg = cfg
 
+    def __getitem__(self, index: int) -> t.Any:
+        if index == 0:
+            return self.app_ctx
+        if index == 1:
+            return self.lib_ctx
+        if index == 2:
+            return self.args
+        if index == 3:
+            return self.cfg
+        raise IndexError('tuple index out of range')
+
+    def __iter__(self) -> t.Iterable:
+        return (self.app_ctx, self.lib_ctx, self.args, self.cfg).__iter__()
+
 
 def _extract_context_values(known_fields, args: t.Optional[argparse.Namespace],
                             cfg: t.Mapping = ImmutableDict()) -> t.Dict:
@@ -279,13 +293,28 @@ def lib_context(new_context: t.Optional[LibContext] = None) -> t.Generator[LibCo
     lib_ctx.reset(reset_token)
 
 
+@t.overload
 @contextmanager
-def app_context(new_context: AppContextT) -> t.Generator[AppContextT, None, None]:
+def app_context() -> t.ContextManager[AppContext]:
+    ...
+
+
+@t.overload
+@contextmanager
+def app_context(new_context: AppContextT) -> t.ContextManager[AppContextT]:
+    ...
+
+
+@contextmanager
+def app_context(new_context=None):
     """
     Set up a new app_context.
 
     :kwarg new_context: New app context to setup.
     """
+    if new_context is None:
+        new_context = _copy_app_context()
+
     reset_token = app_ctx.set(new_context)
     yield new_context
 

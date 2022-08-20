@@ -144,7 +144,7 @@ def load_config(conf_files: t.Union[t.Iterable[str], str, None] = None,
                 explicit_files=explicit_files).debug('found config files')
 
     flog.debug('loading implicit config files')
-    cfg = {}
+    cfg: t.Dict = {}
     for filename in implicit_files:
         cfg.update(_load_config_file(filename))
 
