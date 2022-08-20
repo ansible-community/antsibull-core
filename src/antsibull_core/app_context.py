@@ -29,14 +29,18 @@ targets Python3.7 and above, there is no such limitation.
 Setup
 =====
 
-Importing antsibull.app_context will setup a default context with default values for the library to
-use.  The application should initialize a new context with user overriding values by calling
-:func:`antsibull.app_context.create_contexts` with command line args and configuration data.  The
+Importing antsibull_core.app_context will setup a default context with default values for the library
+to use.  The application should initialize a new context with user overriding values by calling
+:func:`antsibull_core.app_context.create_contexts` with command line args and configuration data.  The
 data from those will be used to initialize a new app_ctx and new lib_ctx.  The application can then
 use the context managers to utilize these contexts before calling any further antsibull code.  An
 example:
 
 .. code-block:: python
+
+    from antsibull_core import app_context
+    from antsibull_core.config import load_config
+
 
     def do_something():
         app_ctx = app_context.app_ctx.get()
@@ -44,9 +48,55 @@ example:
         return core_filename
 
     def run(args):
-        args = parsre_args(args)
+        args = parse_args(args)
         cfg = load_config(args.config_file)
         context_data = app_context.create_contexts(args=args, cfg=cfg)
+        with app_context.app_and_lib_context(context_data):
+            do_something()
+
+Extending AppContext
+====================
+
+Since antsibull-core 1.2.0, applications using antsibull-core can use their own extension
+of AppContext to better handle command line arguments, or handle additional configuration
+values in explicitly specified configuration files.  (The implicitly specified configuration
+files, ``/etc/antsibull.cfg`` and ``~/.antsibull.cfg``, cannot have extra keys to prevent
+incompatibility with other antsibull-core based applications.)
+
+For this, the application needs to create a derived class of :obj:`AppContext`, and pass
+it to :func:`antsibull_core.config.load_config` when loading the configuration.  Please
+note that :func:`antsibull_core.app_context.app_ctx.get` always returns the :obj:`AppContext`
+view of that extended app context, so applications should create their own ``app_context``
+module that provides itself a way to obtain the extended app context.  For example in
+antsibull-docs this is done as follows:
+
+.. code-block:: python
+
+    from antsibull_core.app_context import AppContextWrapper
+    from antsibull_docs.schemas.app_context import DocsAppContext
+
+    app_ctx: AppContextWrapper[DocsAppContext] = AppContextWrapper()
+
+In antsibull-docs, the extended app context (``DocsAppContext``) is then used as follows:
+
+.. code-block:: python
+
+    from antsibull_core.app_context import app_and_lib_context, create_contexts
+    from antsibull_core.config import load_config
+
+    from antsibull_docs import app_context
+    from antsibull_docs.schemas.app_context import DocsAppContext
+
+
+    def do_something():
+        app_ctx = app_context.app_ctx.get()
+        # collection_url is an option in DocsAppContext
+        print(f'collection_url configuration: {app_ctx.collection_url}')
+
+    def run(args):
+        args = parse_args(args)
+        cfg = load_config(args.config_file, app_context_model=DocsAppContext)
+        context_data = create_contexts(args=args, cfg=cfg)
         with app_and_lib_context(context_data):
             do_something()
 """
@@ -105,7 +155,7 @@ app_ctx: 'contextvars.ContextVar[AppContext]' = contextvars.ContextVar('app_ctx'
 
 class ContextReturn(t.Generic[AppContextT]):
     """
-    NamedTuple for the return value of :func:`create_contexts`.
+    NamedTuple-like object for the return value of :func:`create_contexts`.
 
     The :func:`create_contexts` returns quite a bit of information.  This data structure organizes
     the information.
@@ -116,6 +166,11 @@ class ContextReturn(t.Generic[AppContextT]):
     :ivar args: An :python:obj:`argparse.Namespace` containing command line arguments that were not
         used to construct the contexts
     :ivar cfg: Configuration values which were not used to construct the contexts.
+
+    .. note:: unfortunately generic ``NamedTuple`` objects are not possible, so this is a generic
+              class that tries to behave as close as possible to a named tuple. Right now it does
+              not support comparisons though, if that is needed please create an issue in the
+              antsibull-core repository.
     """
 
     app_ctx: AppContextT

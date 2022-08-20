@@ -127,6 +127,8 @@ def load_config(conf_files: t.Union[t.Iterable[str], str, None] = None,
     those same keys in earlier files.
 
     :arg conf_files: An iterable of conf_files to load configuration information from.
+    :kwarg app_context_model: The model to use for the app context. Must be derived from
+        :obj:`AppContext`. If not provided, will use :obj:`AppContext` itself.
     :returns: A dict containing the configuration.
     """
     flog = mlog.fields(func='load_config')
