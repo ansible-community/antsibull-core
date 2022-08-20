@@ -29,12 +29,12 @@ targets Python3.7 and above, there is no such limitation.
 Setup
 =====
 
-Importing antsibull_core.app_context will setup a default context with default values for the library
-to use.  The application should initialize a new context with user overriding values by calling
-:func:`antsibull_core.app_context.create_contexts` with command line args and configuration data.  The
-data from those will be used to initialize a new app_ctx and new lib_ctx.  The application can then
-use the context managers to utilize these contexts before calling any further antsibull code.  An
-example:
+Importing antsibull_core.app_context will setup a default context with default values for the
+library to use.  The application should initialize a new context with user overriding values by
+calling :func:`antsibull_core.app_context.create_contexts` with command line args and
+configuration data.  The data from those will be used to initialize a new ``app_ctx`` and new
+``lib_ctx``.  The application can then use the context managers to utilize these contexts before
+calling any further antsibull code.  An example:
 
 .. code-block:: python
 
