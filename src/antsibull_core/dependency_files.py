@@ -115,7 +115,8 @@ class DepsFile:
 
     def write(self, ansible_version: Union[str, 'PypiVer'],
               ansible_core_version: Union[str, 'PypiVer'],
-              included_versions: Union[Mapping[str, str], Mapping[str, 'SemVer']]) -> None:
+              included_versions: Union[Mapping[str, str], Mapping[str, 'SemVer']],
+              python_requires: Optional[str] = None) -> None:
         """
         Write a list of all the dependent collections included in this Ansible release.
 
@@ -123,6 +124,7 @@ class DepsFile:
         :arg ansible_core_version: The version of Ansible-core that will be depended on.
         :arg included_versions: Dictionary mapping collection names to the version range in this
             version of Ansible.
+        :arg python_requires: A python_requires string. Will be stored as ``_python``.
 
         WARNING: This function will no longer accept version objects in the ansible_core_version
                  and included_versions parameters, and will require a PypiVer object in the
@@ -142,6 +144,8 @@ class DepsFile:
                 f.write(f'_ansible_core_version: {ansible_core_version}\n')
             else:
                 f.write(f'_ansible_base_version: {ansible_core_version}\n')
+            if python_requires is not None:
+                f.write(f'_python: {python_requires}\n')
             f.write('\n'.join(records))
             f.write('\n')
 
@@ -155,7 +159,8 @@ class BuildFile:
         return _parse_name_version_spec_file(self.filename)
 
     def write(self, ansible_version: 'PypiVer', ansible_core_version: str,
-              dependencies: Mapping[str, 'SemVer']) -> None:
+              dependencies: Mapping[str, 'SemVer'],
+              python_requires: Optional[str] = None) -> None:
         """
         Write a build dependency file.
 
@@ -168,6 +173,7 @@ class BuildFile:
         :arg ansible_core_version: The version of Ansible-core that will be depended on.
         :arg dependencies: Dictionary with keys of collection names and values of the latest
             versions of those collections.
+        :arg python_requires: A python_requires string. Will be stored as ``_python``.
         """
         records = []
         for dep, version in dependencies.items():
@@ -190,5 +196,7 @@ class BuildFile:
                 f.write(f'_ansible_core_version: {ansible_core_version}\n')
             else:
                 f.write(f'_ansible_base_version: {ansible_core_version}\n')
+            if python_requires is not None:
+                f.write(f'_python: {python_requires}\n')
             f.write('\n'.join(records))
             f.write('\n')
