@@ -1,0 +1,2 @@
+minor_changes:
+  - "Allow to write Python dependencies as ``_python`` key into build and dependency files (https://github.com/ansible-community/antsibull-core/pull/10)."
