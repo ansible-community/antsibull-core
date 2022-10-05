@@ -71,3 +71,13 @@ releases:
     - 10-python_requires.yml
     - 11-copy-fix.yml
     release_date: '2022-10-05'
+  1.3.0.post0:
+    changes:
+      release_summary: Erroneously released version.
+    release_date: '2022-10-05'
+  1.3.1:
+    changes:
+      release_summary: Maintenance release to fix unwanted ``1.3.0.post0`` release.
+    fragments:
+    - 1.3.1.yml
+    release_date: '2022-10-05'

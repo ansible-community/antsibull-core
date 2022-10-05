@@ -5,6 +5,14 @@ antsibull-core Release Notes
 .. contents:: Topics
 
 
+v1.3.1
+======
+
+Release Summary
+---------------
+
+Maintenance release to fix unwanted ``1.3.0.post0`` release.
+
 v1.3.0
 ======
 
