@@ -47,7 +47,7 @@ async def copy_file(source_path: str, dest_path: str) -> None:
                     # Since we already read the contents of the file to copy, simply write it to
                     # the destination instead of reading it again
                     async with aiofiles.open(dest_path, 'wb') as f_out:
-                        f_out.write(content_to_copy)
+                        await f_out.write(content_to_copy)
                     return
         except FileNotFoundError:
             # Destination (or source) file does not exist
