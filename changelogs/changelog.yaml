@@ -58,3 +58,16 @@ releases:
     - 6-typing.yml
     - 7-config.yml
     release_date: '2022-08-20'
+  1.3.0:
+    changes:
+      bugfixes:
+      - Fix async file copying helper (https://github.com/ansible-community/antsibull-core/pull/11).
+      minor_changes:
+      - Allow to write Python dependencies as ``_python`` key into build and dependency
+        files (https://github.com/ansible-community/antsibull-core/pull/10).
+      release_summary: Feature and bugfix release.
+    fragments:
+    - 1.3.0.yml
+    - 10-python_requires.yml
+    - 11-copy-fix.yml
+    release_date: '2022-10-05'

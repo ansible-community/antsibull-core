@@ -5,6 +5,24 @@ antsibull-core Release Notes
 .. contents:: Topics
 
 
+v1.3.0
+======
+
+Release Summary
+---------------
+
+Feature and bugfix release.
+
+Minor Changes
+-------------
+
+- Allow to write Python dependencies as ``_python`` key into build and dependency files (https://github.com/ansible-community/antsibull-core/pull/10).
+
+Bugfixes
+--------
+
+- Fix async file copying helper (https://github.com/ansible-community/antsibull-core/pull/11).
+
 v1.2.0
 ======
 
