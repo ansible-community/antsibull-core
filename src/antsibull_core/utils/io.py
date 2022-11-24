@@ -7,6 +7,7 @@
 
 import os
 import os.path
+import typing as t
 
 import aiofiles
 
@@ -14,10 +15,15 @@ from .. import app_context
 from ..logging import log
 
 
+if t.TYPE_CHECKING:
+    # TODO PY3.8: Use __future__.annotations instead of quoting annotations
+    # pylint:disable=unused-import
+    from _typeshed import StrOrBytesPath
+
 mlog = log.fields(mod=__name__)
 
 
-async def copy_file(source_path: str, dest_path: str) -> None:
+async def copy_file(source_path: "StrOrBytesPath", dest_path: "StrOrBytesPath") -> None:
     """
     Copy content from one file to another.
 
@@ -64,7 +70,7 @@ async def copy_file(source_path: str, dest_path: str) -> None:
     flog.debug('Leave')
 
 
-async def write_file(filename: str, content: str) -> None:
+async def write_file(filename: "StrOrBytesPath", content: str) -> None:
     flog = mlog.fields(func='write_file')
     flog.debug('Enter')
 
@@ -93,7 +99,7 @@ async def write_file(filename: str, content: str) -> None:
     flog.debug('Leave')
 
 
-async def read_file(filename: str, encoding: str = 'utf-8') -> str:
+async def read_file(filename: "StrOrBytesPath", encoding: str = 'utf-8') -> str:
     flog = mlog.fields(func='read_file')
     flog.debug('Enter')
 
