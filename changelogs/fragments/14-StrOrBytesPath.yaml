@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - Fix overly restrictive file name type annotations. Use ``StrOrBytesPath``
+    type annotation instead of ``str`` for functions that accept a file name
+    (https://github.com/ansible-community/antsibull-core/pull/14).
