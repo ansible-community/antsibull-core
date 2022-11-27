@@ -1,4 +1,0 @@
----
-bugfixes:
-  - Remove use of blocking IO in an async function
-    (https://github.com/ansible-community/antsibull-core/pull/13/).

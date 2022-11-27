@@ -5,6 +5,24 @@ antsibull-core Release Notes
 .. contents:: Topics
 
 
+v1.4.0
+======
+
+Release Summary
+---------------
+
+Bugfix and feature release.
+
+Minor Changes
+-------------
+
+- Fix overly restrictive file name type annotations. Use ``StrOrBytesPath`` type annotation instead of ``str`` for functions that accept a file name (https://github.com/ansible-community/antsibull-core/pull/14).
+
+Bugfixes
+--------
+
+- Remove use of blocking IO in an async function (https://github.com/ansible-community/antsibull-core/pull/13/).
+
 v1.3.1
 ======
 
@@ -12,6 +30,14 @@ Release Summary
 ---------------
 
 Maintenance release to fix unwanted ``1.3.0.post0`` release.
+
+v1.3.0.post0
+============
+
+Release Summary
+---------------
+
+Erroneously released version.
 
 v1.3.0
 ======
