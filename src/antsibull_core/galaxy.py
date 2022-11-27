@@ -10,6 +10,7 @@ import shutil
 import typing as t
 from urllib.parse import urljoin
 
+import aiofiles
 import semantic_version as semver
 
 from . import app_context
@@ -258,12 +259,12 @@ class CollectionDownloader(GalaxyClient):
             if response.status == 404:
                 raise NoSuchCollection(f'No collection found at: {release_url}')
 
-            with open(download_filename, 'wb') as f:
+            async with aiofiles.open(download_filename, 'wb') as f:
                 lib_ctx = app_context.lib_ctx.get()
                 # TODO: PY3.8: while chunk := await response.content.read(lib_ctx.chunksize):
                 chunk = await response.content.read(lib_ctx.chunksize)
                 while chunk:
-                    f.write(chunk)
+                    await f.write(chunk)
                     chunk = await response.content.read(lib_ctx.chunksize)
 
         # Verify the download
