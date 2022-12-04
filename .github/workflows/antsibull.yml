@@ -38,7 +38,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ansible-community/antsibull
-          ref: 0.52.0
+          # ref: 0.52.0 TODO
+          ref: main
           path: antsibull
 
       - name: Set up Python 3.11
