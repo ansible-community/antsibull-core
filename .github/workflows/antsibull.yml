@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Run some antsibull 0.44.0 tests against the current development version of antsibull-core
+# Run some antsibull 0.52.0 tests against the current development version of antsibull-core
 # to make sure we don't accidentally break compatibility.
 
 name: antsibull compatibility
@@ -26,15 +26,7 @@ jobs:
         with:
           path: antsibull-core
 
-      # antsibull 0.44.0 depends on antsibull-docs >= 1.0.0 as well, so install 1.0.0 of that
-      - name: Check out antsibull-docs 1.0.0
-        uses: actions/checkout@v3
-        with:
-          repository: ansible-community/antsibull-docs
-          ref: 1.0.0
-          path: antsibull-docs
-
-      # antsibull 0.44.0 depends on antsibull-changelog >= 0.14.0 as well, so install 0.14.0 of that
+      # antsibull 0.52.0 depends on antsibull-changelog >= 0.14.0 as well, so install 0.14.0 of that
       - name: Check out antsibull-changelog 0.14.0
         uses: actions/checkout@v3
         with:
@@ -42,17 +34,17 @@ jobs:
           ref: 0.14.0
           path: antsibull-changelog
 
-      - name: Check out antsibull 0.44.0
+      - name: Check out antsibull 0.52.0
         uses: actions/checkout@v3
         with:
           repository: ansible-community/antsibull
-          ref: 0.44.0
+          ref: 0.52.0
           path: antsibull
 
-      - name: Set up Python 3.10
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
@@ -69,8 +61,7 @@ jobs:
           ./lint-pyre.sh
         working-directory: antsibull
 
-      # We use Ansible 5 here since antsibull 0.44.0 is not compatible with the latest Ansible 6 releases (due to _python in .deps files)
-      - name: "Test building a release: Ansible 5 with ansible-core devel"
+      - name: "Test building a release: Ansible 7 with ansible-core devel"
         run: |
-          ansible-playbook -vv playbooks/build-single-release.yaml -e 'antsibull_build_command="poetry run antsibull-build"' -e antsibull_ansible_version=5.99.0 -e antsibull_build_file=ansible-5.build -e antsibull_data_dir="{{ antsibull_data_git_dir }}/5" -e antsibull_ansible_git_version=devel
+          ansible-playbook -vv playbooks/build-single-release.yaml -e 'antsibull_build_command="poetry run antsibull-build"' -e antsibull_ansible_version=7.99.0 -e antsibull_build_file=ansible-7.build -e antsibull_data_dir="{{ antsibull_data_git_dir }}/7" -e antsibull_ansible_git_version=devel
         working-directory: antsibull
