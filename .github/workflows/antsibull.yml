@@ -56,6 +56,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          ansible-galaxy collection install community.general
           python -m pip install --upgrade pip
           python -m pip install ansible-core poetry
           poetry install
