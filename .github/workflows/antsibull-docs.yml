@@ -34,6 +34,10 @@ jobs:
           ref: main
           path: antsibull-docs
 
+      - name: Bump minimum Python requirement of antsibull-docs
+        run:
+          sed -i -e 's/^python = .*/python = "^3.9"/' antsibull-docs/pyproject.toml
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
