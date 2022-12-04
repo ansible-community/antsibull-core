@@ -61,11 +61,8 @@ async def copy_file(source_path: "StrOrBytesPath", dest_path: "StrOrBytesPath") 
 
     async with aiofiles.open(source_path, 'rb') as f_in:
         async with aiofiles.open(dest_path, 'wb') as f_out:
-            # TODO: PY3.8: while chunk := await f.read(lib_ctx.chunksize)
-            chunk = await f_in.read(lib_ctx.chunksize)
-            while chunk:
+            while chunk := await f_in.read(lib_ctx.chunksize):
                 await f_out.write(chunk)
-                chunk = await f_in.read(lib_ctx.chunksize)
 
     flog.debug('Leave')
 

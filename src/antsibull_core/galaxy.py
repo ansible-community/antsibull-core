@@ -225,8 +225,7 @@ class CollectionDownloader(GalaxyClient):
         """
         super().__init__(aio_session, galaxy_server)
         self.download_dir = download_dir
-        # TODO: PY3.8: self.collection_cache: t.Final[t.Optional[str]] = collection_cache
-        self.collection_cache = collection_cache
+        self.collection_cache: t.Final[t.Optional[str]] = collection_cache
 
     async def download(self, collection: str, version: t.Union[str, semver.Version], ) -> str:
         """
@@ -247,8 +246,7 @@ class CollectionDownloader(GalaxyClient):
 
         if self.collection_cache:
             if release_info['artifact']['filename'] in os.listdir(self.collection_cache):
-                # TODO: PY3.8: We can use t.Final in __init__ instead of cast here.
-                cached_copy = os.path.join(t.cast(str, self.collection_cache),
+                cached_copy = os.path.join(self.collection_cache,
                                            release_info['artifact']['filename'])
                 if await verify_hash(cached_copy, sha256sum):
                     shutil.copyfile(cached_copy, download_filename)
@@ -261,11 +259,8 @@ class CollectionDownloader(GalaxyClient):
 
             async with aiofiles.open(download_filename, 'wb') as f:
                 lib_ctx = app_context.lib_ctx.get()
-                # TODO: PY3.8: while chunk := await response.content.read(lib_ctx.chunksize):
-                chunk = await response.content.read(lib_ctx.chunksize)
-                while chunk:
+                while chunk := await response.content.read(lib_ctx.chunksize):
                     await f.write(chunk)
-                    chunk = await response.content.read(lib_ctx.chunksize)
 
         # Verify the download
         if not await verify_hash(download_filename, sha256sum):
@@ -274,7 +269,6 @@ class CollectionDownloader(GalaxyClient):
 
         # Copy downloaded collection into cache
         if self.collection_cache:
-            # TODO: PY3.8: We can use t.Final in __init__ instead of cast here.
             cached_copy = os.path.join(self.collection_cache,
                                        release_info['artifact']['filename'])
             shutil.copyfile(download_filename, cached_copy)

@@ -38,11 +38,8 @@ def parse_pieces_file(pieces_file: str) -> List[str]:
 
     decoded_contents = contents.decode('utf-8')
     # One collection per line, ignoring comments and empty lines
-    # TODO: PY3.8:
-    # collections = [c for line in decoded_contents.split('\n')
-    #                if (c := line.strip()) and not c.startswith('#')]
-    collections = [line.strip() for line in decoded_contents.split('\n')
-                   if line.strip() and not line.strip().startswith('#')]
+    collections = [c for line in decoded_contents.split('\n')
+                   if (c := line.strip()) and not c.startswith('#')]
     return collections
 
 
