@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 import asyncio
 import sys
-import typing as t
 
 from importlib import metadata
 
