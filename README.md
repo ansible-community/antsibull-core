@@ -22,6 +22,8 @@ antsibull-core is covered by the [Ansible Code of Conduct](https://docs.ansible.
 
 From version 1.0.0 on, antsibull-core sticks to semantic versioning and aims at providing no backwards compatibility breaking changes during a major release cycle. We might make exceptions from this in case of security fixes for vulnerabilities that are severe enough.
 
+The current major version release train is 2.x.y. It mainly differs from 1.x.y by dropping support for Python 3.6, 3.7, and 3.8. It deprecates several compatibility functions for older Python versions that are no longer needed; see the changelog for details.
+
 ## Creating a new release:
 
 If you want to create a new release::
