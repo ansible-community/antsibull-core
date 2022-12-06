@@ -11,6 +11,7 @@ import os
 import re
 import tempfile
 import typing as t
+from asyncio import get_running_loop, create_task
 from functools import lru_cache, partial
 from urllib.parse import urljoin
 
@@ -19,7 +20,6 @@ import sh
 from packaging.version import Version as PypiVer
 
 from . import app_context
-from .compat import best_get_loop, create_task
 from .logging import log
 from .utils.http import retry_get
 
@@ -250,7 +250,7 @@ async def checkout_from_git(download_dir: str, repo_url: str = _ANSIBLE_CORE_URL
     :kwarg: repo_url: The url to the git repo.
     :return: The directory that ansible-core has been checked out to.
     """
-    loop = best_get_loop()
+    loop = get_running_loop()
     ansible_core_dir = os.path.join(download_dir, 'ansible-core')
     await loop.run_in_executor(None, sh.git, 'clone', repo_url, ansible_core_dir)
 
@@ -269,7 +269,7 @@ async def create_sdist(source_dir: str, dest_dir: str) -> str:
     :arg dest_dir: the directory that the sdist will be written to/
     :returns: path to the sdist.
     """
-    loop = best_get_loop()
+    loop = get_running_loop()
 
     # Make sure setup.py exists
     setup_script = os.path.join(source_dir, 'setup.py')

@@ -6,13 +6,13 @@
 """Functions to deal with collections on the local system"""
 import asyncio
 import os
+from asyncio import get_running_loop
 from concurrent.futures import ThreadPoolExecutor
 from typing import List
 
 import sh
 
 from . import app_context
-from .compat import best_get_loop
 
 
 class CollectionFormatError(Exception):
@@ -21,7 +21,7 @@ class CollectionFormatError(Exception):
 
 async def install_together(collection_tarballs: List[str],
                            ansible_collections_dir: str) -> None:
-    loop = best_get_loop()
+    loop = get_running_loop()
     lib_ctx = app_context.lib_ctx.get()
     executor = ThreadPoolExecutor(max_workers=lib_ctx.thread_max)
 

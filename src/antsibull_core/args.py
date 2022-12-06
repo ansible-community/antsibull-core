@@ -8,7 +8,7 @@
 import argparse
 import os.path
 
-from .compat import metadata
+from importlib import metadata
 
 
 class InvalidArgumentError(Exception):
