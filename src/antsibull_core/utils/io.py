@@ -18,8 +18,6 @@ from ..logging import log
 
 
 if t.TYPE_CHECKING:
-    # TODO PY3.8: Use __future__.annotations instead of quoting annotations
-    # pylint:disable=unused-import
     from _typeshed import StrOrBytesPath
 
 mlog = log.fields(mod=__name__)
