@@ -5,7 +5,9 @@
 # SPDX-FileCopyrightText: 2020, Ansible Project
 """Compat for older versions of Python.
 
-THIS MODULE IS DEPRECATED AND WILL BE REMOVED IN ANTSIBULL-CORE 3.0.0!
+PARTS OF THIS MODULE ARE DEPRECATED AND WILL BE REMOVED IN ANTSIBULL-CORE 3.0.0:
+  - the `metadata` module;
+  - the functions `asyncio_run`, `best_get_loop`, and `create_task`.
 """
 
 from __future__ import annotations
