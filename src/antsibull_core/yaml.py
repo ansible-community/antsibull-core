@@ -8,6 +8,8 @@
 YAML handling.
 """
 
+from __future__ import annotations
+
 import typing as t
 
 import yaml
@@ -23,8 +25,6 @@ except ImportError:
     from yaml import SafeDumper as _SafeDumper
 
 if t.TYPE_CHECKING:
-    # TODO PY3.8: Use __future__.annotations instead of quoting annotations
-    # pylint:disable=unused-import
     from _typeshed import StrOrBytesPath
 
 
@@ -35,7 +35,7 @@ def load_yaml_bytes(data: bytes) -> t.Any:
     return yaml.load(data, Loader=_SafeLoader)
 
 
-def load_yaml_file(path: "StrOrBytesPath") -> t.Any:
+def load_yaml_file(path: StrOrBytesPath) -> t.Any:
     """
     Load and parse YAML file ``path``.
     """
@@ -43,7 +43,7 @@ def load_yaml_file(path: "StrOrBytesPath") -> t.Any:
         return yaml.load(stream, Loader=_SafeLoader)
 
 
-def store_yaml_file(path: "StrOrBytesPath", content: t.Any) -> None:
+def store_yaml_file(path: StrOrBytesPath, content: t.Any) -> None:
     """
     Store ``content`` as YAML file under ``path``.
     """

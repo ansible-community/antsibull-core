@@ -8,7 +8,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "antsibull-core"
-version = "1.4.0.post0"
+version = "2.0.0"
 description = "Tools for building the Ansible Distribution"
 authors = ["Toshio Kuratomi <a.badger@gmail.com>", "Felix Fontein <felix@fontein.de>"]
 license = "GPL-3.0-or-later"
@@ -29,11 +29,9 @@ classifiers = [
 "Bug tracker" = "https://github.com/ansible-community/antsibull-core/issues"
 
 [tool.poetry.dependencies]
-python = "^3.6.1"
-aiocontextvars = {version = "*", python = "~3.6"}
+python = "^3.9.0"
 aiofiles = "*"
 aiohttp = ">= 3.0.0"
-importlib-metadata = {version = "*", python =  "<3.8"}
 # major/minor was introduced here
 packaging = ">= 20.0"
 perky = "*"
@@ -48,13 +46,13 @@ twiggy = ">= 0.5.0"
 asynctest = "*"
 cryptography = "*"
 codecov = "*"
-flake8 = ">= 3.8.0"
+flake8 = ">= 6.0.0"
 mypy = "*"
 # https://github.com/facebook/pyre-check/issues/398
-pyre-check = "^0.9.15"
-pylint = "^2.12.0"
+pyre-check = "^0.9.17"
+pylint = "^2.15.7"
 pytest = "*"
-pytest-asyncio = ">= 0.12"
+pytest-asyncio = ">= 0.20"
 pytest-cov = "*"
 types-aiofiles = "*"
 types-PyYAML = "*"

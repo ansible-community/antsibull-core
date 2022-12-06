@@ -25,11 +25,8 @@ async def verify_hash(filename: str, hash_digest: str, algorithm: str = 'sha256'
     hasher = getattr(hashlib, algorithm)()
     async with aiofiles.open(filename, 'rb') as f:
         ctx = app_context.lib_ctx.get()
-        # TODO: PY3.8: while chunk := await f.read(ctx.chunksize):
-        chunk = await f.read(ctx.chunksize)
-        while chunk:
+        while chunk := await f.read(ctx.chunksize):
             hasher.update(chunk)
-            chunk = await f.read(ctx.chunksize)
     if hasher.hexdigest() != hash_digest:
         return False
 

@@ -1,0 +1,6 @@
+---
+breaking_changes:
+  - "Support for Python 3.6, 3.7, and 3.8 has been dropped. antsibull-core 2.x.y needs Python 3.9 or newer. If you need to use Python 3.6 to 3.8, please use antsibull-core 1.x.y (https://github.com/ansible-community/antsibull-core/pull/16)."
+deprecated_features:
+  - "The ``antsibull_core.compat`` module deprecates the ``metadata`` module. Use ``importlib.metadata`` instead, which is available from Python 3.8 on (https://github.com/ansible-community/antsibull-core/pull/16)."
+  - "The ``antsibull_core.compat`` module deprecates the functions ``asyncio_run``, ``best_get_loop``, and ``create_task``. Replace ``asyncio_run`` with ``asyncio.run``, ``create_task`` with ``asyncio.create_task``, and ``best_get_loop`` with ``asyncio.get_running_loop`` (https://github.com/ansible-community/antsibull-core/pull/16)."

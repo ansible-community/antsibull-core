@@ -19,7 +19,6 @@ import sh
 from packaging.version import Version as PypiVer
 
 from . import app_context
-from .compat import best_get_loop, create_task
 from .logging import log
 from .utils.http import retry_get
 
@@ -81,7 +80,7 @@ class AnsibleCorePyPiClient:
         tasks = []
         for package_name in ('ansible-core', 'ansible-base'):
             query_url = urljoin(self.pypi_server_url, f'pypi/{package_name}/json')
-            tasks.append(create_task(self._get_json(query_url)))
+            tasks.append(asyncio.create_task(self._get_json(query_url)))
 
         # Note: gather maintains the order of results
         results = await asyncio.gather(*tasks)
@@ -143,11 +142,8 @@ class AnsibleCorePyPiClient:
         async with retry_get(self.aio_session, pypi_url) as response:
             async with aiofiles.open(tar_filename, 'wb') as f:
                 lib_ctx = app_context.lib_ctx.get()
-                # TODO: PY3.8: while chunk := await response.read(lib_ctx.chunksize):
-                chunk = await response.content.read(lib_ctx.chunksize)
-                while chunk:
+                while chunk := await response.content.read(lib_ctx.chunksize):
                     await f.write(chunk)
-                    chunk = await response.content.read(lib_ctx.chunksize)
 
         return tar_filename
 
@@ -253,7 +249,7 @@ async def checkout_from_git(download_dir: str, repo_url: str = _ANSIBLE_CORE_URL
     :kwarg: repo_url: The url to the git repo.
     :return: The directory that ansible-core has been checked out to.
     """
-    loop = best_get_loop()
+    loop = asyncio.get_running_loop()
     ansible_core_dir = os.path.join(download_dir, 'ansible-core')
     await loop.run_in_executor(None, sh.git, 'clone', repo_url, ansible_core_dir)
 
@@ -272,7 +268,7 @@ async def create_sdist(source_dir: str, dest_dir: str) -> str:
     :arg dest_dir: the directory that the sdist will be written to/
     :returns: path to the sdist.
     """
-    loop = best_get_loop()
+    loop = asyncio.get_running_loop()
 
     # Make sure setup.py exists
     setup_script = os.path.join(source_dir, 'setup.py')

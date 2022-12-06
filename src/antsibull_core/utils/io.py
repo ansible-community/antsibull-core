@@ -5,6 +5,8 @@
 # SPDX-FileCopyrightText: 2021, Ansible Project
 """I/O helper functions."""
 
+from __future__ import annotations
+
 import os
 import os.path
 import typing as t
@@ -16,14 +18,12 @@ from ..logging import log
 
 
 if t.TYPE_CHECKING:
-    # TODO PY3.8: Use __future__.annotations instead of quoting annotations
-    # pylint:disable=unused-import
     from _typeshed import StrOrBytesPath
 
 mlog = log.fields(mod=__name__)
 
 
-async def copy_file(source_path: "StrOrBytesPath", dest_path: "StrOrBytesPath") -> None:
+async def copy_file(source_path: StrOrBytesPath, dest_path: StrOrBytesPath) -> None:
     """
     Copy content from one file to another.
 
@@ -61,16 +61,13 @@ async def copy_file(source_path: "StrOrBytesPath", dest_path: "StrOrBytesPath") 
 
     async with aiofiles.open(source_path, 'rb') as f_in:
         async with aiofiles.open(dest_path, 'wb') as f_out:
-            # TODO: PY3.8: while chunk := await f.read(lib_ctx.chunksize)
-            chunk = await f_in.read(lib_ctx.chunksize)
-            while chunk:
+            while chunk := await f_in.read(lib_ctx.chunksize):
                 await f_out.write(chunk)
-                chunk = await f_in.read(lib_ctx.chunksize)
 
     flog.debug('Leave')
 
 
-async def write_file(filename: "StrOrBytesPath", content: str) -> None:
+async def write_file(filename: StrOrBytesPath, content: str) -> None:
     flog = mlog.fields(func='write_file')
     flog.debug('Enter')
 
@@ -99,7 +96,7 @@ async def write_file(filename: "StrOrBytesPath", content: str) -> None:
     flog.debug('Leave')
 
 
-async def read_file(filename: "StrOrBytesPath", encoding: str = 'utf-8') -> str:
+async def read_file(filename: StrOrBytesPath, encoding: str = 'utf-8') -> str:
     flog = mlog.fields(func='read_file')
     flog.debug('Enter')
 

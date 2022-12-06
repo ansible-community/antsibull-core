@@ -103,17 +103,11 @@ In antsibull-docs, the extended app context (``DocsAppContext``) is then used as
 
 import argparse
 import contextvars
-import sys
 import typing as t
 from contextlib import contextmanager
 
 from .schemas.context import AppContext, LibContext
 from .vendored.collections import ImmutableDict
-
-if sys.version_info < (3, 7):
-    # contextvars for Python3.6.  It uses a backport of contextvars which takes over the contextvars
-    # import slot there and aiocontextvars which adds the needed asyncio support.
-    import aiocontextvars  # noqa: F401, pylint:disable=unused-import
 
 
 AppContextT = t.TypeVar('AppContextT', bound=AppContext)

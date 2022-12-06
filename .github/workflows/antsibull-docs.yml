@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Run some antsibull-docs 1.0.0 tests against the current development version of antsibull-core
+# Run some antsibull-docs 1.8.0 tests against the current development version of antsibull-core
 # to make sure we don't accidentally break compatibility.
 
 name: antsibull-docs compatibility
@@ -30,17 +30,22 @@ jobs:
         with:
           path: antsibull-core
 
-      - name: Check out antsibull-docs 1.0.0
+      - name: Check out antsibull-docs 1.8.0
         uses: actions/checkout@v3
         with:
           repository: ansible-community/antsibull-docs
-          ref: 1.0.0
+          # ref: 1.8.0  TODO
+          ref: main
           path: antsibull-docs
 
-      - name: Set up Python 3.10
+      - name: Bump minimum Python requirement of antsibull-docs
+        run:
+          sed -i -e 's/^python = .*/python = "^3.9"/' antsibull-docs/pyproject.toml
+
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
