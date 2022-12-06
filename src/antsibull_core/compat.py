@@ -5,6 +5,8 @@
 # SPDX-FileCopyrightText: 2020, Ansible Project
 """Compat for older versions of Python."""
 
+from __future__ import annotations
+
 import argparse
 import asyncio
 import sys
@@ -13,7 +15,7 @@ import typing as t
 from importlib import metadata
 
 
-BooleanOptionalAction: t.Type[argparse.BooleanOptionalAction]
+BooleanOptionalAction: type[argparse.BooleanOptionalAction]
 
 if sys.version_info < (3, 9, 11) or (
     sys.version_info >= (3, 10, 0) and sys.version_info < (3, 10, 3)

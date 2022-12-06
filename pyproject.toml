@@ -30,7 +30,6 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.9.0"
-aiocontextvars = "*"
 aiofiles = "*"
 aiohttp = ">= 3.0.0"
 # major/minor was introduced here
