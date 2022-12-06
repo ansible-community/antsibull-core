@@ -5,6 +5,8 @@
 # SPDX-FileCopyrightText: 2020, Ansible Project
 """General functions for working with aiohttp."""
 
+from __future__ import annotations
+
 import asyncio
 import math
 import random
@@ -29,7 +31,7 @@ class RetryGetManager:
     response: t.Optional[aiohttp.ClientResponse]
 
     def __init__(self,
-                 aio_session: 'aiohttp.client.ClientSession',
+                 aio_session: aiohttp.client.ClientSession,
                  args: t.Tuple[t.Any, ...],
                  kwargs: t.Mapping[str, t.Any],
                  max_retries: int,
@@ -94,7 +96,7 @@ class RetryGetManager:
         flog.debug('Leave')
 
 
-def retry_get(aio_session: 'aiohttp.client.ClientSession',
+def retry_get(aio_session: aiohttp.client.ClientSession,
               *args,
               acceptable_error_codes: t.Optional[t.Iterable[int]] = None,
               max_retries: t.Optional[int] = None,

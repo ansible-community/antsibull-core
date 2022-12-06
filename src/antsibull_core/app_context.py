@@ -101,6 +101,8 @@ In antsibull-docs, the extended app context (``DocsAppContext``) is then used as
             do_something()
 """
 
+from __future__ import annotations
+
 import argparse
 import contextvars
 import typing as t
@@ -124,7 +126,7 @@ AppContextT = t.TypeVar('AppContextT', bound=AppContext)
 #: for tweaking via a value saved in lib_ctx.  All values in lib_ctx need to have a default value
 #: so that code which uses it can fallback to something if the application or user did not
 #: specify a value.
-lib_ctx: 'contextvars.ContextVar[LibContext]' = contextvars.ContextVar('lib_ctx')
+lib_ctx: contextvars.ContextVar[LibContext] = contextvars.ContextVar('lib_ctx')
 
 #: Values in app_ctx are things that form defaults in the application.  Even though it may be
 #: tempting to use them for library API, they should not be used there.  Instead, these values
@@ -144,7 +146,7 @@ lib_ctx: 'contextvars.ContextVar[LibContext]' = contextvars.ContextVar('lib_ctx'
 #: server, the library can provide a class which takes the server's URL as a parameter and stores
 #: as an attribute and the functions can be converted into methods of the object.  Then the
 #: application code can initialize the object once and thereafter call the object's methods.
-app_ctx: 'contextvars.ContextVar[AppContext]' = contextvars.ContextVar('app_ctx')
+app_ctx: contextvars.ContextVar[AppContext] = contextvars.ContextVar('app_ctx')
 
 
 class ContextReturn(t.Generic[AppContextT]):
