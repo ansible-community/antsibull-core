@@ -3,7 +3,10 @@
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2020, Ansible Project
-"""Compat for older versions of Python."""
+"""Compat for older versions of Python.
+
+THIS MODULE IS DEPRECATED AND WILL BE REMOVED IN ANTSIBULL-CORE 3.0.0!
+"""
 
 from __future__ import annotations
 
