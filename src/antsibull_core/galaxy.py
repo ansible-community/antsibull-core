@@ -5,6 +5,8 @@
 # SPDX-FileCopyrightText: 2020, Ansible Project
 """Functions to work with Galaxy."""
 
+from __future__ import annotations
+
 import os.path
 import shutil
 import typing as t
@@ -50,7 +52,7 @@ class DownloadResults(t.NamedTuple):
 class GalaxyClient:
     """Class for querying the Galaxy REST API."""
 
-    def __init__(self, aio_session: 'aiohttp.client.ClientSession',
+    def __init__(self, aio_session: aiohttp.client.ClientSession,
                  galaxy_server: str = _GALAXY_SERVER_URL) -> None:
         """
         Create a GalaxyClient object to query the Galaxy Server.
@@ -208,7 +210,7 @@ class GalaxyClient:
 class CollectionDownloader(GalaxyClient):
     """Manage downloading collections from Galaxy."""
 
-    def __init__(self, aio_session: 'aiohttp.client.ClientSession',
+    def __init__(self, aio_session: aiohttp.client.ClientSession,
                  download_dir: str,
                  galaxy_server: str = _GALAXY_SERVER_URL,
                  collection_cache: t.Optional[str] = None) -> None:
