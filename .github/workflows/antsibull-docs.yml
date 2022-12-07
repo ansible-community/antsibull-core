@@ -34,8 +34,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ansible-community/antsibull-docs
-          # ref: 1.8.0  TODO
-          ref: main
+          ref: 1.8.0
           path: antsibull-docs
 
       - name: Bump minimum Python requirement of antsibull-docs
