@@ -1,14 +1,19 @@
 # BSD 2-clause license (see LICENSES/BSD-2-Clause.txt)
 # SPDX-FileCopyrightText: Ansible Project
 # SPDX-License-Identifier: BSD-2-Clause
+#
+# This is borrowed from
+# https://github.com/ansible/ansible/blob/devel/lib/ansible/module_utils/json_utils.py.
+# Minor changes were made to add type hints and follow Python 3 best practices.
 
-# pylint:disable=missing-module-docstring,no-else-break,redundant-u-string-prefix
-# pylint:disable=undefined-loop-variable
+"""
+Utilities to sanitize JSON output.
+"""
+
+from __future__ import annotations
 
 
-# NB: a copy of this function exists in ../../modules/core/async_wrapper.py. Ensure any
-# changes are propagated there.
-def _filter_non_json_lines(data):
+def _filter_non_json_lines(data: str) -> tuple[str, list[str]]:
     '''
     Used to filter unrelated output around module JSON output, like messages from
     tcagetattr, or where dropbear spews MOTD on every single command (which is nuts).
@@ -23,11 +28,11 @@ def _filter_non_json_lines(data):
 
     for start, line in enumerate(lines):
         line = line.strip()
-        if line.startswith(u'{'):
-            endchar = u'}'
+        if line.startswith('{'):
+            endchar = '}'
             break
-        elif line.startswith(u'['):
-            endchar = u']'
+        if line.startswith('['):
+            endchar = ']'
             break
     else:
         raise ValueError('No start of json char found')
@@ -47,8 +52,8 @@ def _filter_non_json_lines(data):
         trailing_junk = lines[len(lines) - reverse_end_offset:]
         for line in trailing_junk:
             if line.strip():
-                warnings.append('Module invocation had junk after the JSON data: %s'
-                                % '\n'.join(trailing_junk))
+                junk = '\n'.join(trailing_junk)
+                warnings.append(f'Module invocation had junk after the JSON data: {junk}')
                 break
 
     lines = lines[:(len(lines) - reverse_end_offset)]
