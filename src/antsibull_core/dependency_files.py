@@ -17,6 +17,7 @@ don't want to install backwards incompatible collections until the next major An
 from __future__ import annotations
 
 import typing as t
+from collections.abc import Mapping
 
 from packaging.version import Version as PypiVer
 
@@ -114,7 +115,7 @@ class DepsFile:
 
     def write(self, ansible_version: str | PypiVer,
               ansible_core_version: str | PypiVer,
-              included_versions: t.Mapping[str, str] | t.Mapping[str, SemVer],
+              included_versions: Mapping[str, str] | Mapping[str, SemVer],
               python_requires: str | None = None) -> None:
         """
         Write a list of all the dependent collections included in this Ansible release.
@@ -157,8 +158,8 @@ class BuildFile:
         """Parse the build from a dependency file."""
         return _parse_name_version_spec_file(self.filename)
 
-    def write(self, ansible_version: 'PypiVer', ansible_core_version: str,
-              dependencies: t.Mapping[str, 'SemVer'],
+    def write(self, ansible_version: PypiVer, ansible_core_version: str,
+              dependencies: Mapping[str, SemVer],
               python_requires: str | None = None) -> None:
         """
         Write a build dependency file.

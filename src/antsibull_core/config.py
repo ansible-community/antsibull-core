@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 import os.path
-import typing as t
+from collections.abc import Iterable, Mapping
 
 import perky  # type: ignore[import]
 import pydantic as p
@@ -31,7 +31,7 @@ class ConfigError(Exception):
     pass
 
 
-def find_config_files(conf_files: t.Iterable[str]) -> list[str]:
+def find_config_files(conf_files: Iterable[str]) -> list[str]:
     """
     Find all config files that exist.
 
@@ -77,7 +77,7 @@ def read_config(filename: str) -> ConfigModel:
     return raw_config_data
 
 
-def validate_config(config: t.Mapping, filenames: list[str],
+def validate_config(config: Mapping, filenames: list[str],
                     app_context_model: type[AppContext]) -> None:
     """
     Validate configuration.
@@ -104,7 +104,7 @@ def validate_config(config: t.Mapping, filenames: list[str],
             f"Error while parsing configuration from {', '.join(filenames)}:\n{exc}") from exc
 
 
-def _load_config_file(filename: str) -> t.Mapping:
+def _load_config_file(filename: str) -> Mapping:
     """
     Load configuration from one file and return the raw data.
     """
@@ -118,7 +118,7 @@ def _load_config_file(filename: str) -> t.Mapping:
             f"Error while parsing configuration from {filename}:\n{exc}") from exc
 
 
-def load_config(conf_files: t.Iterable[str] | str | None = None,
+def load_config(conf_files: Iterable[str] | str | None = None,
                 app_context_model: type[AppContext] = AppContext) -> dict:
     """
     Load configuration.

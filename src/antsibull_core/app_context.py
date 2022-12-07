@@ -107,6 +107,7 @@ import argparse
 import contextvars
 import typing as t
 from contextlib import contextmanager
+from collections.abc import Iterable, Mapping
 
 from .schemas.context import AppContext, LibContext
 from .vendored.collections import ImmutableDict
@@ -193,12 +194,12 @@ class ContextReturn(t.Generic[AppContextT]):
             return self.cfg
         raise IndexError('tuple index out of range')
 
-    def __iter__(self) -> t.Iterable:
+    def __iter__(self) -> Iterable:
         return (self.app_ctx, self.lib_ctx, self.args, self.cfg).__iter__()
 
 
 def _extract_context_values(known_fields, args: argparse.Namespace | None,
-                            cfg: t.Mapping = ImmutableDict()) -> dict:
+                            cfg: Mapping = ImmutableDict()) -> dict:
 
     context_values = {}
     if cfg:
@@ -221,7 +222,7 @@ def _extract_context_values(known_fields, args: argparse.Namespace | None,
 
 @t.overload
 def create_contexts(args: argparse.Namespace | None = None,
-                    cfg: t.Mapping = ImmutableDict(),
+                    cfg: Mapping = ImmutableDict(),
                     use_extra: bool = True,
                     ) -> ContextReturn[AppContext]:
     ...
@@ -229,7 +230,7 @@ def create_contexts(args: argparse.Namespace | None = None,
 
 @t.overload
 def create_contexts(args: argparse.Namespace | None = None,
-                    cfg: t.Mapping = ImmutableDict(),
+                    cfg: Mapping = ImmutableDict(),
                     use_extra: bool = True,
                     *,
                     app_context_model: type[AppContextT],
@@ -238,7 +239,7 @@ def create_contexts(args: argparse.Namespace | None = None,
 
 
 def create_contexts(args: argparse.Namespace | None = None,
-                    cfg: t.Mapping = ImmutableDict(),
+                    cfg: Mapping = ImmutableDict(),
                     use_extra: bool = True,
                     *,
                     app_context_model=AppContext,
