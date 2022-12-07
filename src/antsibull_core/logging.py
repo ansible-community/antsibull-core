@@ -200,6 +200,9 @@ Here's a sample of the relevant portions of an antsibull command to show how thi
 Once those steps are taken, any further logging calls will obey the user's configuration.
 
 """
+
+from __future__ import annotations
+
 import os
 
 import twiggy  # type: ignore[import]

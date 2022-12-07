@@ -5,6 +5,8 @@
 # SPDX-FileCopyrightText: 2020, Ansible Project
 """General functions for working with python collections and classes for new data types."""
 
+from __future__ import annotations
+
 import typing as t
 from collections.abc import Container, Mapping, Sequence, Set
 

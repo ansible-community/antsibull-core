@@ -5,6 +5,8 @@
 # SPDX-FileCopyrightText: 2020, Ansible Project
 """Argument parsing helpers."""
 
+from __future__ import annotations
+
 import argparse
 import os.path
 

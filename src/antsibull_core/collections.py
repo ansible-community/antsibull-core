@@ -4,6 +4,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2020, Ansible Project
 """Functions to deal with collections on the local system"""
+
+from __future__ import annotations
+
 import asyncio
 import os
 from concurrent.futures import ThreadPoolExecutor
