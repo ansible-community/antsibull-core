@@ -172,11 +172,11 @@ class ContextReturn(t.Generic[AppContextT]):
     app_ctx: AppContextT
     lib_ctx: LibContext
     args: argparse.Namespace
-    cfg: t.Dict
+    cfg: dict
 
     # pylint: disable-next=redefined-outer-name
     def __init__(self, app_ctx: AppContextT, lib_ctx: LibContext,
-                 args: argparse.Namespace, cfg: t.Dict):
+                 args: argparse.Namespace, cfg: dict):
         self.app_ctx = app_ctx
         self.lib_ctx = lib_ctx
         self.args = args
@@ -197,8 +197,8 @@ class ContextReturn(t.Generic[AppContextT]):
         return (self.app_ctx, self.lib_ctx, self.args, self.cfg).__iter__()
 
 
-def _extract_context_values(known_fields, args: t.Optional[argparse.Namespace],
-                            cfg: t.Mapping = ImmutableDict()) -> t.Dict:
+def _extract_context_values(known_fields, args: argparse.Namespace | None,
+                            cfg: t.Mapping = ImmutableDict()) -> dict:
 
     context_values = {}
     if cfg:
@@ -220,7 +220,7 @@ def _extract_context_values(known_fields, args: t.Optional[argparse.Namespace],
 
 
 @t.overload
-def create_contexts(args: t.Optional[argparse.Namespace] = None,
+def create_contexts(args: argparse.Namespace | None = None,
                     cfg: t.Mapping = ImmutableDict(),
                     use_extra: bool = True,
                     ) -> ContextReturn[AppContext]:
@@ -228,16 +228,16 @@ def create_contexts(args: t.Optional[argparse.Namespace] = None,
 
 
 @t.overload
-def create_contexts(args: t.Optional[argparse.Namespace] = None,
+def create_contexts(args: argparse.Namespace | None = None,
                     cfg: t.Mapping = ImmutableDict(),
                     use_extra: bool = True,
                     *,
-                    app_context_model: t.Type[AppContextT],
+                    app_context_model: type[AppContextT],
                     ) -> ContextReturn[AppContextT]:
     ...
 
 
-def create_contexts(args: t.Optional[argparse.Namespace] = None,
+def create_contexts(args: argparse.Namespace | None = None,
                     cfg: t.Mapping = ImmutableDict(),
                     use_extra: bool = True,
                     *,
@@ -328,7 +328,7 @@ def _copy_app_context() -> AppContext:
 
 
 @contextmanager
-def lib_context(new_context: t.Optional[LibContext] = None) -> t.Generator[LibContext, None, None]:
+def lib_context(new_context: LibContext | None = None) -> t.Generator[LibContext, None, None]:
     """
     Set up a new lib_context.
 
@@ -374,7 +374,7 @@ def app_context(new_context=None):
 
 @contextmanager
 def app_and_lib_context(context_data: ContextReturn[AppContextT]
-                        ) -> t.Generator[t.Tuple[AppContextT, LibContext], None, None]:
+                        ) -> t.Generator[tuple[AppContextT, LibContext], None, None]:
     """
     Set the app and lib context at the same time.
 

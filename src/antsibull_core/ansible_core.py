@@ -5,6 +5,9 @@
 # SPDX-FileCopyrightText: 2020, Ansible Project
 
 """Functions for working with the ansible-core package."""
+
+from __future__ import annotations
+
 import ast
 import asyncio
 import os
@@ -56,7 +59,7 @@ class AnsibleCorePyPiClient:
         self.aio_session = aio_session
         self.pypi_server_url = pypi_server_url
 
-    async def _get_json(self, query_url: str) -> t.Dict[str, t.Any]:
+    async def _get_json(self, query_url: str) -> dict[str, t.Any]:
         """
         JSON data from a url with retries and return the data as python data structures.
         """
@@ -65,7 +68,7 @@ class AnsibleCorePyPiClient:
         return pkg_info
 
     @lru_cache(None)
-    async def get_release_info(self) -> t.Dict[str, t.Any]:
+    async def get_release_info(self) -> dict[str, t.Any]:
         """
         Retrieve information about releases of the ansible-core/ansible-base package from pypi.
 
@@ -89,7 +92,7 @@ class AnsibleCorePyPiClient:
 
         return release_info
 
-    async def get_versions(self) -> t.List[PypiVer]:
+    async def get_versions(self) -> list[PypiVer]:
         """
         Get the versions of the ansible-core package on pypi.
 
@@ -148,7 +151,7 @@ class AnsibleCorePyPiClient:
         return tar_filename
 
 
-def get_ansible_core_package_name(ansible_core_version: t.Union[str, PypiVer]) -> str:
+def get_ansible_core_package_name(ansible_core_version: str | PypiVer) -> str:
     """
     Returns the name of the minimal ansible package.
 
@@ -195,7 +198,7 @@ def _version_is_devel(version: PypiVer) -> bool:
     return bool(dev_version.match(version.public))
 
 
-def source_is_devel(ansible_core_source: t.Optional[str]) -> bool:
+def source_is_devel(ansible_core_source: str | None) -> bool:
     """
     :arg ansible_core_source: A path to an Ansible-core checkout or expanded sdist or None.
         This will be used instead of downloading an ansible-core package if the version matches
@@ -213,7 +216,7 @@ def source_is_devel(ansible_core_source: t.Optional[str]) -> bool:
     return _version_is_devel(source_version)
 
 
-def source_is_correct_version(ansible_core_source: t.Optional[str],
+def source_is_correct_version(ansible_core_source: str | None,
                               ansible_core_version: PypiVer) -> bool:
     """
     :arg ansible_core_source: A path to an Ansible-core checkout or expanded sdist or None.
@@ -303,7 +306,7 @@ async def create_sdist(source_dir: str, dest_dir: str) -> str:
 async def get_ansible_core(aio_session: 'aiohttp.client.ClientSession',
                            ansible_core_version: str,
                            tmpdir: str,
-                           ansible_core_source: t.Optional[str] = None) -> str:
+                           ansible_core_source: str | None = None) -> str:
     """
     Create an ansible-core directory of the requested version.
 

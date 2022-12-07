@@ -65,7 +65,7 @@ class GalaxyClient:
         self.aio_session = aio_session
         self.params = {'format': 'json'}
 
-    async def _get_galaxy_versions(self, versions_url: str) -> t.List[str]:
+    async def _get_galaxy_versions(self, versions_url: str) -> list[str]:
         """
         Retrieve the complete list of versions for a collection from a galaxy endpoint.
 
@@ -93,7 +93,7 @@ class GalaxyClient:
 
         return versions
 
-    async def get_versions(self, collection: str) -> t.List[str]:
+    async def get_versions(self, collection: str) -> list[str]:
         """
         Retrieve all versions of a collection on Galaxy.
 
@@ -105,7 +105,7 @@ class GalaxyClient:
         retval = await self._get_galaxy_versions(galaxy_url)
         return retval
 
-    async def get_info(self, collection: str) -> t.Dict[str, t.Any]:
+    async def get_info(self, collection: str) -> dict[str, t.Any]:
         """
         Retrieve information about the collection on Galaxy.
 
@@ -131,7 +131,7 @@ class GalaxyClient:
         return collection_info
 
     async def get_release_info(self, collection: str,
-                               version: t.Union[str, semver.Version]) -> t.Dict[str, t.Any]:
+                               version: str | semver.Version) -> dict[str, t.Any]:
         """
         Retrive information about a specific version of a collection.
 
@@ -213,7 +213,7 @@ class CollectionDownloader(GalaxyClient):
     def __init__(self, aio_session: aiohttp.client.ClientSession,
                  download_dir: str,
                  galaxy_server: str = _GALAXY_SERVER_URL,
-                 collection_cache: t.Optional[str] = None) -> None:
+                 collection_cache: str | None = None) -> None:
         """
         Create an object to download collections from galaxy.
 
@@ -227,9 +227,9 @@ class CollectionDownloader(GalaxyClient):
         """
         super().__init__(aio_session, galaxy_server)
         self.download_dir = download_dir
-        self.collection_cache: t.Final[t.Optional[str]] = collection_cache
+        self.collection_cache: t.Final[str | None] = collection_cache
 
-    async def download(self, collection: str, version: t.Union[str, semver.Version], ) -> str:
+    async def download(self, collection: str, version: str | semver.Version, ) -> str:
         """
         Download a collection.
 

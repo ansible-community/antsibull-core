@@ -32,7 +32,7 @@ def is_sequence(obj: t.Any, include_string: bool = False) -> bool:
 
 
 def compare_all_but(dict_a: t.Mapping, dict_b: t.Mapping,
-                    keys_to_ignore: t.Optional[t.Iterable] = None) -> bool:
+                    keys_to_ignore: t.Iterable | None = None) -> bool:
     """
     Compare two dictionaries, with the possibility to ignore some fields.
 
@@ -64,7 +64,7 @@ def compare_all_but(dict_a: t.Mapping, dict_b: t.Mapping,
     return True
 
 
-def _make_contained_containers_immutable(obj: t.Union[Set, Sequence]) -> t.List:
+def _make_contained_containers_immutable(obj: Set | Sequence) -> t.List:
     """
     Make contained containers into immutable containers.
 

@@ -14,25 +14,27 @@ When we initially build an Ansible major release, we'll use certain versions of 
 don't want to install backwards incompatible collections until the next major Ansible release.
 """
 
-from typing import TYPE_CHECKING, Dict, List, Mapping, NamedTuple, Optional, Union
+from __future__ import annotations
+
+import typing as t
 
 from packaging.version import Version as PypiVer
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from semantic_version import Version as SemVer
 
 
-class DependencyFileData(NamedTuple):
+class DependencyFileData(t.NamedTuple):
     ansible_version: str
     ansible_core_version: str
-    deps: Dict[str, str]
+    deps: dict[str, str]
 
 
 class InvalidFileFormat(Exception):
     pass
 
 
-def parse_pieces_file(pieces_file: str) -> List[str]:
+def parse_pieces_file(pieces_file: str) -> list[str]:
     with open(pieces_file, 'rb') as f:
         contents = f.read()
 
@@ -44,9 +46,9 @@ def parse_pieces_file(pieces_file: str) -> List[str]:
 
 
 def _parse_name_version_spec_file(filename: str) -> DependencyFileData:
-    deps: Dict[str, str] = {}
-    ansible_core_version: Optional[str] = None
-    ansible_version: Optional[str] = None
+    deps: dict[str, str] = {}
+    ansible_core_version: str | None = None
+    ansible_version: str | None = None
 
     for line in parse_pieces_file(filename):
         record = [entry.strip() for entry in line.split(':', 1)]
@@ -110,10 +112,10 @@ class DepsFile:
         """Parse the deps from a dependency file."""
         return _parse_name_version_spec_file(self.filename)
 
-    def write(self, ansible_version: Union[str, 'PypiVer'],
-              ansible_core_version: Union[str, 'PypiVer'],
-              included_versions: Union[Mapping[str, str], Mapping[str, 'SemVer']],
-              python_requires: Optional[str] = None) -> None:
+    def write(self, ansible_version: str | PypiVer,
+              ansible_core_version: str | PypiVer,
+              included_versions: t.Mapping[str, str] | t.Mapping[str, SemVer],
+              python_requires: str | None = None) -> None:
         """
         Write a list of all the dependent collections included in this Ansible release.
 
@@ -156,8 +158,8 @@ class BuildFile:
         return _parse_name_version_spec_file(self.filename)
 
     def write(self, ansible_version: 'PypiVer', ansible_core_version: str,
-              dependencies: Mapping[str, 'SemVer'],
-              python_requires: Optional[str] = None) -> None:
+              dependencies: t.Mapping[str, 'SemVer'],
+              python_requires: str | None = None) -> None:
         """
         Write a build dependency file.
 

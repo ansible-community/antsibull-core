@@ -5,6 +5,8 @@
 # SPDX-FileCopyrightText: 2020, Ansible Project
 """Functions to handle config files."""
 
+from __future__ import annotations
+
 import os.path
 import typing as t
 
@@ -29,7 +31,7 @@ class ConfigError(Exception):
     pass
 
 
-def find_config_files(conf_files: t.Iterable[str]) -> t.List[str]:
+def find_config_files(conf_files: t.Iterable[str]) -> list[str]:
     """
     Find all config files that exist.
 
@@ -75,8 +77,8 @@ def read_config(filename: str) -> ConfigModel:
     return raw_config_data
 
 
-def validate_config(config: t.Mapping, filenames: t.List[str],
-                    app_context_model: t.Type[AppContext]) -> None:
+def validate_config(config: t.Mapping, filenames: list[str],
+                    app_context_model: type[AppContext]) -> None:
     """
     Validate configuration.
 
@@ -116,8 +118,8 @@ def _load_config_file(filename: str) -> t.Mapping:
             f"Error while parsing configuration from {filename}:\n{exc}") from exc
 
 
-def load_config(conf_files: t.Union[t.Iterable[str], str, None] = None,
-                app_context_model: t.Type[AppContext] = AppContext) -> t.Dict:
+def load_config(conf_files: t.Iterable[str] | str | None = None,
+                app_context_model: type[AppContext] = AppContext) -> dict:
     """
     Load configuration.
 
@@ -146,7 +148,7 @@ def load_config(conf_files: t.Union[t.Iterable[str], str, None] = None,
                 explicit_files=explicit_files).debug('found config files')
 
     flog.debug('loading implicit config files')
-    cfg: t.Dict = {}
+    cfg: dict = {}
     for filename in implicit_files:
         cfg.update(_load_config_file(filename))
 
