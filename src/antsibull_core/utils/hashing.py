@@ -5,6 +5,8 @@
 # SPDX-FileCopyrightText: 2020, Ansible Project
 """Functions to help with hashing."""
 
+from __future__ import annotations
+
 import hashlib
 
 import aiofiles

@@ -5,8 +5,10 @@
 # SPDX-FileCopyrightText: 2020, Ansible Project
 """General functions for working with python collections and classes for new data types."""
 
+from __future__ import annotations
+
 import typing as t
-from collections.abc import Container, Mapping, Sequence, Set
+from collections.abc import Container, Iterable, Mapping, Sequence, Set
 
 from ..vendored.collections import ImmutableDict
 
@@ -31,8 +33,8 @@ def is_sequence(obj: t.Any, include_string: bool = False) -> bool:
     return False
 
 
-def compare_all_but(dict_a: t.Mapping, dict_b: t.Mapping,
-                    keys_to_ignore: t.Optional[t.Iterable] = None) -> bool:
+def compare_all_but(dict_a: Mapping, dict_b: Mapping,
+                    keys_to_ignore: Iterable | None = None) -> bool:
     """
     Compare two dictionaries, with the possibility to ignore some fields.
 
@@ -64,7 +66,7 @@ def compare_all_but(dict_a: t.Mapping, dict_b: t.Mapping,
     return True
 
 
-def _make_contained_containers_immutable(obj: t.Union[Set, Sequence]) -> t.List:
+def _make_contained_containers_immutable(obj: Set | Sequence) -> list:
     """
     Make contained containers into immutable containers.
 
@@ -125,7 +127,7 @@ class ContextDict(ImmutableDict):
         yield cls.validate_and_convert
 
     @classmethod
-    def validate_and_convert(cls, value: t.Mapping) -> 'ContextDict':
+    def validate_and_convert(cls, value: Mapping) -> 'ContextDict':
         if isinstance(value, ContextDict):
             # optimization.  If it's already an ImmutableContext, we don't need to recursively
             # convert things to immutable again.

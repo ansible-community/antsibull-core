@@ -5,14 +5,15 @@
 # SPDX-FileCopyrightText: 2020, Ansible Project
 """Functionality to work with a venv."""
 
+from __future__ import annotations
+
 import os
-import typing as t
 import venv
 
 import sh
 
 
-def get_clean_environment() -> t.Dict[str, str]:
+def get_clean_environment() -> dict[str, str]:
     env = os.environ.copy()
     try:
         del env['PYTHONPATH']

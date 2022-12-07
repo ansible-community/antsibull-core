@@ -4,6 +4,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2020, Ansible Project
 """Functions for working with tarballs."""
+
+from __future__ import annotations
+
 import re
 
 import sh

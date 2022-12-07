@@ -5,6 +5,8 @@
 # SPDX-FileCopyrightText: 2021, Toshio Kuratomi
 """Pydantic validators."""
 
+from __future__ import annotations
+
 import os.path
 
 

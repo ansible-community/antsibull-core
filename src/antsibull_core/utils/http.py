@@ -12,6 +12,7 @@ import math
 import random
 import typing as t
 import warnings
+from collections.abc import Iterable, Mapping
 
 import aiohttp
 
@@ -22,20 +23,20 @@ from ..logging import log
 mlog = log.fields(mod=__name__)
 
 
-def _format_call(command: str, args: t.Tuple[t.Any, ...], kwargs: t.Mapping[str, t.Any]) -> str:
+def _format_call(command: str, args: tuple[t.Any, ...], kwargs: Mapping[str, t.Any]) -> str:
     arguments = [repr(a) for a in args] + [f'{k}={repr(v)}' for k, v in kwargs.items()]
     return f'aio_session.{command}({", ".join(arguments)})'
 
 
 class RetryGetManager:
-    response: t.Optional[aiohttp.ClientResponse]
+    response: aiohttp.ClientResponse | None
 
     def __init__(self,
                  aio_session: aiohttp.client.ClientSession,
-                 args: t.Tuple[t.Any, ...],
-                 kwargs: t.Mapping[str, t.Any],
+                 args: tuple[t.Any, ...],
+                 kwargs: Mapping[str, t.Any],
                  max_retries: int,
-                 acceptable_error_codes: t.Iterable[int],
+                 acceptable_error_codes: Iterable[int],
                  ):
         self.aio_session = aio_session
         self.args = args
@@ -98,8 +99,8 @@ class RetryGetManager:
 
 def retry_get(aio_session: aiohttp.client.ClientSession,
               *args,
-              acceptable_error_codes: t.Optional[t.Iterable[int]] = None,
-              max_retries: t.Optional[int] = None,
+              acceptable_error_codes: Iterable[int] | None = None,
+              max_retries: int | None = None,
               **kwargs) -> t.AsyncContextManager[aiohttp.ClientResponse]:
     # Handle default value for max_retries
     lib_ctx = app_context.lib_ctx.get()

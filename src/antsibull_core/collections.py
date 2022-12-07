@@ -4,10 +4,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2020, Ansible Project
 """Functions to deal with collections on the local system"""
+
+from __future__ import annotations
+
 import asyncio
 import os
 from concurrent.futures import ThreadPoolExecutor
-from typing import List
 
 import sh
 
@@ -18,7 +20,7 @@ class CollectionFormatError(Exception):
     pass
 
 
-async def install_together(collection_tarballs: List[str],
+async def install_together(collection_tarballs: list[str],
                            ansible_collections_dir: str) -> None:
     loop = asyncio.get_running_loop()
     lib_ctx = app_context.lib_ctx.get()
@@ -42,9 +44,9 @@ async def install_together(collection_tarballs: List[str],
     await asyncio.gather(*installers)
 
 
-async def install_separately(collection_tarballs: List[str], collection_dir: str) -> List[str]:
+async def install_separately(collection_tarballs: list[str], collection_dir: str) -> list[str]:
     installers = []
-    collection_dirs: List[str] = []
+    collection_dirs: list[str] = []
 
     if not collection_tarballs:
         return collection_dirs
