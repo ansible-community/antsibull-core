@@ -7,6 +7,7 @@
 
 import os.path
 import typing as t
+from collections.abc import Callable, Mapping, MutableMapping, MutableSequence, Sequence
 
 import pydantic as p
 import twiggy.formats  # type: ignore[import]
@@ -39,29 +40,29 @@ class BaseModel(p.BaseModel):
 
 # pyre-ignore[13]: BaseModel initializes attributes when data is loaded
 class LogFiltersModel(BaseModel):
-    filter: t.Union[str, t.Callable]
-    args: t.Sequence[t.Any] = []
-    kwargs: t.Mapping[str, t.Any] = {}
+    filter: t.Union[str, Callable]
+    args: Sequence[t.Any] = []
+    kwargs: Mapping[str, t.Any] = {}
 
 
 # pyre-ignore[13]: BaseModel initializes attributes when data is loaded
 class LogEmitterModel(BaseModel):
     output_name: str
     level: str = LEVEL_CHOICES_F
-    filters: t.List[LogFiltersModel] = []
+    filters: list[LogFiltersModel] = []
 
 
 # pyre-ignore[13]: BaseModel initializes attributes when data is loaded
 class LogOutputModel(BaseModel):
-    output: t.Union[str, t.Callable]
-    args: t.Sequence[t.Any] = []
-    format: t.Union[str, t.Callable] = twiggy.formats.line_format
-    kwargs: t.Mapping[str, t.Any] = {}
+    output: t.Union[str, Callable]
+    args: Sequence[t.Any] = []
+    format: t.Union[str, Callable] = twiggy.formats.line_format
+    kwargs: Mapping[str, t.Any] = {}
 
     @p.validator('args')
     # pylint:disable=no-self-argument
-    def expand_home_dir_args(cls, args_field: t.MutableSequence,
-                             values: t.Mapping) -> t.MutableSequence:
+    def expand_home_dir_args(cls, args_field: MutableSequence,
+                             values: Mapping) -> MutableSequence:
         """Expand tilde in the arguments of specific outputs."""
         if values['output'] in ('twiggy.outputs.FileOutput', twiggy.outputs.FileOutput):
             if args_field:
@@ -70,8 +71,8 @@ class LogOutputModel(BaseModel):
 
     @p.validator('kwargs')
     # pylint:disable=no-self-argument
-    def expand_home_dir_kwargs(cls, kwargs_field: t.MutableMapping,
-                               values: t.Mapping) -> t.MutableMapping:
+    def expand_home_dir_kwargs(cls, kwargs_field: MutableMapping,
+                               values: Mapping) -> MutableMapping:
         """Expand tilde in the keyword arguments of specific outputs."""
         if values['output'] in ('twiggy.outputs.FileOutput', twiggy.outputs.FileOutput):
             if 'name' in kwargs_field:
@@ -80,9 +81,9 @@ class LogOutputModel(BaseModel):
 
 
 class LoggingModel(BaseModel):
-    emitters: t.Optional[t.Dict[str, LogEmitterModel]] = {}
+    emitters: t.Optional[dict[str, LogEmitterModel]] = {}
     incremental: bool = False
-    outputs: t.Optional[t.Dict[str, LogOutputModel]] = {}
+    outputs: t.Optional[dict[str, LogOutputModel]] = {}
     version: str = VERSION_CHOICES_F
 
 
