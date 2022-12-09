@@ -94,3 +94,13 @@ releases:
     - 13-no-blocking-io-async.yaml
     - 14-StrOrBytesPath.yaml
     release_date: '2022-11-27'
+  1.5.0:
+    changes:
+      minor_changes:
+      - Add a ``store_yaml_stream`` function to ``antsibull_core.yaml`` to dump YAML
+        to an IO stream (https://github.com/ansible-community/antsibull-core/pull/24).
+      release_summary: Feature release.
+    fragments:
+    - 1.5.0.yml
+    - 24.yaml
+    release_date: '2022-12-09'
