@@ -5,6 +5,30 @@ antsibull-core Release Notes
 .. contents:: Topics
 
 
+v2.0.0a1
+========
+
+Release Summary
+---------------
+
+Alpha release of 2.0.0.
+
+Minor Changes
+-------------
+
+- Add a ``store_yaml_stream`` function to ``antsibull_core.yaml`` to dump YAML to an IO stream (https://github.com/ansible-community/antsibull-core/pull/24).
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- Support for Python 3.6, 3.7, and 3.8 has been dropped. antsibull-core 2.x.y needs Python 3.9 or newer. If you need to use Python 3.6 to 3.8, please use antsibull-core 1.x.y (https://github.com/ansible-community/antsibull-core/pull/16).
+
+Deprecated Features
+-------------------
+
+- The ``antsibull_core.compat`` module deprecates the ``metadata`` module. Use ``importlib.metadata`` instead, which is available from Python 3.8 on (https://github.com/ansible-community/antsibull-core/pull/16).
+- The ``antsibull_core.compat`` module deprecates the functions ``asyncio_run``, ``best_get_loop``, and ``create_task``. Replace ``asyncio_run`` with ``asyncio.run``, ``create_task`` with ``asyncio.create_task``, and ``best_get_loop`` with ``asyncio.get_running_loop`` (https://github.com/ansible-community/antsibull-core/pull/16).
+
 v1.4.0
 ======
 
