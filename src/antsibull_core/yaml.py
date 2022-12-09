@@ -25,7 +25,7 @@ except ImportError:
 if t.TYPE_CHECKING:
     # TODO PY3.8: Use __future__.annotations instead of quoting annotations
     # pylint:disable=unused-import
-    from _typeshed import StrOrBytesPath
+    from _typeshed import SupportsWrite, StrOrBytesPath
 
 
 def load_yaml_bytes(data: bytes) -> t.Any:
@@ -48,6 +48,14 @@ def store_yaml_file(path: "StrOrBytesPath", content: t.Any) -> None:
     Store ``content`` as YAML file under ``path``.
     """
     with open(path, 'wb') as stream:
-        dumper = _SafeDumper
-        dumper.ignore_aliases = lambda *args: True
-        yaml.dump(content, stream, default_flow_style=False, encoding='utf-8', Dumper=dumper)
+        store_yaml_stream(stream, content)
+
+
+def store_yaml_stream(stream: 'SupportsWrite',
+                      content: t.Any) -> None:
+    """
+    Dump ``content`` as YAML to an IO ``stream``.
+    """
+    dumper = _SafeDumper
+    dumper.ignore_aliases = lambda *args: True
+    yaml.dump(content, stream, default_flow_style=False, encoding='utf-8', Dumper=dumper)
