@@ -36,7 +36,8 @@ jobs:
           - 3.8
           - 3.9
           - '3.10'
-          - '3.11'
+          # Will fail due to frozenlist build failure:
+          # - '3.11'
 
     steps:
       - name: Check out antsibull-core
