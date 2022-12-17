@@ -106,12 +106,11 @@ from __future__ import annotations
 import argparse
 import contextvars
 import typing as t
-from contextlib import contextmanager
 from collections.abc import Iterable, Mapping
+from contextlib import contextmanager
 
 from .schemas.context import AppContext, LibContext
 from .vendored.collections import ImmutableDict
-
 
 AppContextT = t.TypeVar('AppContextT', bound=AppContext)
 

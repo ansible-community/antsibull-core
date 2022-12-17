@@ -6,15 +6,17 @@
 #
 # https://github.com/solid-abstractions/python/tree/master/testing-aiohttp-clients
 
-import aiohttp
-import aiohttp.test_utils
-import aiohttp.web
 import asyncio
 import collections
 import inspect
-import pytest
 import socket
 import weakref
+
+import pytest
+
+import aiohttp
+import aiohttp.test_utils
+import aiohttp.web
 
 # ----------------------------------------------------------------------------
 

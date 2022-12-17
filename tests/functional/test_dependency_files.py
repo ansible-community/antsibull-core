@@ -2,13 +2,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: Ansible Project
 
+import pytest
 from packaging.version import Version as PypiVer
 from semantic_version import Version as SemVer
 
-import pytest
-
 from antsibull_core.dependency_files import BuildFile
-
 
 SIMPLE_TEST_FILE = """_ansible_version: 4
 _ansible_base_version: 2.11.0rc1

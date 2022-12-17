@@ -15,9 +15,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import sys
-
 from importlib import metadata
-
 
 BooleanOptionalAction: type[argparse.BooleanOptionalAction]
 

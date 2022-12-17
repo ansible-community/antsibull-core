@@ -16,7 +16,6 @@ import aiofiles
 from .. import app_context
 from ..logging import log
 
-
 if t.TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
 

@@ -9,9 +9,9 @@ import typing as t
 
 import pydantic as p
 
+from ..utils.collections import ContextDict
 from .config import DEFAULT_LOGGING_CONFIG, LoggingModel
 from .validators import convert_bool, convert_none, convert_path
-from ..utils.collections import ContextDict
 
 
 class BaseModel(p.BaseModel):

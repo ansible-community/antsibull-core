@@ -11,7 +11,6 @@ import re
 
 import sh
 
-
 #: Regex to find toplevel directories in tar output
 TOPLEVEL_RE: re.Pattern = re.compile('^[^/]+/$')
 
