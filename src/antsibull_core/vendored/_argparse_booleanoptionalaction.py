@@ -17,7 +17,7 @@
 
 # pylint:disable=missing-module-docstring,redefined-builtin
 
-from argparse import Action, SUPPRESS, OPTIONAL, ZERO_OR_MORE
+from argparse import OPTIONAL, SUPPRESS, ZERO_OR_MORE, Action
 
 
 def _add_default_to_help_string(action):

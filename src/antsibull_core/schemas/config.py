@@ -15,7 +15,6 @@ import twiggy.outputs  # type: ignore[import]
 
 from .validators import convert_bool, convert_none, convert_path
 
-
 #: Valid choices for a logging level field
 LEVEL_CHOICES_F = p.Field(..., regex='^(CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG|DISABLED)$')
 

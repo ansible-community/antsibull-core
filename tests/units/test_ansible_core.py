@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: Ansible Project
 
-from packaging.version import  Version
 import pytest
+from packaging.version import Version
 
 import antsibull_core.ansible_core as ac
 

@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import os.path
-
 from importlib import metadata
 
 
