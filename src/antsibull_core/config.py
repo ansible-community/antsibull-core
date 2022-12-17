@@ -15,7 +15,6 @@ from .logging import log
 from .schemas.config import ConfigModel
 from .schemas.context import AppContext, LibContext
 
-
 mlog = log.fields(mod=__name__)
 
 #: System config file location.

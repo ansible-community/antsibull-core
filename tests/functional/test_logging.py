@@ -5,7 +5,6 @@
 import os
 
 import pytest
-
 import twiggy.levels
 
 import antsibull_core.logging as al

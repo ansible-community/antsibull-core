@@ -16,7 +16,6 @@ import aiohttp
 from .. import app_context
 from ..logging import log
 
-
 mlog = log.fields(mod=__name__)
 
 

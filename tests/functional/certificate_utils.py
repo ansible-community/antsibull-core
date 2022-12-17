@@ -8,9 +8,10 @@
 
 import contextlib
 import datetime
-import pytest
 import ssl
 import tempfile
+
+import pytest
 
 
 class TemporaryCertificate:

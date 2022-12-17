@@ -16,16 +16,16 @@ _SafeLoader: t.Any
 _SafeDumper: t.Any
 try:
     # use C version if possible for speedup
-    from yaml import CSafeLoader as _SafeLoader
     from yaml import CSafeDumper as _SafeDumper
+    from yaml import CSafeLoader as _SafeLoader
 except ImportError:
-    from yaml import SafeLoader as _SafeLoader
     from yaml import SafeDumper as _SafeDumper
+    from yaml import SafeLoader as _SafeLoader
 
 if t.TYPE_CHECKING:
     # TODO PY3.8: Use __future__.annotations instead of quoting annotations
     # pylint:disable=unused-import
-    from _typeshed import SupportsWrite, StrOrBytesPath
+    from _typeshed import StrOrBytesPath, SupportsWrite
 
 
 def load_yaml_bytes(data: bytes) -> t.Any:
