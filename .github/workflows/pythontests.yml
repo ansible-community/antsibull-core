@@ -35,7 +35,8 @@ jobs:
           - 3.7
           - 3.8
           - 3.9
-          - '3.10'
+          # Will fail due to some dependencies having trouble:
+          # - '3.10'
           # Will fail due to frozenlist build failure:
           # - '3.11'
 
