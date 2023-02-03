@@ -103,6 +103,7 @@ def count(seq):
     deprecated and replaced when support for Python < 2.7 is dropped.
     """
     if not is_iterable(seq):
+        # pylint:disable-next=broad-exception-raised
         raise Exception('Argument provided  is not an iterable')
     counters = dict()
     for elem in seq:

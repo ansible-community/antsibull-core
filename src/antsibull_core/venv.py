@@ -101,4 +101,5 @@ class FakeVenvRunner:
             directly to :command:`pip install`.
         :returns: An :sh:obj:`sh.RunningCommand` for the pip output.
         """
+        # pylint:disable-next=broad-exception-raised
         raise Exception('Not implemented')
