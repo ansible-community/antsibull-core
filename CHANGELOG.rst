@@ -5,6 +5,19 @@ antsibull-core Release Notes
 .. contents:: Topics
 
 
+v1.5.1
+======
+
+Release Summary
+---------------
+
+Bugfix release to avoid breakage due to sh 2.0.0.
+
+Bugfixes
+--------
+
+- Restrict the ``sh`` dependency to versions before 2.0.0 (https://github.com/ansible-community/antsibull-core/pull/31).
+
 v1.5.0
 ======
 

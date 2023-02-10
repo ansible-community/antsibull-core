@@ -104,3 +104,12 @@ releases:
     - 1.5.0.yml
     - 24.yaml
     release_date: '2022-12-09'
+  1.5.1:
+    changes:
+      bugfixes:
+      - Restrict the ``sh`` dependency to versions before 2.0.0 (https://github.com/ansible-community/antsibull-core/pull/31).
+      release_summary: Bugfix release to avoid breakage due to sh 2.0.0.
+    fragments:
+    - 1.5.1.yml
+    - 31-sh.yml
+    release_date: '2023-02-10'

@@ -1,2 +1,0 @@
-bugfixes:
-  - "Restrict the ``sh`` dependency to versions before 2.0.0 (https://github.com/ansible-community/antsibull-core/pull/31)."
