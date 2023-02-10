@@ -38,7 +38,7 @@ perky = "*"
 pydantic = "*"
 PyYAML = "*"
 semantic_version = "*"
-sh = "*"
+sh = ">= 1.0.0 < 2.0.0"
 # 0.5.0 introduces dict_config
 twiggy = ">= 0.5.0"
 
