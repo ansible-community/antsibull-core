@@ -35,7 +35,7 @@ aiohttp = ">= 3.0.0"
 # major/minor was introduced here
 packaging = ">= 20.0"
 perky = "*"
-pydantic = "*"
+pydantic = ">= 1.0.0 < 2.0.0"
 PyYAML = "*"
 semantic_version = "*"
 sh = ">= 1.0.0 < 2.0.0"
