@@ -37,7 +37,8 @@ importlib-metadata = {version = "*", python =  "<3.8"}
 # major/minor was introduced here
 packaging = ">= 20.0"
 perky = "*"
-pydantic = "*"
+# pydantic v2 is a major rewrite
+pydantic = ">= 1.0.0 < 2.0.0"
 PyYAML = "*"
 semantic_version = "*"
 sh = ">= 1.0.0 < 2.0.0"
