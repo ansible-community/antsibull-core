@@ -26,7 +26,7 @@ from .logging import log
 from .utils.http import retry_get
 
 if t.TYPE_CHECKING:
-    import aiohttp.client  # pylint:disable=unused-import
+    import aiohttp.client
 
 
 mlog = log.fields(mod=__name__)

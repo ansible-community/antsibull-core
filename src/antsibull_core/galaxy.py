@@ -21,7 +21,7 @@ from .utils.http import retry_get
 
 # The type checker can handle finding aiohttp.client but flake8 cannot :-(
 if t.TYPE_CHECKING:
-    import aiohttp.client  # pylint:disable=unused-import
+    import aiohttp.client
 
 
 #: URL to galaxy. (Get the default from the context default)

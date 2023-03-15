@@ -44,5 +44,5 @@ async def unpack_tarball(tarname: str, destdir: str) -> str:
     return toplevel_dirs[0]
 
 
-async def pack_tarball(tarname: str, directory: str) -> str:  # pylint:disable=unused-argument
+async def pack_tarball(tarname: str, directory: str) -> str:
     raise NotImplementedError('pack_tarball has not yet been implemented')
