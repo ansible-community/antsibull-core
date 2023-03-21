@@ -12,11 +12,10 @@ import inspect
 import socket
 import weakref
 
-import pytest
-
 import aiohttp
 import aiohttp.test_utils
 import aiohttp.web
+import pytest
 
 # ----------------------------------------------------------------------------
 
