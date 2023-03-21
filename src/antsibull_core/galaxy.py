@@ -292,4 +292,6 @@ class CollectionDownloader(GalaxyClient):
         """
         version = await self.get_latest_matching_version(collection, version_spec)
         download_path = await self.download(collection, version)
+        if download_path == '/':
+            print(1)
         return DownloadResults(version=version, download_path=download_path)
