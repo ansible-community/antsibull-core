@@ -12,19 +12,20 @@ from __future__ import annotations
 import asyncio
 import subprocess
 from collections.abc import Callable, Sequence
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from antsibull_core.logging import log
 
 if TYPE_CHECKING:
+    from logging import Logger as StdLogger
     from _typeshed import StrOrBytesPath
-    from twiggy.logger import Logger  # type: ignore[import]
+    from twiggy.logger import Logger as TwiggyLogger  # type: ignore[import]
 
 mlog = log.fields(mod=__name__)
 
 
 async def _stream_log(
-    name: str, callback: Callable | None, stream: asyncio.StreamReader
+    name: str, callback: Callable[[str], Any] | None, stream: asyncio.StreamReader
 ) -> str:
     line = await stream.readline()
     lines = []
@@ -41,7 +42,7 @@ async def _stream_log(
 
 async def async_log_run(
     args: Sequence[StrOrBytesPath],
-    logger: Logger | None = None,
+    logger: TwiggyLogger | StdLogger | None = None,
     check: bool = True,
     stdout_loglevel: str | None = None,
     stderr_loglevel: str | None = 'debug',
@@ -54,7 +55,9 @@ async def async_log_run(
     asyncio.create_subprocess_exec() directly to have more control.
 
     :param args: Command to run
-    :param logger: Where to log command.
+    :param logger:
+        Logger in which to log the command. Can be a `twiggy.logger.Logger` or
+        a stdlib `logger.Logger`.
     :param check: Whether to raise a `subprocess.CalledProcessError` when the
                   command returns a non-zero exit code
     :param stdout_loglevel: Which level to use to log stdout. `None` disables logging.
@@ -97,7 +100,7 @@ async def async_log_run(
 
 def log_run(
     args: Sequence[StrOrBytesPath],
-    logger: Logger | None = None,
+    logger: TwiggyLogger | StdLogger | None = None,
     check: bool = True,
     stdout_loglevel: str | None = None,
     stderr_loglevel: str | None = 'debug',
