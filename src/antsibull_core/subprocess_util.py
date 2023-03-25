@@ -43,9 +43,9 @@ async def _stream_log(
 async def async_log_run(
     args: Sequence[StrOrBytesPath],
     logger: TwiggyLogger | StdLogger | None = None,
-    check: bool = True,
     stdout_loglevel: str | None = None,
     stderr_loglevel: str | None = 'debug',
+    check: bool = True,
     **kwargs,
 ) -> subprocess.CompletedProcess:
     """
@@ -58,10 +58,11 @@ async def async_log_run(
     :param logger:
         Logger in which to log the command. Can be a `twiggy.logger.Logger` or
         a stdlib `logger.Logger`.
-    :param check: Whether to raise a `subprocess.CalledProcessError` when the
-                  command returns a non-zero exit code
     :param stdout_loglevel: Which level to use to log stdout. `None` disables logging.
     :param stderr_loglevel: Which level to use to log stderr. `None` disables logging.
+    :param check:
+        Whether to raise a `subprocess.CalledProcessError` when the
+        command returns a non-zero exit code
     """
     logger = logger or mlog
     stdout_logfunc: Callable[[str], Any] | None = None
@@ -101,9 +102,9 @@ async def async_log_run(
 def log_run(
     args: Sequence[StrOrBytesPath],
     logger: TwiggyLogger | StdLogger | None = None,
-    check: bool = True,
     stdout_loglevel: str | None = None,
     stderr_loglevel: str | None = 'debug',
+    check: bool = True,
     **kwargs,
 ) -> subprocess.CompletedProcess:
     """
@@ -112,5 +113,5 @@ def log_run(
     output.
     """
     return asyncio.run(
-        async_log_run(args, logger, check, stdout_loglevel, stderr_loglevel, **kwargs)
+        async_log_run(args, logger, stdout_loglevel, stderr_loglevel, check, **kwargs)
     )
