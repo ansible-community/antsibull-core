@@ -103,7 +103,7 @@ def count(seq):
     deprecated and replaced when support for Python < 2.7 is dropped.
     """
     if not is_iterable(seq):
-        raise Exception('Argument provided  is not an iterable')
+        raise RuntimeError('Argument provided  is not an iterable')
     counters = dict()
     for elem in seq:
         counters[elem] = counters.get(elem, 0) + 1

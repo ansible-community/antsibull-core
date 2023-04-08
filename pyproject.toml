@@ -66,7 +66,7 @@ email = "maxwell@gtmx.me"
 [project.optional-dependencies]
 codeqa = [
     "flake8 >= 6.0.0",
-    "pylint ~= 2.15.7",
+    "pylint >= 2.15.7",
     "reuse",
 ]
 coverage = [
@@ -83,7 +83,7 @@ test = [
 typing = [
     "mypy",
     # https://github.com/facebook/pyre-check/issues/398
-    "pyre-check ~= 0.9.17",
+    "pyre-check >= 0.9.17",
     "types-aiofiles",
     "types-PyYAML",
 ]
