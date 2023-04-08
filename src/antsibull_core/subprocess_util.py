@@ -18,6 +18,7 @@ from antsibull_core.logging import log
 
 if TYPE_CHECKING:
     from logging import Logger as StdLogger
+
     from _typeshed import StrOrBytesPath
     from twiggy.logger import Logger as TwiggyLogger  # type: ignore[import]
 

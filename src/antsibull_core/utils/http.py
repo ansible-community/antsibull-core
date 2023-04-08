@@ -82,8 +82,7 @@ class RetryGetManager:
             await asyncio.sleep(math.pow(1.5, retry) * wait_factor + (0.5 + random.uniform(0, 1)))
 
         flog.debug('Raise error')
-        # pylint:disable-next=broad-exception-raised
-        raise Exception(
+        raise RuntimeError(
             f'Repeated error when calling {self.call_string}: received status codes '
             f'{", ".join(errors)}')
 

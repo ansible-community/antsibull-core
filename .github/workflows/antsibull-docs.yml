@@ -30,16 +30,14 @@ jobs:
         with:
           path: antsibull-core
 
+      # nb: this is the first version of antsibull-docs that declares support
+      # for antsibull-core v2
       - name: Check out antsibull-docs 1.8.0
         uses: actions/checkout@v3
         with:
           repository: ansible-community/antsibull-docs
           ref: 1.8.0
           path: antsibull-docs
-
-      - name: Bump minimum Python requirement of antsibull-docs
-        run:
-          sed -i -e 's/^python = .*/python = "^3.9"/' antsibull-docs/pyproject.toml
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
@@ -48,46 +46,47 @@ jobs:
 
       - name: Install dependencies
         run: |
+          python3 -m venv venv
+          . ./venv/bin/activate
           python -m pip install --upgrade pip
-          python -m pip install poetry
-          poetry install
-          poetry update
+          python -m pip install . ../antsibull-docs "pyre-check ~= 0.9.15"
         working-directory: antsibull-docs
 
       # pyre should complain if a signature changed in an incompatible way
       - name: Lint with pyre
         run: |
+          . ./venv/bin/activate
+          sed -i 's|poetry run||' ./lint-pyre.sh
           ./lint-pyre.sh
         working-directory: antsibull-docs
 
       - name: Use antsibull-docs sphinx-init
         run: |
-          poetry run antsibull-docs sphinx-init --lenient --dest-dir . --use-current --sphinx-theme sphinx_rtd_theme
-        working-directory: antsibull-docs
-
-      - name: Patch build.sh to use poetry run
-        run: |
-          sed -i build.sh -e 's!antsibull-docs !poetry run antsibull-docs !g'
-          sed -i build.sh -e 's!sphinx-build !poetry run sphinx-build !g'
+          . ./venv/bin/activate
+          antsibull-docs sphinx-init --lenient --dest-dir . --use-current --sphinx-theme sphinx_rtd_theme
         working-directory: antsibull-docs
 
       - name: Install dependencies
         run: |
-          poetry run pip install ansible-core
-          poetry run pip install -r requirements.txt
+          . ./venv/bin/activate
+          pip install ansible-core -r requirements.txt
         working-directory: antsibull-docs
 
       - name: Install collections
         run: |
+          . ./venv/bin/activate
           ansible-galaxy collection install community.docker sensu.sensu_go
           git clone https://github.com/ansible-collections/community.crypto.git ~/.ansible/collections/ansible_collections/community/crypto
+        working-directory: antsibull-docs
 
       - name: Lint collection docs
         run: |
-          poetry run antsibull-docs lint-collection-docs ~/.ansible/collections/ansible_collections/community/docker
+          . ./venv/bin/activate
+          antsibull-docs lint-collection-docs ~/.ansible/collections/ansible_collections/community/docker
         working-directory: antsibull-docs
 
       - name: Build docsite
         run: |
+          . ./venv/bin/activate
           ./build.sh
         working-directory: antsibull-docs
