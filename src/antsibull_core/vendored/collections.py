@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 """Collection of low-level utility functions."""
 
-# pylint:disable=consider-using-f-string,consider-iterating-dictionary,use-dict-literal
+# pylint:disable=consider-using-f-string,consider-iterating-dictionary,use-dict-literal,broad-exception-raised
 
 from collections.abc import Hashable, Mapping, Sequence
 
@@ -103,7 +103,7 @@ def count(seq):
     deprecated and replaced when support for Python < 2.7 is dropped.
     """
     if not is_iterable(seq):
-        raise RuntimeError('Argument provided  is not an iterable')
+        raise Exception('Argument provided  is not an iterable')
     counters = dict()
     for elem in seq:
         counters[elem] = counters.get(elem, 0) + 1
