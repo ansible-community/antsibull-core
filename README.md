@@ -6,8 +6,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 # antsibull-core -- Library for Ansible Build Scripts
 [![Discuss on Matrix at #community:ansible.com](https://img.shields.io/matrix/community:ansible.com.svg?server_fqdn=ansible-accounts.ems.host&label=Discuss%20on%20Matrix%20at%20%23community:ansible.com&logo=matrix)](https://matrix.to/#/#community:ansible.com)
-[![Python linting badge](https://github.com/ansible-community/antsibull-core/workflows/Python%20linting/badge.svg?event=push&branch=main)](https://github.com/ansible-community/antsibull-core/actions?query=workflow%3A%22Python+linting%22+branch%3Amain)
-[![Python testing badge](https://github.com/ansible-community/antsibull-core/workflows/Python%20testing/badge.svg?event=push&branch=main)](https://github.com/ansible-community/antsibull-core/actions?query=workflow%3A%22Python+testing%22+branch%3Amain)
+[![Nox badge](https://github.com/ansible-community/antsibull-core/actions/workflows/nox.yml/badge.svg)](https://github.com/ansible-community/antsibull-core/actions/workflows/nox.yml)
 [![Codecov badge](https://img.shields.io/codecov/c/github/ansible-community/antsibull-core)](https://codecov.io/gh/ansible-community/antsibull-core)
 [![REUSE status](https://api.reuse.software/badge/github.com/ansible-community/antsibull-core)](https://api.reuse.software/info/github.com/ansible-community/antsibull-core)
 
@@ -26,23 +25,36 @@ From version 1.0.0 on, antsibull-core sticks to semantic versioning and aims at 
 
 The current major version is 2.x.y. Development for 2.x.y occurs on the `main` branch. 2.x.y mainly differs from 1.x.y by dropping support for Python 3.6, 3.7, and 3.8. It deprecates several compatibility functions for older Python versions that are no longer needed; see the changelog for details. 1.x.y is still developed on the `stable-1` branch, but only security fixes, major bugfixes, and other changes that are absolutely necessary for the other antsibull projects will be backported.
 
+## Development
+
+Install and run `nox` to run all tests. That's it for simple contributions!
+`nox` will create virtual environments in `.nox` inside the checked out project
+and install the requirements needed to run the tests there.
+
+To run specific tests:
+
+1. `nox -e test` to only run unit tests;
+2. `nox -e coverage` to display combined coverage results after running `nox -e
+   test`;
+3. `nox -e lint` to run all linters and formatters at once;
+4. `nox -e formatters` to run `isort`;
+5. `nox -e codeqa` to run `flake8`, `pylint`, and `reuse lint`;
+6. `nox -e typing` to run `mypy` and `pyre`
+
 ## Creating a new release:
 
-If you want to create a new release::
-
-    vim pyproject.toml  # Make sure version number is correct
-    vim changelogs/fragment/$VERSION_NUMBER.yml  # create 'release_summary:' fragment
-    antsibull-changelog release --version $VERSION_NUMBER
-    git add CHANGELOG.rst changelogs
-    git commit -m "Release $VERSION_NUMBER."
-    poetry build
-    poetry publish  # Uploads to pypi.  Be sure you really want to do this
-
-    git tag $VERSION_NUMBER
-    git push --tags
-    vim pyproject.toml  # Bump the version number to X.Y.Z.post0
-    git commit -m 'Update the version number for the next release' pyproject.toml
-    git push
+1. Run `nox -e bump -- <version> <release_summary_message>`. This:
+   * Bumps the package version in `pyproject.toml`.
+   * Creates `changelogs/fragments/<version>.yml` with a `release_summary` section.
+   * Runs `antsibull-changelog release` and adds the changed files to git.
+   * Commits with message `Release <version>.` and runs `git tag -a -m 'antsibull-core <version>' <version>`.
+   * Runs `hatch build`.
+2. Run `git push` to the appropriate remotes.
+3. Once CI passes on GitHub, run `nox -e publish`. This:
+   * Runs `hatch publish`;
+   * Bumps the version to `<version>.post0`;
+   * Adds the changed file to git and run `git commit -m 'Post-release version bump.'`;
+4. Run `git push --follow-tags` to the appropriate remotes and create a GitHub release.
 
 ## License
 
