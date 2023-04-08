@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 """Collection of low-level utility functions."""
 
-# pylint:disable=consider-using-f-string,consider-iterating-dictionary,use-dict-literal
+# pylint:disable=consider-using-f-string,consider-iterating-dictionary,use-dict-literal,broad-exception-raised
 
 from collections.abc import Hashable, Mapping, Sequence
 
