@@ -38,16 +38,13 @@ jobs:
           ref: 0.14.0
           path: antsibull-changelog
 
+      # nb: this is the first version of antsibull that declares support for antsibull-core v2
       - name: Check out antsibull 0.52.0
         uses: actions/checkout@v3
         with:
           repository: ansible-community/antsibull
           ref: 0.52.0
           path: antsibull
-
-      - name: Bump minimum Python requirement of antsibull
-        run:
-          sed -i -e 's/^python = .*/python = "^3.9"/' antsibull/pyproject.toml
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
@@ -56,20 +53,23 @@ jobs:
 
       - name: Install dependencies
         run: |
-          ansible-galaxy collection install community.general
+          python -m venv venv
+          . ./venv/bin/activate
           python -m pip install --upgrade pip
-          python -m pip install ansible-core poetry
-          poetry install
-          poetry update
+          python -m pip install . ../antsibull-core "pyre-check ~= 0.9.15" ansible-core
+          ansible-galaxy collection install community.general
         working-directory: antsibull
 
       # pyre should complain if a signature changed in an incompatible way
       - name: Lint with pyre
         run: |
+          . ./venv/bin/activate
+          sed -i 's|poetry run||' ./lint-pyre.sh
           ./lint-pyre.sh
         working-directory: antsibull
 
       - name: "Test building a release: Ansible 7 with ansible-core devel"
         run: |
-          ansible-playbook -vv playbooks/build-single-release.yaml -e 'antsibull_build_command="poetry run antsibull-build"' -e antsibull_ansible_version=7.99.0 -e antsibull_build_file=ansible-7.build -e antsibull_data_dir="{{ antsibull_data_git_dir }}/7" -e antsibull_ansible_git_version=devel
+          . ./venv/bin/activate
+          ansible-playbook -vv playbooks/build-single-release.yaml -e antsibull_ansible_version=7.99.0 -e antsibull_build_file=ansible-7.build -e antsibull_data_dir="{{ antsibull_data_git_dir }}/7" -e antsibull_ansible_git_version=devel
         working-directory: antsibull
