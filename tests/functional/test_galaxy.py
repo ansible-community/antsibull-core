@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: Ansible Project
 
-import aiohttp
-import pytest
 import hashlib
 
-from antsibull_core.galaxy import GalaxyVersion, GalaxyContext, GalaxyClient, CollectionDownloader
+import aiohttp
+import pytest
 
+from antsibull_core.galaxy import CollectionDownloader, GalaxyClient, GalaxyContext, GalaxyVersion
 
 KNOWN_CG_VERSIONS = [
     '6.4.0', '6.3.0', '6.2.0', '6.1.0', '6.0.1', '6.0.0', '6.0.0-a1',

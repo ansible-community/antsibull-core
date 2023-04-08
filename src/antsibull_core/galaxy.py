@@ -8,10 +8,10 @@
 from __future__ import annotations
 
 import asyncio
-from enum import Enum
 import os.path
 import shutil
 import typing as t
+from enum import Enum
 from urllib.parse import urljoin
 
 import aiofiles
