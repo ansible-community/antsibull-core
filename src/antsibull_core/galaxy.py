@@ -126,23 +126,21 @@ class GalaxyClient:
 
         :arg aio_session: :obj:`aiohttp.ClientSession` with which to perform all
             requests to galaxy.
-        :kwarg galaxy_server: URL to the galaxy server. One of ``galaxy_server`` and
-            ``context`` must be provided in the future.
-        :kwarg context: A ``GalaxyContext`` instance. One of ``galaxy_server`` and
-            ``context`` must be provided in the future.
+        :kwarg galaxy_server: URL to the galaxy server. ``context`` must be provided instead
+            in the future.
+        :kwarg context: A ``GalaxyContext`` instance. Must be provided in the future.
         """
         if galaxy_server is None and context is None:
             # TODO: deprecate
             galaxy_server = _GALAXY_SERVER_URL
         elif context is not None:
             # TODO: deprecate
-            galaxy_server = context.server
-        else:
-            if galaxy_server != context.server:
+            if galaxy_server is not None and galaxy_server != context.server:
                 raise ValueError(
                     f'galaxy_server ({galaxy_server}) does not coincide'
                     f' with context.server ({context.server})'
                 )
+            galaxy_server = context.server
         self.galaxy_server = galaxy_server
         self.context = context
         self.aio_session = aio_session
@@ -352,10 +350,9 @@ class CollectionDownloader(GalaxyClient):
         :arg aio_session: :obj:`aiohttp.ClientSession` with which to perform all
             requests to galaxy.
         :arg download_dir: Directory to download into.
-        :kwarg galaxy_server: URL to the galaxy server. One of ``galaxy_server`` and
-            ``context`` must be provided in the future.
-        :kwarg context: A ``GalaxyContext`` instance. One of ``galaxy_server`` and
-            ``context`` must be provided in the future.
+        :kwarg galaxy_server: URL to the galaxy server. ``context`` must be provided instead
+            in the future.
+        :kwarg context: A ``GalaxyContext`` instance. Must be provided in the future.
         :kwarg collection_cache: If given, a path to a directory containing collection tarballs.
             These tarballs will be used instead of downloading new tarballs provided that the
             versions match the criteria (latest compatible version known to galaxy).
