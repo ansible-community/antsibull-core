@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import re
 
-import sh
+from antsibull_core.subprocess_util import async_log_run
 
 #: Regex to find toplevel directories in tar output
 TOPLEVEL_RE: re.Pattern = re.compile('^[^/]+/$')
@@ -28,11 +28,11 @@ async def unpack_tarball(tarname: str, destdir: str) -> str:
     :returns: Toplevel of the unpacked directory structure.  This will be
         a subdirectory of `destdir`.
     """
-    # FIXME: Need to run tar via run_in_executor()
-    # FIXME: Use unpack_tarball for places that are manually calling tar now
-    # pyre-ignore[16]
-    manifest = sh.tar('-xzvf', tarname, f'-C{destdir}')  # pylint:disable=no-member
-    toplevel_dirs = [filename for filename in manifest if TOPLEVEL_RE.match(filename)]
+    manifest = await async_log_run(['tar', '-xzvf', tarname, f'-C{destdir}'])
+    toplevel_dirs = [
+        filename for filename in manifest.stdout.splitlines()
+        if TOPLEVEL_RE.match(filename)
+    ]
 
     if len(toplevel_dirs) != 1:
         raise InvalidTarball(f'The tarball {tarname} had more than a single toplevel dir')

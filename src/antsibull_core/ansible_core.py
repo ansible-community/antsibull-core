@@ -18,11 +18,11 @@ from functools import lru_cache, partial
 from urllib.parse import urljoin
 
 import aiofiles
-import sh
 from packaging.version import Version as PypiVer
 
 from . import app_context
 from .logging import log
+from .subprocess_util import async_log_run
 from .utils.http import retry_get
 
 if t.TYPE_CHECKING:
@@ -252,9 +252,8 @@ async def checkout_from_git(download_dir: str, repo_url: str = _ANSIBLE_CORE_URL
     :kwarg: repo_url: The url to the git repo.
     :return: The directory that ansible-core has been checked out to.
     """
-    loop = asyncio.get_running_loop()
     ansible_core_dir = os.path.join(download_dir, 'ansible-core')
-    await loop.run_in_executor(None, sh.git, 'clone', repo_url, ansible_core_dir)
+    await async_log_run(['git', 'clone', repo_url, ansible_core_dir])
 
     return ansible_core_dir
 
