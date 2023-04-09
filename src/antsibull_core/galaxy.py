@@ -126,7 +126,10 @@ class GalaxyClient:
 
         :arg aio_session: :obj:`aiohttp.ClientSession` with which to perform all
             requests to galaxy.
-        :kwarg galaxy_server: URL to the galaxy server.
+        :kwarg galaxy_server: URL to the galaxy server. One of ``galaxy_server`` and
+            ``context`` must be provided in the future.
+        :kwarg context: A ``GalaxyContext`` instance. One of ``galaxy_server`` and
+            ``context`` must be provided in the future.
         """
         if galaxy_server is None and context is None:
             # TODO: deprecate
@@ -134,6 +137,12 @@ class GalaxyClient:
         elif context is not None:
             # TODO: deprecate
             galaxy_server = context.server
+        else:
+            if galaxy_server != context.server:
+                raise ValueError(
+                    f'galaxy_server ({galaxy_server}) does not coincide'
+                    f' with context.server ({context.server})'
+                )
         self.galaxy_server = galaxy_server
         self.context = context
         self.aio_session = aio_session
@@ -147,6 +156,9 @@ class GalaxyClient:
             self.params['format'] = 'json'
 
     async def _ensure_context(self) -> GalaxyContext:
+        """
+        Ensure that ``self.context`` is present.
+        """
         context = self.context
         if context is not None:
             return context
@@ -166,7 +178,9 @@ class GalaxyClient:
         information is paged, it continues to retrieve linked pages until all of the information has
         been returned.
 
+        :arg context: the ``GalaxyContext`` to use.
         :arg version_url: url to the page to retrieve.
+        :arg add_params: used internally during recursion. Do not specify when calling this.
         :returns: List of the all the versions of the collection.
         """
         if add_params:
@@ -338,7 +352,10 @@ class CollectionDownloader(GalaxyClient):
         :arg aio_session: :obj:`aiohttp.ClientSession` with which to perform all
             requests to galaxy.
         :arg download_dir: Directory to download into.
-        :kwarg galaxy_server: URL to the galaxy server.
+        :kwarg galaxy_server: URL to the galaxy server. One of ``galaxy_server`` and
+            ``context`` must be provided in the future.
+        :kwarg context: A ``GalaxyContext`` instance. One of ``galaxy_server`` and
+            ``context`` must be provided in the future.
         :kwarg collection_cache: If given, a path to a directory containing collection tarballs.
             These tarballs will be used instead of downloading new tarballs provided that the
             versions match the criteria (latest compatible version known to galaxy).
