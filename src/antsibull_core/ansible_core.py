@@ -264,31 +264,20 @@ async def create_sdist(source_dir: str, dest_dir: str) -> str:
     """
     Create an sdist for the python package at a given path.
 
-    Note that this is not able to create an sdist for any python package.  It has to have a setup.py
-    sdist command.
-
     :arg source_dir: the directory that the python package source is in.
     :arg dest_dir: the directory that the sdist will be written to/
     :returns: path to the sdist.
     """
-    loop = asyncio.get_running_loop()
-
-    # Make sure setup.py exists
-    setup_script = os.path.join(source_dir, 'setup.py')
-    if not os.path.exists(setup_script):
-        raise CannotBuild(f'{source_dir} does not include a setup.py script.  This script cannot'
-                          ' build the package')
 
     # Make a subdir of dest_dir for returning the dist in
     dist_dir_prefix = os.path.join(os.path.basename(source_dir))
     dist_dir = tempfile.mkdtemp(prefix=dist_dir_prefix, dir=dest_dir)
 
-    # execute python setup.py sdist --dist-dir dest_dir/
-    # sh maps attributes to commands dynamically so ignore the linting errors there
-    # pyre-ignore[16]
-    python_cmd = partial(sh.python, _cwd=source_dir)  # pylint:disable=no-member
     try:
-        await loop.run_in_executor(None, python_cmd, setup_script, 'sdist', '--dist-dir', dist_dir)
+        await async_log_run(
+            ['python', '-m', 'build', '--sdist', '--outdir', dist_dir, source_dir],
+            stderr_loglevel='warning',
+        )
     except Exception as e:
         raise CannotBuild(f'Building {source_dir} failed: {e}')  # pylint:disable=raise-missing-from
 

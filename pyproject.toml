@@ -27,6 +27,7 @@ requires-python = ">=3.9"
 dependencies = [
     "aiofiles",
     "aiohttp >= 3.0.0",
+    "build",
     # major/minor was introduced here
     "packaging >= 20.0",
     "perky",
