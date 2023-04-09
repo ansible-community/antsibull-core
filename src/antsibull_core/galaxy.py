@@ -200,7 +200,11 @@ class GalaxyClient:
             results = collection_info['results']
             next_link = collection_info['next']
         else:
-            results = collection_info['data']
+            if 'data' in collection_info:
+                # Apparently 'data' isn't always used...
+                results = collection_info['data']
+            else:
+                results = collection_info['results']
             next_link = collection_info['links']['next']
             add_params = False
         for version_record in results:
