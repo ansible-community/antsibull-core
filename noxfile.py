@@ -88,6 +88,7 @@ def codeqa(session: nox.Session):
     session.run("flake8", "src", *session.posargs)
     session.run("pylint", "--rcfile", ".pylintrc.automated", "src/antsibull_core")
     session.run("reuse", "lint")
+    session.run("antsibull-changelog", "lint")
 
 
 @nox.session
