@@ -11,7 +11,7 @@ import asyncio
 import os
 import venv
 from collections.abc import MutableSequence
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NoReturn
 
 import sh
 
@@ -167,7 +167,7 @@ class FakeVenvRunner:
         return sh.Command(executable_name)
 
     @staticmethod
-    def install_package(package_name: str) -> sh.RunningCommand:
+    def install_package(package_name: str) -> NoReturn:
         """
         Install a python package into the venv.
 
