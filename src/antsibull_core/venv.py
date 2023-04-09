@@ -7,10 +7,22 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
 import venv
+from collections.abc import MutableSequence
+from typing import TYPE_CHECKING
 
 import sh
+
+from antsibull_core import subprocess_util
+
+if TYPE_CHECKING:
+    import subprocess
+    from logging import Logger as StdLogger
+
+    from _typeshed import StrPath
+    from twiggy.logger import Logger as TwiggyLogger  # type: ignore[import]
 
 
 def get_clean_environment() -> dict[str, str]:
@@ -35,7 +47,11 @@ class VenvRunner:
         * :python:mod:`venv`
     """
 
-    def __init__(self, name: str, top_dir: str) -> None:
+    name: str
+    top_dir: StrPath
+    venv_dir: str
+
+    def __init__(self, name: str, top_dir: StrPath) -> None:
         """
         Create a venv.
 
@@ -46,13 +62,14 @@ class VenvRunner:
         self.top_dir = top_dir
         self.venv_dir: str = os.path.join(top_dir, name)
         venv.create(self.venv_dir, clear=True, symlinks=True, with_pip=True)
-        self._python = self.get_command('python')
 
         # Upgrade pip to the latest version.
         # Note that cryptography stopped building manylinux1 wheels (the only ship manylinux2010) so
         # we need pip19+ in order to work now.  RHEL8 and Ubuntu 18.04 contain a pip that's older
         # than that so we must upgrade to something even if it's not latest.
-        self._python('-m', 'pip', 'install', '--upgrade', 'pip')
+
+        # pyre thinks a list is not a MutableSequence when it very much is.
+        self.log_run(['pip', 'install', '--upgrade', 'pip'])  # pyre-ignore[6]
 
     def get_command(self, executable_name) -> sh.Command:
         """
@@ -60,18 +77,67 @@ class VenvRunner:
 
         :arg executable_name: Program to return a command for.
         :returns: An :obj:`sh.Command` that will invoke the program.
+
+        .. deprecated:: 2.0.0
+            This method is deprecated in favor of :method:`asnyc_log_run` and
+            :method:`log_run`. It will be removed in antsibull_core 3.0.0.
         """
         return sh.Command(os.path.join(self.venv_dir, 'bin', executable_name))
 
-    def install_package(self, package_name: str) -> sh.RunningCommand:
+    def install_package(self, package_name: str) -> subprocess.CompletedProcess:
         """
         Install a python package into the venv.
 
         :arg package_name: This can be a bare package name or a path to a file.  It's passed
             directly to :command:`pip install`.
-        :returns: An :sh:obj:`sh.RunningCommand` for the pip output.
+        :returns: An :obj:`subprocess.CompletedProcess` for the pip output.
         """
-        return self._python('-m', 'pip', 'install', package_name, _env=get_clean_environment())
+        return self.log_run(["pip", "install", package_name])  # pyre-ignore[6]
+
+    async def async_log_run(
+        self,
+        args: MutableSequence[StrPath],
+        logger: TwiggyLogger | StdLogger | None = None,
+        stdout_loglevel: str | None = None,
+        stderr_loglevel: str | None = 'debug',
+        check: bool = True,
+        **kwargs,
+    ) -> subprocess.CompletedProcess:
+        """
+        This method asynchronously runs a command in a subprocess and logs
+        its output. It calls `antsibull_core.subprocess_util.async_log_run` to
+        do the heavy lifting. `args[0]` must be a filename that's installed in
+        the venv. If it's not, a `ValueError` will be raised.
+        """
+        kwargs.setdefault("env", get_clean_environment())
+        basename = args[0]
+        if os.path.isabs(basename):
+            raise ValueError(f'{basename!r} must not be an absolute path!')
+        path = os.path.join(self.venv_dir, 'bin', basename)
+        if not os.path.exists(path):
+            raise ValueError(f'{path!r} does not exist!')
+        args[0] = path
+        return await subprocess_util.async_log_run(
+            args, logger, stdout_loglevel, stderr_loglevel, check, **kwargs
+        )
+
+    def log_run(
+        self,
+        args: MutableSequence[StrPath],
+        logger: TwiggyLogger | StdLogger | None = None,
+        stdout_loglevel: str | None = None,
+        stderr_loglevel: str | None = 'debug',
+        check: bool = True,
+        **kwargs,
+    ) -> subprocess.CompletedProcess:
+        """
+        See :method:`async_log_run`
+        """
+        return asyncio.run(
+            self.async_log_run(
+                args, logger, stdout_loglevel, stderr_loglevel, check, **kwargs
+            )
+        )
 
 
 class FakeVenvRunner:
@@ -83,6 +149,9 @@ class FakeVenvRunner:
         * :python:mod:`venv`
     """
 
+    log_run = staticmethod(subprocess_util.log_run)
+    async_log_run = staticmethod(subprocess_util.async_log_run)
+
     @staticmethod
     def get_command(executable_name) -> sh.Command:
         """
@@ -90,6 +159,10 @@ class FakeVenvRunner:
 
         :arg executable_name: Program to return a command for.
         :returns: An :obj:`sh.Command` that will invoke the program.
+
+        .. deprecated:: 2.0.0
+            This function is deprecated in favor of :method:`asnyc_log_run` and
+            :method:`log_run`. It will be removed in antsibull_core 3.0.0.
         """
         return sh.Command(executable_name)
 
