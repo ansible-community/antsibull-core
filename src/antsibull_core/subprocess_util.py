@@ -33,7 +33,7 @@ async def _stream_log(
     while True:
         if not line:
             break
-        text = line.decode('utf-8')
+        text = line.decode('utf-8', errors='surrogateescape')
         if callback:
             callback(f'{name}: {text.strip()}')
         lines.append(text)
