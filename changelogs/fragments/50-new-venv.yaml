@@ -1,0 +1,18 @@
+---
+deprecated_features:
+  - Deprecate the ``get_command()`` methods of ``antsibull_core.venv.VenvRunner` and ``antsibull_core.venv.FakeVenvRunner``.
+    These methods will be removed in antsibull-core 3.0.0.
+    Use the new ``log_run()`` and ``async_run()`` methods instead
+    (https://github.com/ansible-community/antsibull-core/pull/50).
+
+breaking_changes:
+  - The ``install_package()`` method of ``antsibull_core.venv.VenvRunner`` now
+    returns a ``subprocess.CompletedProcess` object instead of an
+    ``sh.RunningCommand``.
+    The rest of the function signature remains the same.
+    Most callers should not need to access the output to begin with
+    (https://github.com/ansible-community/antsibull-core/pull/50).
+minor_changes:
+  - Add ``async_log_run()`` and ``log_run()`` methods to ``antsibull_core.venv.VenvRunner` and ``antsibull_core.venv.FakeVenvRunner``.
+    These should be used instead of ``get_command()``
+    (https://github.com/ansible-community/antsibull-core/pull/50).
