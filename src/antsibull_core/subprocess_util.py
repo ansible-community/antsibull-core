@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import asyncio
 import subprocess
+from asyncio.exceptions import IncompleteReadError, LimitOverrunError
 from collections.abc import Callable, Sequence
 from typing import TYPE_CHECKING, Any, cast
 
@@ -28,16 +29,28 @@ mlog = log.fields(mod=__name__)
 async def _stream_log(
     name: str, callback: Callable[[str], Any] | None, stream: asyncio.StreamReader
 ) -> str:
-    line = await stream.readline()
     lines = []
+    line_parts = []
+    sep = b'\n'
     while True:
+        try:
+            line_parts.append(await stream.readuntil(sep))
+        except IncompleteReadError as e:
+            line_parts.append(e.partial)
+        except LimitOverrunError as e:
+            part = await stream.read(e.consumed)
+            line_parts.append(part)
+            if part:
+                continue
+
+        line = b''.join(line_parts)
+        line_parts.clear()
         if not line:
             break
         text = line.decode('utf-8')
         if callback:
             callback(f'{name}: {text.strip()}')
         lines.append(text)
-        line = await stream.readline()
     return ''.join(lines)
 
 

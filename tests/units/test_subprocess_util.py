@@ -48,3 +48,11 @@ def test_log_run_multi() -> None:
         assert inp == call('stderr: ' + msg)
     assert proc.stdout == '\n'.join(expected_out) + '\n'
     assert proc.stderr == '\n'.join(expected_err) + '\n'
+
+
+def test_log_run_long_line() -> None:
+    args = ('sh', '-c', 'dd if=/dev/zero of=/dev/stdout bs=1K count=65 ; echo ; echo foo')
+    proc = antsibull_core.subprocess_util.log_run(args)
+    assert proc.args == args
+    assert proc.returncode == 0
+    assert proc.stdout == ('\u0000' * (65 * 1024)) + '\nfoo\n'
