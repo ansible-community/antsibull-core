@@ -105,6 +105,20 @@ line_length = 100
 multi_line_output = 3
 include_trailing_comma = true
 
+[tool.coverage.report]
+# https://coverage.readthedocs.io/en/latest/excluding.html#advanced-exclusion
+# These should use single quotes in TOML, as they're regular expressions.
+exclude_lines = [
+    'pragma: no cover',
+    'def __repr__',
+    'raise NotImplementedError',
+    'if __name__ == .__main__.:',
+    'if TYPE_CHECKING:',
+    'if t.TYPE_CHECKING:',
+    'class .*\bProtocol\):',
+    '@(abc\.)?abstractmethod',
+]
+
 [tool.coverage.paths]
 source = [
     "src",
