@@ -7,7 +7,7 @@
 
 from __future__ import annotations
 
-import sh
+from antsibull_core.subprocess_util import log_run
 
 try:
     # We fallback to /usr/bin/getfacl so we can ignore failure to import this
@@ -32,10 +32,8 @@ def _get_acls(path: str) -> str:
         acls = acl.to_any_text(options=posix1e.TEXT_NUMERIC_IDS).decode('utf-8')
     else:
         try:
-            # sh dynamically creates functions which map to executables
-            # pyre-ignore[16]
-            acls = sh.getfacl(path, '-n').stdout.decode('utf-8')  # pylint:disable=no-member
-        except sh.CommandNotFound:
+            acls = log_run(['getfacl', path, '-n']).stdout
+        except FileNotFoundError:
             pass
         except Exception as e:
             # pylint:disable-next=raise-missing-from

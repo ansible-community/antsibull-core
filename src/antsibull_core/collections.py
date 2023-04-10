@@ -9,11 +9,8 @@ from __future__ import annotations
 
 import asyncio
 import os
-from concurrent.futures import ThreadPoolExecutor
 
-import sh
-
-from . import app_context
+from .subprocess_util import async_log_run
 
 
 class CollectionFormatError(Exception):
@@ -22,10 +19,6 @@ class CollectionFormatError(Exception):
 
 async def install_together(collection_tarballs: list[str],
                            ansible_collections_dir: str) -> None:
-    loop = asyncio.get_running_loop()
-    lib_ctx = app_context.lib_ctx.get()
-    executor = ThreadPoolExecutor(max_workers=lib_ctx.thread_max)
-
     installers = []
     for pathname in collection_tarballs:
         namespace, collection, _dummy = os.path.basename(pathname).split('-', 2)
@@ -33,13 +26,11 @@ async def install_together(collection_tarballs: list[str],
         # Note: mkdir -p equivalent is okay because we created package_dir ourselves as a directory
         # that only we can access
         os.makedirs(collection_dir, mode=0o700, exist_ok=False)
-
-        # If the choice of install tools for galaxy is ever settled upon, we can switch from tar to
-        # using that
-        # sh dynamically creates functions which map to executables
-        # pyre-ignore[16] pylint:disable-next=no-member
-        installers.append(loop.run_in_executor(executor, sh.tar, '-xf', pathname, '-C',
-                                               collection_dir))
+        installers.append(
+            asyncio.create_task(
+                async_log_run(['tar', '-xf', pathname, '-C', collection_dir])
+            )
+        )
 
     await asyncio.gather(*installers)
 
@@ -50,10 +41,6 @@ async def install_separately(collection_tarballs: list[str], collection_dir: str
 
     if not collection_tarballs:
         return collection_dirs
-
-    loop = asyncio.get_running_loop()
-    lib_ctx = app_context.lib_ctx.get()
-    executor = ThreadPoolExecutor(max_workers=lib_ctx.thread_max)
 
     for pathname in collection_tarballs:
         filename = os.path.basename(pathname)
@@ -79,12 +66,11 @@ async def install_separately(collection_tarballs: list[str], collection_dir: str
         # that only we can access
         os.makedirs(collection_dir, mode=0o700, exist_ok=False)
 
-        # If the choice of install tools for galaxy is ever settled upon, we can switch from tar to
-        # using that
-        # sh dynamically creates functions which map to executables
-        # pyre-ignore[16] pylint:disable-next=no-member
-        installers.append(loop.run_in_executor(executor, sh.tar, '-xf', pathname, '-C',
-                                               collection_dir))
+        installers.append(
+            asyncio.create_task(
+                async_log_run(['tar', '-xf', pathname, '-C', collection_dir])
+            )
+        )
 
     await asyncio.gather(*installers)
 
