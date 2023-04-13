@@ -30,6 +30,7 @@ def test_venv_run_init(tmp_path):
             None,
             'debug',
             True,
+            errors='strict',
             env=get_clean_environment(),
         )
 

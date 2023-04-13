@@ -26,14 +26,15 @@ mlog = log.fields(mod=__name__)
 
 
 async def _stream_log(
-    name: str, callback: Callable[[str], Any] | None, stream: asyncio.StreamReader
+    name: str, callback: Callable[[str], Any] | None, stream: asyncio.StreamReader,
+    errors: str,
 ) -> str:
     line = await stream.readline()
     lines = []
     while True:
         if not line:
             break
-        text = line.decode('utf-8')
+        text = line.decode('utf-8', errors=errors)
         if callback:
             callback(f'{name}: {text.strip()}')
         lines.append(text)
@@ -47,6 +48,8 @@ async def async_log_run(
     stdout_loglevel: str | None = None,
     stderr_loglevel: str | None = 'debug',
     check: bool = True,
+    *,
+    errors: str = 'strict',
     **kwargs,
 ) -> subprocess.CompletedProcess:
     """
@@ -64,6 +67,8 @@ async def async_log_run(
     :param check:
         Whether to raise a `subprocess.CalledProcessError` when the
         command returns a non-zero exit code
+    :param errors:
+        How to handle UTF-8 decoding errors. Default is ``strict``.
     """
     logger = logger or mlog
     stdout_logfunc: Callable[[str], Any] | None = None
@@ -81,12 +86,18 @@ async def async_log_run(
         # proc.stdout and proc.stderr won't be None with PIPE, hence the cast()
         asyncio.create_task(
             _stream_log(
-                'stdout', stdout_logfunc, cast(asyncio.StreamReader, proc.stdout)
+                'stdout',
+                stdout_logfunc,
+                cast(asyncio.StreamReader, proc.stdout),
+                errors,
             )
         ),
         asyncio.create_task(
             _stream_log(
-                'stderr', stderr_logfunc, cast(asyncio.StreamReader, proc.stderr)
+                'stderr',
+                stderr_logfunc,
+                cast(asyncio.StreamReader, proc.stderr),
+                errors,
             )
         ),
     )

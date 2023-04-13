@@ -101,6 +101,8 @@ class VenvRunner:
         stdout_loglevel: str | None = None,
         stderr_loglevel: str | None = 'debug',
         check: bool = True,
+        *,
+        errors: str = 'strict',
         **kwargs,
     ) -> subprocess.CompletedProcess:
         """
@@ -118,7 +120,7 @@ class VenvRunner:
             raise ValueError(f'{path!r} does not exist!')
         args[0] = path
         return await subprocess_util.async_log_run(
-            args, logger, stdout_loglevel, stderr_loglevel, check, **kwargs
+            args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
         )
 
     def log_run(
@@ -128,6 +130,8 @@ class VenvRunner:
         stdout_loglevel: str | None = None,
         stderr_loglevel: str | None = 'debug',
         check: bool = True,
+        *,
+        errors: str = 'strict',
         **kwargs,
     ) -> subprocess.CompletedProcess:
         """
@@ -135,7 +139,7 @@ class VenvRunner:
         """
         return asyncio.run(
             self.async_log_run(
-                args, logger, stdout_loglevel, stderr_loglevel, check, **kwargs
+                args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
             )
         )
 
