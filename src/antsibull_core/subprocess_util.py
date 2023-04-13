@@ -29,6 +29,10 @@ mlog = log.fields(mod=__name__)
 async def _stream_log(
     name: str, callback: Callable[[str], Any] | None, stream: asyncio.StreamReader
 ) -> str:
+    # We do not simply use stream.readline() since it has a line length limit.
+    # While we set this limit already to 8 MB (the default is 64 KB), we still
+    # want to cover longer lines as well, so we use stream.readuntil('\n')
+    # and manually handle the case of longer lines.
     lines = []
     line_parts = []
     sep = b'\n'
@@ -89,6 +93,7 @@ async def async_log_run(
     logger.debug(f'Running subprocess: {args!r}')
     kwargs['stdout'] = asyncio.subprocess.PIPE
     kwargs['stderr'] = asyncio.subprocess.PIPE
+    kwargs['limit'] = 2 ** 23  # Increase line length limit to 8 MB (the default is 64k)
     proc = await asyncio.create_subprocess_exec(*args, **kwargs)
     stdout, stderr = await asyncio.gather(
         # proc.stdout and proc.stderr won't be None with PIPE, hence the cast()
