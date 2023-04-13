@@ -11,7 +11,7 @@ import pydantic as p
 
 from ..utils.collections import ContextDict
 from .config import DEFAULT_LOGGING_CONFIG, LoggingModel
-from .validators import convert_bool, convert_none, convert_path
+from .validators import convert_none, convert_path
 
 
 class BaseModel(p.BaseModel):
@@ -49,11 +49,7 @@ class AppContext(BaseModel):
         or the entries can be given an actual entry in the AppContext to take advantage of the
         schema's checking, normalization, and default setting.
     :ivar ansible_base_url: Url to the ansible-core git repo.
-    :ivar breadcrumbs: If True, build with breadcrumbs on the plugin pages (this takes more memory).
-    :ivar use_html_blobs: If True, use HTML blobs instead of RST tables for option and return value
-        tables (this takes less memory).
     :ivar galaxy_url: URL of the galaxy server to get collection info from
-    :ivar indexes: If True, create index pages for all collections and all plugins in a collection.
     :ivar logging_cfg: Configuration of the application logging
     :ivar pypi_url: URL of the pypi server to query for information
     :ivar collection_cache: If set, must be a path pointing to a directory where collection
@@ -63,19 +59,13 @@ class AppContext(BaseModel):
     extra: ContextDict = ContextDict()
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
     ansible_base_url: p.HttpUrl = 'https://github.com/ansible/ansible/'  # type: ignore[assignment]
-    breadcrumbs: p.StrictBool = True
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
     galaxy_url: p.HttpUrl = 'https://galaxy.ansible.com/'  # type: ignore[assignment]
-    indexes: p.StrictBool = True
     logging_cfg: LoggingModel = LoggingModel.parse_obj(DEFAULT_LOGGING_CONFIG)
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
     pypi_url: p.HttpUrl = 'https://pypi.org/'  # type: ignore[assignment]
-    use_html_blobs: p.StrictBool = False
     collection_cache: t.Optional[str] = None
 
-    # pylint: disable-next=unused-private-member
-    __convert_bools = p.validator('breadcrumbs', 'indexes', 'use_html_blobs',
-                                  pre=True, allow_reuse=True)(convert_bool)
     # pylint: disable-next=unused-private-member
     __convert_paths = p.validator('collection_cache',
                                   pre=True, allow_reuse=True)(convert_path)
@@ -94,15 +84,9 @@ class LibContext(BaseModel):
         disable.
     :ivar max_retries: Maximum number of times to retry an http request (in case of timeouts and
         other transient problems.
-    :ivar doc_parsing_backend: The backend to use for parsing the documentation strings from
-        plugins.  'auto' selects a backend depending on the ansible-core version.
-        'ansible-internal' is the fastest, but does not work with ansible-core 2.13+.
-        'ansible-core-2.13' is also very fast, but requires ansible-core 2.13+.
-        'ansible-doc' exists in case of problems with the ansible-internal backend.
     """
 
     chunksize: int = 4096
-    doc_parsing_backend: str = 'auto'
     max_retries: int = 10
     process_max: t.Optional[int] = None
     thread_max: int = 8
