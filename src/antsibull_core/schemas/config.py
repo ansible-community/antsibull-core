@@ -13,14 +13,10 @@ import pydantic as p
 import twiggy.formats  # type: ignore[import]
 import twiggy.outputs  # type: ignore[import]
 
-from .validators import convert_bool, convert_none, convert_path
+from .validators import convert_none, convert_path
 
 #: Valid choices for a logging level field
 LEVEL_CHOICES_F = p.Field(..., regex='^(CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG|DISABLED)$')
-
-#: Valid choices for a logging level field
-DOC_PARSING_BACKEND_CHOICES_F = p.Field(
-    'ansible-internal', regex='^(auto|ansible-doc|ansible-core-2.13|ansible-internal)$')
 
 #: Valid choice of the logging version field
 VERSION_CHOICES_F = p.Field(..., regex=r'1\.0')
@@ -120,24 +116,18 @@ DEFAULT_LOGGING_CONFIG = LoggingModel.parse_obj(
 class ConfigModel(BaseModel):
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
     ansible_base_url: p.HttpUrl = 'https://github.com/ansible/ansible'  # type: ignore[assignment]
-    breadcrumbs: p.StrictBool = True
     chunksize: int = 4096
-    doc_parsing_backend: str = DOC_PARSING_BACKEND_CHOICES_F
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
     galaxy_url: p.HttpUrl = 'https://galaxy.ansible.com/'  # type: ignore[assignment]
-    indexes: p.StrictBool = True
     logging_cfg: LoggingModel = DEFAULT_LOGGING_CONFIG
     max_retries: int = 10
     process_max: t.Optional[int] = None
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
     pypi_url: p.HttpUrl = 'https://pypi.org/'  # type: ignore[assignment]
-    use_html_blobs: p.StrictBool = False
     thread_max: int = 8
     file_check_content: int = 262144
     collection_cache: t.Optional[str] = None
 
     _convert_nones = p.validator('process_max', pre=True, allow_reuse=True)(convert_none)
-    _convert_bools = p.validator('breadcrumbs', 'indexes', 'use_html_blobs',
-                                 pre=True, allow_reuse=True)(convert_bool)
     _convert_paths = p.validator('collection_cache',
                                  pre=True, allow_reuse=True)(convert_path)
