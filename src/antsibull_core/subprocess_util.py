@@ -44,9 +44,8 @@ async def _stream_log(
         except LimitOverrunError as e:
             part = await stream.read(e.consumed)
             line_parts.append(part)
-            if part and not part.endswith(sep):
+            if part:
                 continue
-            del part
 
         line = b''.join(line_parts)
         line_parts.clear()
