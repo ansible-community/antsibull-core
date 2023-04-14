@@ -65,8 +65,8 @@ class GalaxyContext:
         self.base_url = base_url
 
     @classmethod
-    async def create(cls, aio_session: aiohttp.client.ClientSession, galaxy_server: str
-                     ) -> GalaxyContext:
+    async def create(cls, aio_session: 'aiohttp.client.ClientSession', galaxy_server: str
+                     ) -> 'GalaxyContext':
         api_url = urljoin(galaxy_server, 'api/')
         async with retry_get(aio_session, api_url,
                              headers={'Accept': 'application/json'}) as response:
@@ -86,10 +86,10 @@ class GalaxyContext:
         return cls(galaxy_server, version, base_url)
 
 
-_GALAXY_CONTEXT_CACHE: dict[str, t.Union[GalaxyContext, asyncio.Future]] = {}
+_GALAXY_CONTEXT_CACHE: t.Dict[str, t.Union[GalaxyContext, asyncio.Future]] = {}
 
 
-async def _get_cached_galaxy_context(aio_session: aiohttp.client.ClientSession,
+async def _get_cached_galaxy_context(aio_session: 'aiohttp.client.ClientSession',
                                      galaxy_server: str) -> GalaxyContext:
     context_or_future = _GALAXY_CONTEXT_CACHE.get(galaxy_server)
     if context_or_future is not None:
@@ -105,7 +105,7 @@ async def _get_cached_galaxy_context(aio_session: aiohttp.client.ClientSession,
             context = await GalaxyContext.create(aio_session, galaxy_server)
             future.set_result(context)
             _GALAXY_CONTEXT_CACHE[galaxy_server] = context
-        except Exception as exc:  # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-except
             future.set_exception(exc)
 
     loop.create_task(_init())
@@ -117,7 +117,7 @@ class GalaxyClient:
     """Class for querying the Galaxy REST API."""
 
     def __init__(self, aio_session: 'aiohttp.client.ClientSession',
-                 galaxy_server: str = t.Optional[str] = None,
+                 galaxy_server: t.Optional[str] = None,
                  context: t.Optional[GalaxyContext] = None) -> None:
         """
         Create a GalaxyClient object to query the Galaxy Server.
@@ -344,7 +344,7 @@ class CollectionDownloader(GalaxyClient):
     def __init__(self, aio_session: 'aiohttp.client.ClientSession',
                  download_dir: str,
                  galaxy_server: t.Optional[str] = None,
-                 collection_cache: str | None = None,
+                 collection_cache: t.Optional[str] = None,
                  context: t.Optional[GalaxyContext] = None) -> None:
         """
         Create an object to download collections from galaxy.
