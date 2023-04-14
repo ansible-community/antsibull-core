@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import asyncio
+import dataclasses
 import os.path
 import shutil
 import typing as t
@@ -56,15 +57,11 @@ class GalaxyVersion(Enum):
     V3 = 3
 
 
+@dataclasses.dataclass
 class GalaxyContext:
     server: str
     version: GalaxyVersion
     base_url: str
-
-    def __init__(self, server: str, version: GalaxyVersion, base_url: str) -> None:
-        self.server = server
-        self.version = version
-        self.base_url = base_url
 
     @classmethod
     async def create(cls, aio_session: aiohttp.client.ClientSession, galaxy_server: str
@@ -144,8 +141,8 @@ class GalaxyClient:
         self.galaxy_server = galaxy_server
         self.context = context
         self.aio_session = aio_session
-        self.headers: t.Dict[str, str] = {'Accept': 'application/json'}
-        self.params: t.Dict[str, str] = {}
+        self.headers: dict[str, str] = {'Accept': 'application/json'}
+        self.params: dict[str, str] = {}
         if context:
             self._update_from_context(context)
 
