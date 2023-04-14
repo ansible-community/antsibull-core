@@ -5,6 +5,8 @@
 
 from unittest.mock import MagicMock, call
 
+import pytest
+
 import antsibull_core.subprocess_util
 
 
@@ -48,3 +50,18 @@ def test_log_run_multi() -> None:
         assert inp == call('stderr: ' + msg)
     assert proc.stdout == '\n'.join(expected_out) + '\n'
     assert proc.stderr == '\n'.join(expected_err) + '\n'
+
+
+@pytest.mark.parametrize('count', [
+    8 * 1024 * 1024 - 1,  # should not trigger long line code
+    8 * 1024 * 1024,  # should not trigger long line code
+    8 * 1024 * 1024 + 1,
+    8 * 1024 * 1024 + 10,
+    9 * 1024 * 1024,
+])
+def test_log_run_long_line(count: int) -> None:
+    args = ('sh', '-c', f'dd if=/dev/zero of=/dev/stdout bs={count} count=1 ; echo ; echo foo')
+    proc = antsibull_core.subprocess_util.log_run(args)
+    assert proc.args == args
+    assert proc.returncode == 0
+    assert proc.stdout == ('\u0000' * count) + '\nfoo\n'
