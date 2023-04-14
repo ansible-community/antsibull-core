@@ -63,5 +63,9 @@ jobs:
         run: |
           ./test-pytest.sh
           poetry run coverage xml -i
-          poetry run codecov
         working-directory: antsibull-core
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          working-directory: antsibull-core
