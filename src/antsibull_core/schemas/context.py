@@ -84,9 +84,18 @@ class LibContext(BaseModel):
         disable.
     :ivar max_retries: Maximum number of times to retry an http request (in case of timeouts and
         other transient problems.
+    :ivar doc_parsing_backend: The backend to use for parsing the documentation strings from
+        plugins.  This is DEPRECATED and will be removed from the library context in
+        antsibull-core 3.0.0.
+        'auto' selects a backend depending on the ansible-core version.
+        'ansible-internal' is the fastest, but does not work with ansible-core 2.13+.
+        'ansible-core-2.13' is also very fast, but requires ansible-core 2.13+.
+        'ansible-doc' exists in case of problems with the ansible-internal backend.
     """
 
     chunksize: int = 4096
+    # DEPRECATED: doc_parsing_backend will be removed in antsibull-core 3.0.0
+    doc_parsing_backend: str = 'auto'
     max_retries: int = 10
     process_max: t.Optional[int] = None
     thread_max: int = 8
