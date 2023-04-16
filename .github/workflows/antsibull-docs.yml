@@ -49,7 +49,6 @@ jobs:
           python3 -m venv venv
           . ./venv/bin/activate
           python -m pip install --upgrade pip
-          # The following two installs MUST NOT be done in one transaction. Otherwise antsibull-core will be installed from PyPI instead of from ../antsibull-core!
           python -m pip install ../antsibull-core
           python -m pip install . "pyre-check ~= 0.9"
         working-directory: antsibull-docs
