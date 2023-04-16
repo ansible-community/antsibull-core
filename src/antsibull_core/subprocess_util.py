@@ -25,6 +25,8 @@ if TYPE_CHECKING:
 
 mlog = log.fields(mod=__name__)
 
+CalledProcessError = subprocess.CalledProcessError
+
 
 async def _stream_log(
     name: str, callback: Callable[[str], Any] | None, stream: asyncio.StreamReader,
@@ -145,3 +147,6 @@ def log_run(
     return asyncio.run(
         async_log_run(args, logger, stdout_loglevel, stderr_loglevel, check, **kwargs)
     )
+
+
+__all__ = ('async_log_run', 'log_run', 'CalledProcessError')
