@@ -49,7 +49,7 @@ jobs:
           python3 -m venv venv
           . ./venv/bin/activate
           python -m pip install --upgrade pip
-          python -m pip install . ../antsibull-docs "pyre-check ~= 0.9.15"
+          python -m pip install . ../antsibull-core "pyre-check ~= 0.9"
         working-directory: antsibull-docs
 
       # pyre should complain if a signature changed in an incompatible way
