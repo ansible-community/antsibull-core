@@ -73,3 +73,6 @@ jobs:
           . ./venv/bin/activate
           ansible-playbook -vv playbooks/build-single-release.yaml -e antsibull_ansible_version=7.99.0 -e antsibull_build_file=ansible-7.build -e antsibull_data_dir="{{ antsibull_data_git_dir }}/7" -e antsibull_ansible_git_version=devel
         working-directory: antsibull
+        env:
+          # Make result better readable
+          ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
