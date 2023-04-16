@@ -70,7 +70,7 @@ async def async_log_run(
     *,
     errors: str = 'strict',
     **kwargs,
-) -> subprocess.CompletedProcess:
+) -> subprocess.CompletedProcess[str]:
     """
     Asynchronously run a command in a subprocess and log its output.
     The command's stdout and stderr are always captured.
@@ -138,7 +138,7 @@ def log_run(
     stderr_loglevel: str | None = 'debug',
     check: bool = True,
     **kwargs,
-) -> subprocess.CompletedProcess:
+) -> subprocess.CompletedProcess[str]:
     """
     Synchronous wrapper for the async_log_run function.
     This function runs a command in a subprocess and captures and logs its

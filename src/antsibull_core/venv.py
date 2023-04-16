@@ -104,7 +104,7 @@ class VenvRunner:
         *,
         errors: str = 'strict',
         **kwargs,
-    ) -> subprocess.CompletedProcess:
+    ) -> subprocess.CompletedProcess[str]:
         """
         This method asynchronously runs a command in a subprocess and logs
         its output. It calls `antsibull_core.subprocess_util.async_log_run` to
@@ -133,7 +133,7 @@ class VenvRunner:
         *,
         errors: str = 'strict',
         **kwargs,
-    ) -> subprocess.CompletedProcess:
+    ) -> subprocess.CompletedProcess[str]:
         """
         See :method:`async_log_run`
         """
