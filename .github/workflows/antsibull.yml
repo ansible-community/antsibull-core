@@ -75,9 +75,9 @@ jobs:
         working-directory: antsibull
 
       # We use Ansible 5 here since antsibull 0.44.0 is not compatible with the latest Ansible 6 releases (due to _python in .deps files)
-      - name: "Test building a release: Ansible 5 with ansible-core devel"
+      - name: "Test building a release: Ansible 5 with ansible-core 2.12"
         run: |
-          ansible-playbook -vv playbooks/build-single-release.yaml -e 'antsibull_build_command="poetry run antsibull-build"' -e antsibull_ansible_version=5.99.0 -e antsibull_build_file=ansible-5.build -e antsibull_data_dir="{{ antsibull_data_git_dir }}/5" -e antsibull_ansible_git_version=devel
+          ansible-playbook -vv playbooks/build-single-release.yaml -e 'antsibull_build_command="poetry run antsibull-build"' -e antsibull_ansible_version=5.99.0 -e antsibull_build_file=ansible-5.build -e antsibull_data_dir="{{ antsibull_data_git_dir }}/5" -e antsibull_ansible_git_version=2.12
         working-directory: antsibull
         env:
           # Make result better readable
