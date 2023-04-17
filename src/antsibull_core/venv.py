@@ -93,7 +93,7 @@ class VenvRunner:
             directly to :command:`pip install`.
         :returns: An :obj:`subprocess.CompletedProcess` for the pip output.
         """
-        return self.log_run(["pip", "install", package_name])  # pyre-ignore[6]
+        return self.log_run(['pip', 'install', package_name])  # pyre-ignore[6]
 
     async def async_log_run(
         self,
@@ -112,7 +112,7 @@ class VenvRunner:
         do the heavy lifting. `args[0]` must be a filename that's installed in
         the venv. If it's not, a `ValueError` will be raised.
         """
-        kwargs.setdefault("env", get_clean_environment())
+        kwargs.setdefault('env', get_clean_environment())
         basename = args[0]
         if os.path.isabs(basename):
             raise ValueError(f'{basename!r} must not be an absolute path!')
