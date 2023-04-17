@@ -11,7 +11,7 @@ import asyncio
 import os
 import sys
 import venv
-from collections.abc import MutableSequence
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, NoReturn
 
 import sh
@@ -69,8 +69,7 @@ class VenvRunner:
         # we need pip19+ in order to work now.  RHEL8 and Ubuntu 18.04 contain a pip that's older
         # than that so we must upgrade to something even if it's not latest.
 
-        # pyre thinks a list is not a MutableSequence when it very much is.
-        self.log_run(['pip', 'install', '--upgrade', 'pip'])  # pyre-ignore[6]
+        self.log_run(['pip', 'install', '--upgrade', 'pip'])
 
     def get_command(self, executable_name) -> sh.Command:
         """
@@ -93,11 +92,11 @@ class VenvRunner:
             directly to :command:`pip install`.
         :returns: An :obj:`subprocess.CompletedProcess` for the pip output.
         """
-        return self.log_run(['pip', 'install', package_name])  # pyre-ignore[6]
+        return self.log_run(['pip', 'install', package_name])
 
     async def async_log_run(
         self,
-        args: MutableSequence[StrPath],
+        args: Sequence[StrPath],
         logger: TwiggyLogger | StdLogger | None = None,
         stdout_loglevel: str | None = None,
         stderr_loglevel: str | None = 'debug',
@@ -119,14 +118,14 @@ class VenvRunner:
         path = os.path.join(self.venv_dir, 'bin', basename)
         if not os.path.exists(path):
             raise ValueError(f'{path!r} does not exist!')
-        args[0] = path
+        args = [path, *args[1:]]
         return await subprocess_util.async_log_run(
             args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
         )
 
     def log_run(
         self,
-        args: MutableSequence[StrPath],
+        args: Sequence[StrPath],
         logger: TwiggyLogger | StdLogger | None = None,
         stdout_loglevel: str | None = None,
         stderr_loglevel: str | None = 'debug',
@@ -156,7 +155,7 @@ class FakeVenvRunner:
 
     @staticmethod
     async def async_log_run(
-        args: MutableSequence[StrPath],
+        args: Sequence[StrPath],
         logger: TwiggyLogger | StdLogger | None = None,
         stdout_loglevel: str | None = None,
         stderr_loglevel: str | None = 'debug',
@@ -172,7 +171,7 @@ class FakeVenvRunner:
         but 'python' will be replaced by `sys.executable`.
         """
         if args and args[0] == 'python':
-            args[0] = sys.executable
+            args = [sys.executable, *args[1:]]
         return await subprocess_util.async_log_run(
             args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
         )
@@ -180,7 +179,7 @@ class FakeVenvRunner:
     @classmethod
     def log_run(
         cls,
-        args: MutableSequence[StrPath],
+        args: Sequence[StrPath],
         logger: TwiggyLogger | StdLogger | None = None,
         stdout_loglevel: str | None = None,
         stderr_loglevel: str | None = 'debug',

@@ -58,6 +58,7 @@ def test_fake_venv_python():
         p = FakeVenvRunner.log_run(args)
         assert p.stdout == 'Hello, world!\n'
 
+        args = args.copy()
         args[0] = sys.executable
         log_run.assert_called_once_with(
             args,
