@@ -68,10 +68,10 @@ jobs:
           ./lint-pyre.sh
         working-directory: antsibull
 
-      - name: "Test building a release: Ansible 7 with ansible-core devel"
+      - name: "Test building a release: Ansible 7 with ansible-core 2.14"
         run: |
           . ./venv/bin/activate
-          ansible-playbook -vv playbooks/build-single-release.yaml -e antsibull_ansible_version=7.99.0 -e antsibull_build_file=ansible-7.build -e antsibull_data_dir="{{ antsibull_data_git_dir }}/7" -e antsibull_ansible_git_version=devel
+          ansible-playbook -vv playbooks/build-single-release.yaml -e antsibull_ansible_version=7.99.0 -e antsibull_build_file=ansible-7.build -e antsibull_data_dir="{{ antsibull_data_git_dir }}/7" -e antsibull_ansible_git_version=stable-2.14
         working-directory: antsibull
         env:
           # Make result better readable
