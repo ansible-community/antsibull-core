@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import sys
 import venv
 from collections.abc import MutableSequence
 from typing import TYPE_CHECKING, NoReturn
@@ -153,8 +154,49 @@ class FakeVenvRunner:
         * :python:mod:`venv`
     """
 
-    log_run = staticmethod(subprocess_util.log_run)
-    async_log_run = staticmethod(subprocess_util.async_log_run)
+    @staticmethod
+    async def async_log_run(
+        args: MutableSequence[StrPath],
+        logger: TwiggyLogger | StdLogger | None = None,
+        stdout_loglevel: str | None = None,
+        stderr_loglevel: str | None = 'debug',
+        check: bool = True,
+        *,
+        errors: str = 'strict',
+        **kwargs,
+    ) -> subprocess.CompletedProcess[str]:
+        """
+        This method asynchronously runs a command in a subprocess and logs its
+        output.
+        It works the same as `antsibull_core.subprocess_util.async_log_run`,
+        but 'python' will be replaced by `sys.executable`.
+        """
+        if args and args[0] == 'python':
+            args[0] = sys.executable
+        return await subprocess_util.async_log_run(
+            args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
+        )
+
+    @classmethod
+    def log_run(
+        cls,
+        args: MutableSequence[StrPath],
+        logger: TwiggyLogger | StdLogger | None = None,
+        stdout_loglevel: str | None = None,
+        stderr_loglevel: str | None = 'debug',
+        check: bool = True,
+        *,
+        errors: str = 'strict',
+        **kwargs,
+    ) -> subprocess.CompletedProcess[str]:
+        """
+        See :method:`async_log_run`
+        """
+        return asyncio.run(
+            cls.async_log_run(
+                args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
+            )
+        )
 
     @staticmethod
     def get_command(executable_name) -> sh.Command:
