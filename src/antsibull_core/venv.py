@@ -14,7 +14,7 @@ import venv
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, NoReturn
 
-import sh
+import sh  # type: ignore[import]
 
 from antsibull_core import subprocess_util
 
