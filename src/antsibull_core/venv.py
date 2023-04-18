@@ -9,8 +9,9 @@ from __future__ import annotations
 
 import asyncio
 import os
+import sys
 import venv
-from collections.abc import MutableSequence
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, NoReturn
 
 import sh
@@ -68,8 +69,7 @@ class VenvRunner:
         # we need pip19+ in order to work now.  RHEL8 and Ubuntu 18.04 contain a pip that's older
         # than that so we must upgrade to something even if it's not latest.
 
-        # pyre thinks a list is not a MutableSequence when it very much is.
-        self.log_run(['pip', 'install', '--upgrade', 'pip'])  # pyre-ignore[6]
+        self.log_run(['pip', 'install', '--upgrade', 'pip'])
 
     def get_command(self, executable_name) -> sh.Command:
         """
@@ -92,11 +92,11 @@ class VenvRunner:
             directly to :command:`pip install`.
         :returns: An :obj:`subprocess.CompletedProcess` for the pip output.
         """
-        return self.log_run(["pip", "install", package_name])  # pyre-ignore[6]
+        return self.log_run(['pip', 'install', package_name])
 
     async def async_log_run(
         self,
-        args: MutableSequence[StrPath],
+        args: Sequence[StrPath],
         logger: TwiggyLogger | StdLogger | None = None,
         stdout_loglevel: str | None = None,
         stderr_loglevel: str | None = 'debug',
@@ -111,21 +111,21 @@ class VenvRunner:
         do the heavy lifting. `args[0]` must be a filename that's installed in
         the venv. If it's not, a `ValueError` will be raised.
         """
-        kwargs.setdefault("env", get_clean_environment())
+        kwargs.setdefault('env', get_clean_environment())
         basename = args[0]
         if os.path.isabs(basename):
             raise ValueError(f'{basename!r} must not be an absolute path!')
         path = os.path.join(self.venv_dir, 'bin', basename)
         if not os.path.exists(path):
             raise ValueError(f'{path!r} does not exist!')
-        args[0] = path
+        args = [path, *args[1:]]
         return await subprocess_util.async_log_run(
             args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
         )
 
     def log_run(
         self,
-        args: MutableSequence[StrPath],
+        args: Sequence[StrPath],
         logger: TwiggyLogger | StdLogger | None = None,
         stdout_loglevel: str | None = None,
         stderr_loglevel: str | None = 'debug',
@@ -153,8 +153,49 @@ class FakeVenvRunner:
         * :python:mod:`venv`
     """
 
-    log_run = staticmethod(subprocess_util.log_run)
-    async_log_run = staticmethod(subprocess_util.async_log_run)
+    @staticmethod
+    async def async_log_run(
+        args: Sequence[StrPath],
+        logger: TwiggyLogger | StdLogger | None = None,
+        stdout_loglevel: str | None = None,
+        stderr_loglevel: str | None = 'debug',
+        check: bool = True,
+        *,
+        errors: str = 'strict',
+        **kwargs,
+    ) -> subprocess.CompletedProcess[str]:
+        """
+        This method asynchronously runs a command in a subprocess and logs its
+        output.
+        It works the same as `antsibull_core.subprocess_util.async_log_run`,
+        but 'python' will be replaced by `sys.executable`.
+        """
+        if args and args[0] == 'python':
+            args = [sys.executable, *args[1:]]
+        return await subprocess_util.async_log_run(
+            args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
+        )
+
+    @classmethod
+    def log_run(
+        cls,
+        args: Sequence[StrPath],
+        logger: TwiggyLogger | StdLogger | None = None,
+        stdout_loglevel: str | None = None,
+        stderr_loglevel: str | None = 'debug',
+        check: bool = True,
+        *,
+        errors: str = 'strict',
+        **kwargs,
+    ) -> subprocess.CompletedProcess[str]:
+        """
+        See :method:`async_log_run`
+        """
+        return asyncio.run(
+            cls.async_log_run(
+                args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
+            )
+        )
 
     @staticmethod
     def get_command(executable_name) -> sh.Command:

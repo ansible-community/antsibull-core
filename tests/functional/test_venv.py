@@ -4,6 +4,7 @@
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 
 import os.path
+import sys
 from unittest import mock
 
 import pytest
@@ -47,3 +48,23 @@ def test_venv_log_run_error2(tmp_path):
     echo = '/usr/bin/echo'
     with pytest.raises(ValueError, match=rf'^{echo!r} must not be an absolute path!'):
         runner.log_run([echo, "This also won't work!"])
+
+
+def test_fake_venv_python():
+    with mock.patch.object(
+        subprocess_util, 'async_log_run', wraps=subprocess_util.async_log_run
+    ) as log_run:
+        args = ['python', '-c', 'import antsibull_core; print("Hello, world!")']
+        p = FakeVenvRunner.log_run(args)
+        assert p.stdout == 'Hello, world!\n'
+
+        args = args.copy()
+        args[0] = sys.executable
+        log_run.assert_called_once_with(
+            args,
+            None,
+            None,
+            'debug',
+            True,
+            errors='strict',
+        )
