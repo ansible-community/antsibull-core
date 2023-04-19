@@ -153,8 +153,8 @@ class FakeVenvRunner:
         * :python:mod:`venv`
     """
 
-    @staticmethod
     async def async_log_run(
+        self,
         args: Sequence[StrPath],
         logger: TwiggyLogger | StdLogger | None = None,
         stdout_loglevel: str | None = None,
@@ -176,9 +176,8 @@ class FakeVenvRunner:
             args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
         )
 
-    @classmethod
     def log_run(
-        cls,
+        self,
         args: Sequence[StrPath],
         logger: TwiggyLogger | StdLogger | None = None,
         stdout_loglevel: str | None = None,
@@ -192,7 +191,7 @@ class FakeVenvRunner:
         See :method:`async_log_run`
         """
         return asyncio.run(
-            cls.async_log_run(
+            self.async_log_run(
                 args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
             )
         )
