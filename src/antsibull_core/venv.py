@@ -153,8 +153,8 @@ class FakeVenvRunner:
         * :python:mod:`venv`
     """
 
-    @staticmethod
     async def async_log_run(
+        self,
         args: Sequence[StrPath],
         logger: TwiggyLogger | StdLogger | None = None,
         stdout_loglevel: str | None = None,
@@ -176,9 +176,8 @@ class FakeVenvRunner:
             args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
         )
 
-    @classmethod
     def log_run(
-        cls,
+        self,
         args: Sequence[StrPath],
         logger: TwiggyLogger | StdLogger | None = None,
         stdout_loglevel: str | None = None,
@@ -192,7 +191,7 @@ class FakeVenvRunner:
         See :method:`async_log_run`
         """
         return asyncio.run(
-            cls.async_log_run(
+            self.async_log_run(
                 args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
             )
         )
@@ -214,10 +213,8 @@ class FakeVenvRunner:
     @staticmethod
     def install_package(package_name: str) -> NoReturn:
         """
-        Install a python package into the venv.
+        This raises a NotImplementedError and only exists for parity with
+        `VenvRunner`.
 
-        :arg package_name: This can be a bare package name or a path to a file.  It's passed
-            directly to :command:`pip install`.
-        :returns: An :sh:obj:`sh.RunningCommand` for the pip output.
         """
         raise NotImplementedError

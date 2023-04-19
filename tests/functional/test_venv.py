@@ -55,7 +55,7 @@ def test_fake_venv_python():
         subprocess_util, 'async_log_run', wraps=subprocess_util.async_log_run
     ) as log_run:
         args = ['python', '-c', 'import antsibull_core; print("Hello, world!")']
-        p = FakeVenvRunner.log_run(args)
+        p = FakeVenvRunner().log_run(args)
         assert p.stdout == 'Hello, world!\n'
 
         args = args.copy()
