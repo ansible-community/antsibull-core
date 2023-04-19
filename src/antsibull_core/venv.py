@@ -213,10 +213,8 @@ class FakeVenvRunner:
     @staticmethod
     def install_package(package_name: str) -> NoReturn:
         """
-        Install a python package into the venv.
+        This raises a NotImplementedError and only exists for parity with
+        `VenvRunner`.
 
-        :arg package_name: This can be a bare package name or a path to a file.  It's passed
-            directly to :command:`pip install`.
-        :returns: An :sh:obj:`sh.RunningCommand` for the pip output.
         """
         raise NotImplementedError
