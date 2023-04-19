@@ -1,5 +1,5 @@
 ---
 bugfixes:
-  - Remove improper usage of ``@functools.cache`` on async function in the
+  - Remove improper usage of ``@functools.cache`` on async functions in the
     ``antsibull_core.ansible_core`` module
     (https://github.com/ansible-community/antsibull-core/pull/67).
