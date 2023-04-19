@@ -11,7 +11,7 @@ import os
 import re
 import tempfile
 import typing as t
-from functools import lru_cache, partial
+from functools import partial
 from urllib.parse import urljoin
 
 import aiofiles
@@ -65,7 +65,6 @@ class AnsibleCorePyPiClient:
             pkg_info = await response.json()
         return pkg_info
 
-    @lru_cache(None)
     async def get_release_info(self) -> t.Dict[str, t.Any]:
         """
         Retrieve information about releases of the ansible-core/ansible-base package from pypi.
@@ -244,7 +243,6 @@ def source_is_correct_version(ansible_core_source: t.Optional[str],
     return False
 
 
-@lru_cache(None)
 async def checkout_from_git(download_dir: str, repo_url: str = _ANSIBLE_CORE_URL) -> str:
     """
     Checkout the ansible-core git repo.
@@ -260,7 +258,6 @@ async def checkout_from_git(download_dir: str, repo_url: str = _ANSIBLE_CORE_URL
     return ansible_core_dir
 
 
-@lru_cache(None)
 async def create_sdist(source_dir: str, dest_dir: str) -> str:
     """
     Create an sdist for the python package at a given path.
