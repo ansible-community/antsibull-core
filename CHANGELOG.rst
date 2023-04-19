@@ -5,6 +5,42 @@ antsibull-core Release Notes
 .. contents:: Topics
 
 
+v2.0.0a2
+========
+
+Release Summary
+---------------
+
+Second alpha release of 2.0.0.
+
+Minor Changes
+-------------
+
+- Add ``async_log_run()`` and ``log_run()`` methods to ``antsibull_core.venv.VenvRunner` and ``antsibull_core.venv.FakeVenvRunner``. These should be used instead of ``get_command()`` (https://github.com/ansible-community/antsibull-core/pull/50).
+- Add a new ``antsibull_core.subprocess_util`` module to help run subprocesses output and log their output (https://github.com/ansible-community/antsibull-core/pull/40).
+- Allow Galaxy client to communicate with the Galaxy v3 API (https://github.com/ansible-community/antsibull-core/pull/45).
+- Replace internal usage of ``sh`` with the ``antsibull.subprocess_util`` module (https://github.com/ansible-community/antsibull-core/pull/51).
+- Use the pypa ``build`` tool instead of directly calling ``setup.py`` which is deprecated (https://github.com/ansible-community/antsibull-core/pull/51).
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- Remove ``breadcrumbs``, ``indexes``, and ``use_html_blobs`` from global antsibull config handling. These options are only used by antsibull-docs, which already validates them itself (https://github.com/ansible-community/antsibull-core/pull/54).
+- The ``install_package()`` method of ``antsibull_core.venv.VenvRunner`` now returns a ``subprocess.CompletedProcess` object instead of an ``sh.RunningCommand``. The rest of the function signature remains the same. Most callers should not need to access the output to begin with (https://github.com/ansible-community/antsibull-core/pull/50).
+
+Deprecated Features
+-------------------
+
+- Deprecate the ``get_command()`` methods of ``antsibull_core.venv.VenvRunner` and ``antsibull_core.venv.FakeVenvRunner``. These methods will be removed in antsibull-core 3.0.0. Use the new ``log_run()`` and ``async_run()`` methods instead (https://github.com/ansible-community/antsibull-core/pull/50).
+- The ``doc_parsing_backend`` option from the library context is deprecated and will be removed in antsibull-core 3.0.0. Applications that need it, such as antsibull-docs, must ensure they allow and validate this option themselves (https://github.com/ansible-community/antsibull-core/pull/59).
+
+Bugfixes
+--------
+
+- Remove improper usage of ``@functools.cache`` on async functions in the ``antsibull_core.ansible_core`` module (https://github.com/ansible-community/antsibull-core/pull/67).
+- Restrict the ``pydantic`` dependency to major version 1 (https://github.com/ansible-community/antsibull-core/pull/35).
+- Restrict the ``sh`` dependency to versions before 2.0.0 (https://github.com/ansible-community/antsibull-core/pull/31).
+
 v2.0.0a1
 ========
 

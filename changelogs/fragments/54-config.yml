@@ -1,4 +1,0 @@
-breaking_changes:
-  - "Remove ``breadcrumbs``, ``indexes``, and ``use_html_blobs`` from global antsibull config handling. These options are only used by antsibull-docs, which already validates them itself (https://github.com/ansible-community/antsibull-core/pull/54)."
-deprecated_features:
-  - "The ``doc_parsing_backend`` option from the library context is deprecated and will be removed in antsibull-core 3.0.0. Applications that need it, such as antsibull-docs, must ensure they allow and validate this option themselves (https://github.com/ansible-community/antsibull-core/pull/59)."

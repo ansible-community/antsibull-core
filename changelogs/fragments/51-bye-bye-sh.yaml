@@ -1,6 +1,0 @@
----
-minor_changes:
-  - "Replace internal usage of ``sh`` with the ``antsibull.subprocess_util`` module
-    (https://github.com/ansible-community/antsibull-core/pull/51)."
-  - "Use the pypa ``build`` tool instead of directly calling ``setup.py`` which is
-    deprecated (https://github.com/ansible-community/antsibull-core/pull/51)."

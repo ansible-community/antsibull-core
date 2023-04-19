@@ -1,5 +1,0 @@
----
-minor_changes:
-  - Add a new ``antsibull_core.subprocess_util`` module to help run
-    subprocesses output and log their output
-    (https://github.com/ansible-community/antsibull-core/pull/40).
