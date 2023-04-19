@@ -1,0 +1,6 @@
+---
+bugfixes:
+  - Remove improper usage of ``@functools.lru_cache`` on async functions in the
+    ``antsibull_core.ansible_core`` module
+    (https://github.com/ansible-community/antsibull-core/pull/67,
+    https://github.com/ansible-community/antsibull-core/pull/69).
