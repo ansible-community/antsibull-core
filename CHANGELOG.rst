@@ -26,7 +26,7 @@ Breaking Changes / Porting Guide
 --------------------------------
 
 - Remove ``breadcrumbs``, ``indexes``, and ``use_html_blobs`` from global antsibull config handling. These options are only used by antsibull-docs, which already validates them itself (https://github.com/ansible-community/antsibull-core/pull/54).
-- The ``install_package()`` method of ``antsibull_core.venv.VenvRunner`` now returns a ``subprocess.CompletedProcess` object instead of an ``sh.RunningCommand``. The rest of the function signature remains the same. Most callers should not need to access the output to begin with (https://github.com/ansible-community/antsibull-core/pull/50).
+- The ``install_package()`` method of ``antsibull_core.venv.VenvRunner`` now returns a ``subprocess.CompletedProcess`` object instead of an ``sh.RunningCommand``. The rest of the function signature remains the same. Most callers should not need to access the output to begin with (https://github.com/ansible-community/antsibull-core/pull/50).
 
 Deprecated Features
 -------------------
