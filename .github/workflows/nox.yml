@@ -58,4 +58,4 @@ jobs:
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
-          working-directory: antsibull-core
+          directory: antsibull-core
