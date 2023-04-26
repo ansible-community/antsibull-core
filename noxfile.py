@@ -75,11 +75,12 @@ def lint(session: nox.Session):
 
 @nox.session
 def formatters(session: nox.Session):
-    install(session, "isort")
+    install(session, ".[formatters]")
     posargs = list(session.posargs)
     if IN_CI:
         posargs.append("--check")
     session.run("isort", *posargs, "src", "tests")
+    session.run("black", *posargs, "src")
 
 
 @nox.session
