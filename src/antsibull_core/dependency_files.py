@@ -36,13 +36,16 @@ class InvalidFileFormat(Exception):
 
 
 def parse_pieces_file(pieces_file: str) -> list[str]:
-    with open(pieces_file, 'rb') as f:
+    with open(pieces_file, "rb") as f:
         contents = f.read()
 
-    decoded_contents = contents.decode('utf-8')
+    decoded_contents = contents.decode("utf-8")
     # One collection per line, ignoring comments and empty lines
-    collections = [c for line in decoded_contents.split('\n')
-                   if (c := line.strip()) and not c.startswith('#')]
+    collections = [
+        c
+        for line in decoded_contents.split("\n")
+        if (c := line.strip()) and not c.startswith("#")
+    ]
     return collections
 
 
@@ -52,31 +55,38 @@ def _parse_name_version_spec_file(filename: str) -> DependencyFileData:
     ansible_version: str | None = None
 
     for line in parse_pieces_file(filename):
-        record = [entry.strip() for entry in line.split(':', 1)]
+        record = [entry.strip() for entry in line.split(":", 1)]
 
-        if record[0] in ('_ansible_version', '_acd_version'):
+        if record[0] in ("_ansible_version", "_acd_version"):
             if ansible_version is not None:
-                raise InvalidFileFormat(f'{filename} specified _ansible_version/_acd_version'
-                                        ' more than once')
+                raise InvalidFileFormat(
+                    f"{filename} specified _ansible_version/_acd_version"
+                    " more than once"
+                )
             ansible_version = record[1]
             continue
 
-        if record[0] in ('_ansible_base_version', '_ansible_core_version'):
+        if record[0] in ("_ansible_base_version", "_ansible_core_version"):
             if ansible_core_version is not None:
                 raise InvalidFileFormat(
-                    f'{filename} specified _ansible_base_version/_ansible_core_version more than'
-                    ' once')
+                    f"{filename} specified _ansible_base_version/_ansible_core_version more than"
+                    " once"
+                )
             ansible_core_version = record[1]
             continue
 
         deps[record[0]] = record[1]
 
     if ansible_core_version is None:
-        raise InvalidFileFormat(f'{filename} was invalid.  It did not contain'
-                                ' the required ansible_core_version field')
+        raise InvalidFileFormat(
+            f"{filename} was invalid.  It did not contain"
+            " the required ansible_core_version field"
+        )
     if ansible_version is None:
-        raise InvalidFileFormat(f'{filename} was invalid.  It did not contain'
-                                ' the required ansible_version field')
+        raise InvalidFileFormat(
+            f"{filename} was invalid.  It did not contain"
+            " the required ansible_version field"
+        )
 
     return DependencyFileData(ansible_version, ansible_core_version, deps)
 
@@ -113,10 +123,13 @@ class DepsFile:
         """Parse the deps from a dependency file."""
         return _parse_name_version_spec_file(self.filename)
 
-    def write(self, ansible_version: str | PypiVer,
-              ansible_core_version: str | PypiVer,
-              included_versions: Mapping[str, str] | Mapping[str, SemVer],
-              python_requires: str | None = None) -> None:
+    def write(
+        self,
+        ansible_version: str | PypiVer,
+        ansible_core_version: str | PypiVer,
+        included_versions: Mapping[str, str] | Mapping[str, SemVer],
+        python_requires: str | None = None,
+    ) -> None:
         """
         Write a list of all the dependent collections included in this Ansible release.
 
@@ -132,22 +145,22 @@ class DepsFile:
         """
         records = []
         for dep, version in included_versions.items():
-            records.append(f'{dep}: {version}')
+            records.append(f"{dep}: {version}")
         records.sort()
 
         if not isinstance(ansible_version, PypiVer):
             ansible_version = PypiVer(ansible_version)
 
-        with open(self.filename, 'w', encoding='utf-8') as f:
-            f.write(f'_ansible_version: {ansible_version}\n')
+        with open(self.filename, "w", encoding="utf-8") as f:
+            f.write(f"_ansible_version: {ansible_version}\n")
             if ansible_version.major > 5:
-                f.write(f'_ansible_core_version: {ansible_core_version}\n')
+                f.write(f"_ansible_core_version: {ansible_core_version}\n")
             else:
-                f.write(f'_ansible_base_version: {ansible_core_version}\n')
+                f.write(f"_ansible_base_version: {ansible_core_version}\n")
             if python_requires is not None:
-                f.write(f'_python: {python_requires}\n')
-            f.write('\n'.join(records))
-            f.write('\n')
+                f.write(f"_python: {python_requires}\n")
+            f.write("\n".join(records))
+            f.write("\n")
 
 
 class BuildFile:
@@ -158,9 +171,13 @@ class BuildFile:
         """Parse the build from a dependency file."""
         return _parse_name_version_spec_file(self.filename)
 
-    def write(self, ansible_version: PypiVer, ansible_core_version: str,
-              dependencies: Mapping[str, SemVer],
-              python_requires: str | None = None) -> None:
+    def write(
+        self,
+        ansible_version: PypiVer,
+        ansible_core_version: str,
+        dependencies: Mapping[str, SemVer],
+        python_requires: str | None = None,
+    ) -> None:
         """
         Write a build dependency file.
 
@@ -180,23 +197,27 @@ class BuildFile:
             if version.prerelease and version.patch == 0:
                 # Prereleases (ex: 2.0.0-b1, 2.1.0-a1) are a special case because they sort before
                 # the major.minor that they are for.
-                records.append(f'{dep}: >={version},<{version.major + 1}.0.0')
+                records.append(f"{dep}: >={version},<{version.major + 1}.0.0")
             else:
-                records.append(f'{dep}: >={version.major}.{version.minor}.0,'
-                               f'<{version.next_major()}')
+                records.append(
+                    f"{dep}: >={version.major}.{version.minor}.0,"
+                    f"<{version.next_major()}"
+                )
         records.sort()
 
-        with open(self.filename, 'w', encoding='utf-8') as f:
+        with open(self.filename, "w", encoding="utf-8") as f:
             if ansible_version.major > 2:
                 # Ansible 3.0.0 and newer use semver, so we only need the major version
-                f.write(f'_ansible_version: {ansible_version.major}\n')
+                f.write(f"_ansible_version: {ansible_version.major}\n")
             else:
-                f.write(f'_ansible_version: {ansible_version.major}.{ansible_version.minor}\n')
+                f.write(
+                    f"_ansible_version: {ansible_version.major}.{ansible_version.minor}\n"
+                )
             if ansible_version.major > 5:
-                f.write(f'_ansible_core_version: {ansible_core_version}\n')
+                f.write(f"_ansible_core_version: {ansible_core_version}\n")
             else:
-                f.write(f'_ansible_base_version: {ansible_core_version}\n')
+                f.write(f"_ansible_base_version: {ansible_core_version}\n")
             if python_requires is not None:
-                f.write(f'_python: {python_requires}\n')
-            f.write('\n'.join(records))
-            f.write('\n')
+                f.write(f"_python: {python_requires}\n")
+            f.write("\n".join(records))
+            f.write("\n")

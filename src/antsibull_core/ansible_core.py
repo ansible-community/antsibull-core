@@ -47,8 +47,11 @@ class CannotBuild(Exception):
 class AnsibleCorePyPiClient:
     """Class to retrieve information about ansible-core from Pypi."""
 
-    def __init__(self, aio_session: 'aiohttp.client.ClientSession',
-                 pypi_server_url: str = _PYPI_SERVER_URL) -> None:
+    def __init__(
+        self,
+        aio_session: "aiohttp.client.ClientSession",
+        pypi_server_url: str = _PYPI_SERVER_URL,
+    ) -> None:
         """
         Initialize the AnsibleCorePypiClient class.
 
@@ -79,14 +82,14 @@ class AnsibleCorePyPiClient:
         """
         # Retrieve the ansible-base and ansible-core package info from pypi
         tasks = []
-        for package_name in ('ansible-core', 'ansible-base'):
-            query_url = urljoin(self.pypi_server_url, f'pypi/{package_name}/json')
+        for package_name in ("ansible-core", "ansible-base"):
+            query_url = urljoin(self.pypi_server_url, f"pypi/{package_name}/json")
             tasks.append(asyncio.create_task(self._get_json(query_url)))
 
         # Note: gather maintains the order of results
         results = await asyncio.gather(*tasks)
-        release_info = results[1]['releases']  # ansible-base information
-        release_info.update(results[0]['releases'])  # ansible-core information
+        release_info = results[1]["releases"]  # ansible-base information
+        release_info.update(results[0]["releases"])  # ansible-core information
 
         return release_info
 
@@ -97,15 +100,15 @@ class AnsibleCorePyPiClient:
         :returns: A list of :pypkg:obj:`packaging.versioning.Version`s
             for all the versions on pypi, including prereleases.
         """
-        flog = mlog.fields(func='AnsibleCorePyPiClient.get_versions')
-        flog.debug('Enter')
+        flog = mlog.fields(func="AnsibleCorePyPiClient.get_versions")
+        flog.debug("Enter")
 
         release_info = await self.get_release_info()
         versions = [PypiVer(r) for r in release_info]
         versions.sort(reverse=True)
-        flog.fields(versions=versions).info('sorted list of ansible-core versions')
+        flog.fields(versions=versions).info("sorted list of ansible-core versions")
 
-        flog.debug('Leave')
+        flog.debug("Leave")
         return versions
 
     async def get_latest_version(self) -> PypiVer:
@@ -129,19 +132,23 @@ class AnsibleCorePyPiClient:
         package_name = get_ansible_core_package_name(ansible_core_version)
         release_info = await self.get_release_info()
 
-        pypi_url = tar_filename = ''
+        pypi_url = tar_filename = ""
         for release in release_info[ansible_core_version]:
-            if release['filename'].startswith(f'{package_name}-{ansible_core_version}.tar.'):
-                tar_filename = release['filename']
-                pypi_url = release['url']
+            if release["filename"].startswith(
+                f"{package_name}-{ansible_core_version}.tar."
+            ):
+                tar_filename = release["filename"]
+                pypi_url = release["url"]
                 break
         else:  # for-else: http://bit.ly/1ElPkyg
-            raise UnknownVersion(f'{package_name} {ansible_core_version} does not'
-                                 ' exist on {self.pypi_server_url}')
+            raise UnknownVersion(
+                f"{package_name} {ansible_core_version} does not"
+                " exist on {self.pypi_server_url}"
+            )
 
         tar_filename = os.path.join(download_dir, tar_filename)
         async with retry_get(self.aio_session, pypi_url) as response:
-            async with aiofiles.open(tar_filename, 'wb') as f:
+            async with aiofiles.open(tar_filename, "wb") as f:
                 lib_ctx = app_context.lib_ctx.get()
                 while chunk := await response.content.read(lib_ctx.chunksize):
                     await f.write(chunk)
@@ -161,14 +168,17 @@ def get_ansible_core_package_name(ansible_core_version: str | PypiVer) -> str:
         ansible_core_version = PypiVer(ansible_core_version)
 
     if ansible_core_version.major <= 2 and ansible_core_version.minor <= 10:
-        return 'ansible-base'
+        return "ansible-base"
 
-    return 'ansible-core'
+    return "ansible-core"
 
 
 def _get_source_version(ansible_core_source: str) -> PypiVer:
-    with open(os.path.join(ansible_core_source, 'lib', 'ansible', 'release.py'),
-              'r', encoding='utf-8') as f:
+    with open(
+        os.path.join(ansible_core_source, "lib", "ansible", "release.py"),
+        "r",
+        encoding="utf-8",
+    ) as f:
         root = ast.parse(f.read())
 
     # Find the version of the source
@@ -178,7 +188,7 @@ def _get_source_version(ansible_core_source: str) -> PypiVer:
         if isinstance(node, ast.Assign):
             for name in node.targets:
                 # These attributes are dynamic so pyre cannot check them
-                if name.id == '__version__':  # type: ignore[attr-defined] # pyre-ignore[16]
+                if name.id == "__version__":  # type: ignore[attr-defined] # pyre-ignore[16]
                     source_version = node.value.s  # type: ignore[attr-defined] # pyre-ignore[16]
                     break
 
@@ -186,13 +196,13 @@ def _get_source_version(ansible_core_source: str) -> PypiVer:
             break
 
     if not source_version:
-        raise ValueError('Version was not found')
+        raise ValueError("Version was not found")
 
     return PypiVer(source_version)
 
 
 def _version_is_devel(version: PypiVer) -> bool:
-    dev_version = re.compile('.*[.]dev[0-9]+$')
+    dev_version = re.compile(".*[.]dev[0-9]+$")
     return bool(dev_version.match(version.public))
 
 
@@ -214,8 +224,9 @@ def source_is_devel(ansible_core_source: str | None) -> bool:
     return _version_is_devel(source_version)
 
 
-def source_is_correct_version(ansible_core_source: str | None,
-                              ansible_core_version: PypiVer) -> bool:
+def source_is_correct_version(
+    ansible_core_source: str | None, ansible_core_version: PypiVer
+) -> bool:
     """
     :arg ansible_core_source: A path to an Ansible-core checkout or expanded sdist or None.
         This will be used instead of downloading an ansible-core package if the version matches
@@ -233,15 +244,19 @@ def source_is_correct_version(ansible_core_source: str | None,
 
     # If the source is a compatible version of ansible-core and it is the same or more recent than
     # the requested version then allow this.
-    if (source_version.major == ansible_core_version.major
-            and source_version.minor == ansible_core_version.minor
-            and source_version.micro >= ansible_core_version.micro):
+    if (
+        source_version.major == ansible_core_version.major
+        and source_version.minor == ansible_core_version.minor
+        and source_version.micro >= ansible_core_version.micro
+    ):
         return True
 
     return False
 
 
-async def checkout_from_git(download_dir: str, repo_url: str = _ANSIBLE_CORE_URL) -> str:
+async def checkout_from_git(
+    download_dir: str, repo_url: str = _ANSIBLE_CORE_URL
+) -> str:
     """
     Checkout the ansible-core git repo.
 
@@ -249,8 +264,8 @@ async def checkout_from_git(download_dir: str, repo_url: str = _ANSIBLE_CORE_URL
     :kwarg: repo_url: The url to the git repo.
     :return: The directory that ansible-core has been checked out to.
     """
-    ansible_core_dir = os.path.join(download_dir, 'ansible-core')
-    await async_log_run(['git', 'clone', repo_url, ansible_core_dir])
+    ansible_core_dir = os.path.join(download_dir, "ansible-core")
+    await async_log_run(["git", "clone", repo_url, ansible_core_dir])
 
     return ansible_core_dir
 
@@ -270,27 +285,33 @@ async def create_sdist(source_dir: str, dest_dir: str) -> str:
 
     try:
         await async_log_run(
-            ['python', '-m', 'build', '--sdist', '--outdir', dist_dir, source_dir],
-            stderr_loglevel='warning',
+            ["python", "-m", "build", "--sdist", "--outdir", dist_dir, source_dir],
+            stderr_loglevel="warning",
         )
     except Exception as e:
-        raise CannotBuild(f'Building {source_dir} failed: {e}')  # pylint:disable=raise-missing-from
+        raise CannotBuild(  # pylint:disable=raise-missing-from
+            f"Building {source_dir} failed: {e}"
+        )
 
-    dist_files = [f for f in os.listdir(dist_dir) if f.endswith('tar.gz')]
+    dist_files = [f for f in os.listdir(dist_dir) if f.endswith("tar.gz")]
     if len(dist_files) != 1:
         if not dist_files:
-            raise CannotBuild(f'Building {source_dir} did not create a tar.gz')
+            raise CannotBuild(f"Building {source_dir} did not create a tar.gz")
 
-        raise CannotBuild(f'Building {source_dir} created more than one tar.gz files which is not'
-                          ' yet supported.')
+        raise CannotBuild(
+            f"Building {source_dir} created more than one tar.gz files which is not"
+            " yet supported."
+        )
 
     return os.path.join(dist_dir, dist_files[0])
 
 
-async def get_ansible_core(aio_session: 'aiohttp.client.ClientSession',
-                           ansible_core_version: str,
-                           tmpdir: str,
-                           ansible_core_source: str | None = None) -> str:
+async def get_ansible_core(
+    aio_session: "aiohttp.client.ClientSession",
+    ansible_core_version: str,
+    tmpdir: str,
+    ansible_core_source: str | None = None,
+) -> str:
     """
     Create an ansible-core directory of the requested version.
 
@@ -304,7 +325,7 @@ async def get_ansible_core(aio_session: 'aiohttp.client.ClientSession',
         This will be used instead of downloading an ansible-core package if the version matches
         with ``ansible_core_version``.
     """
-    if ansible_core_version == '@devel':
+    if ansible_core_version == "@devel":
         # is the source usable?
         if source_is_devel(ansible_core_source):
             # source_is_devel() protects against this.  This assert is to inform the type checker
@@ -319,7 +340,7 @@ async def get_ansible_core(aio_session: 'aiohttp.client.ClientSession',
     else:
         pypi_client = AnsibleCorePyPiClient(aio_session)
         ansible_core_pypi_version: PypiVer
-        if ansible_core_version == '@latest':
+        if ansible_core_version == "@latest":
             ansible_core_pypi_version = await pypi_client.get_latest_version()
         else:
             ansible_core_pypi_version = PypiVer(ansible_core_version)
@@ -330,6 +351,8 @@ async def get_ansible_core(aio_session: 'aiohttp.client.ClientSession',
             # Create an sdist from the source that can be installed
             install_file = await create_sdist(ansible_core_source, tmpdir)
         else:
-            install_file = await pypi_client.retrieve(ansible_core_pypi_version.public, tmpdir)
+            install_file = await pypi_client.retrieve(
+                ansible_core_pypi_version.public, tmpdir
+            )
 
     return install_file

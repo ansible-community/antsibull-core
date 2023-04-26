@@ -29,7 +29,9 @@ CalledProcessError = subprocess.CalledProcessError
 
 
 async def _stream_log(
-    name: str, callback: Callable[[str], Any] | None, stream: asyncio.StreamReader,
+    name: str,
+    callback: Callable[[str], Any] | None,
+    stream: asyncio.StreamReader,
     errors: str,
 ) -> str:
     # We do not simply use stream.readline() since it has a line length limit.
@@ -38,7 +40,7 @@ async def _stream_log(
     # and manually handle the case of longer lines.
     lines = []
     line_parts = []
-    sep = b'\n'
+    sep = b"\n"
     while True:
         try:
             line_parts.append(await stream.readuntil(sep))
@@ -50,25 +52,25 @@ async def _stream_log(
             if part:
                 continue
 
-        line = b''.join(line_parts)
+        line = b"".join(line_parts)
         line_parts.clear()
         if not line:
             break
-        text = line.decode('utf-8', errors=errors)
+        text = line.decode("utf-8", errors=errors)
         if callback:
-            callback(f'{name}: {text.strip()}')
+            callback(f"{name}: {text.strip()}")
         lines.append(text)
-    return ''.join(lines)
+    return "".join(lines)
 
 
 async def async_log_run(
     args: Sequence[StrOrBytesPath],
     logger: TwiggyLogger | StdLogger | None = None,
     stdout_loglevel: str | None = None,
-    stderr_loglevel: str | None = 'debug',
+    stderr_loglevel: str | None = "debug",
     check: bool = True,
     *,
-    errors: str = 'strict',
+    errors: str = "strict",
     **kwargs,
 ) -> subprocess.CompletedProcess[str]:
     """
@@ -97,16 +99,16 @@ async def async_log_run(
     if stderr_loglevel:
         stderr_logfunc = getattr(logger, stderr_loglevel)
 
-    logger.debug(f'Running subprocess: {args!r}')
-    kwargs['stdout'] = asyncio.subprocess.PIPE
-    kwargs['stderr'] = asyncio.subprocess.PIPE
-    kwargs['limit'] = 2 ** 23  # Increase line length limit to 8 MB (the default is 64k)
+    logger.debug(f"Running subprocess: {args!r}")
+    kwargs["stdout"] = asyncio.subprocess.PIPE
+    kwargs["stderr"] = asyncio.subprocess.PIPE
+    kwargs["limit"] = 2**23  # Increase line length limit to 8 MB (the default is 64k)
     proc = await asyncio.create_subprocess_exec(*args, **kwargs)
     stdout, stderr = await asyncio.gather(
         # proc.stdout and proc.stderr won't be None with PIPE, hence the cast()
         asyncio.create_task(
             _stream_log(
-                'stdout',
+                "stdout",
                 stdout_logfunc,
                 cast(asyncio.StreamReader, proc.stdout),
                 errors,
@@ -114,7 +116,7 @@ async def async_log_run(
         ),
         asyncio.create_task(
             _stream_log(
-                'stderr',
+                "stderr",
                 stderr_logfunc,
                 cast(asyncio.StreamReader, proc.stderr),
                 errors,
@@ -135,7 +137,7 @@ def log_run(
     args: Sequence[StrOrBytesPath],
     logger: TwiggyLogger | StdLogger | None = None,
     stdout_loglevel: str | None = None,
-    stderr_loglevel: str | None = 'debug',
+    stderr_loglevel: str | None = "debug",
     check: bool = True,
     **kwargs,
 ) -> subprocess.CompletedProcess[str]:
@@ -149,4 +151,4 @@ def log_run(
     )
 
 
-__all__ = ('async_log_run', 'log_run', 'CalledProcessError')
+__all__ = ("async_log_run", "log_run", "CalledProcessError")

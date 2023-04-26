@@ -58,17 +58,18 @@ class AppContext(BaseModel):
 
     extra: ContextDict = ContextDict()
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    ansible_base_url: p.HttpUrl = 'https://github.com/ansible/ansible/'  # type: ignore[assignment]
+    ansible_base_url: p.HttpUrl = "https://github.com/ansible/ansible/"  # type: ignore[assignment]
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    galaxy_url: p.HttpUrl = 'https://galaxy.ansible.com/'  # type: ignore[assignment]
+    galaxy_url: p.HttpUrl = "https://galaxy.ansible.com/"  # type: ignore[assignment]
     logging_cfg: LoggingModel = LoggingModel.parse_obj(DEFAULT_LOGGING_CONFIG)
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    pypi_url: p.HttpUrl = 'https://pypi.org/'  # type: ignore[assignment]
+    pypi_url: p.HttpUrl = "https://pypi.org/"  # type: ignore[assignment]
     collection_cache: t.Optional[str] = None
 
     # pylint: disable-next=unused-private-member
-    __convert_paths = p.validator('collection_cache',
-                                  pre=True, allow_reuse=True)(convert_path)
+    __convert_paths = p.validator("collection_cache", pre=True, allow_reuse=True)(
+        convert_path
+    )
 
 
 class LibContext(BaseModel):
@@ -95,11 +96,13 @@ class LibContext(BaseModel):
 
     chunksize: int = 4096
     # DEPRECATED: doc_parsing_backend will be removed in antsibull-core 3.0.0
-    doc_parsing_backend: str = 'auto'
+    doc_parsing_backend: str = "auto"
     max_retries: int = 10
     process_max: t.Optional[int] = None
     thread_max: int = 8
     file_check_content: int = 262144
 
     # pylint: disable-next=unused-private-member
-    __convert_nones = p.validator('process_max', pre=True, allow_reuse=True)(convert_none)
+    __convert_nones = p.validator("process_max", pre=True, allow_reuse=True)(
+        convert_none
+    )

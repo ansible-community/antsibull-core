@@ -64,23 +64,27 @@ class GalaxyContext:
     base_url: str
 
     @classmethod
-    async def create(cls, aio_session: aiohttp.client.ClientSession, galaxy_server: str
-                     ) -> GalaxyContext:
-        api_url = urljoin(galaxy_server, 'api/')
-        async with retry_get(aio_session, api_url,
-                             headers={'Accept': 'application/json'}) as response:
+    async def create(
+        cls, aio_session: aiohttp.client.ClientSession, galaxy_server: str
+    ) -> GalaxyContext:
+        api_url = urljoin(galaxy_server, "api/")
+        async with retry_get(
+            aio_session, api_url, headers={"Accept": "application/json"}
+        ) as response:
             galaxy_info = await response.json()
-        available_versions: t.Mapping[str, str] = galaxy_info.get('available_versions') or {}
-        if 'v3' in available_versions:
+        available_versions: t.Mapping[str, str] = (
+            galaxy_info.get("available_versions") or {}
+        )
+        if "v3" in available_versions:
             version = GalaxyVersion.V3
-            base_url = urljoin(galaxy_server, 'api/' + available_versions['v3'])
-        elif 'v2' in available_versions:
+            base_url = urljoin(galaxy_server, "api/" + available_versions["v3"])
+        elif "v2" in available_versions:
             version = GalaxyVersion.V2
-            base_url = urljoin(galaxy_server, 'api/' + available_versions['v2'])
+            base_url = urljoin(galaxy_server, "api/" + available_versions["v2"])
         else:
             raise RuntimeError(
-                f'Information retrieved from {api_url} seems to indicate'
-                ' neither Galaxy v2 API nor Galaxy v3 API'
+                f"Information retrieved from {api_url} seems to indicate"
+                " neither Galaxy v2 API nor Galaxy v3 API"
             )
         return cls(galaxy_server, version, base_url)
 
@@ -88,8 +92,9 @@ class GalaxyContext:
 _GALAXY_CONTEXT_CACHE: dict[str, t.Union[GalaxyContext, asyncio.Future]] = {}
 
 
-async def _get_cached_galaxy_context(aio_session: aiohttp.client.ClientSession,
-                                     galaxy_server: str) -> GalaxyContext:
+async def _get_cached_galaxy_context(
+    aio_session: aiohttp.client.ClientSession, galaxy_server: str
+) -> GalaxyContext:
     context_or_future = _GALAXY_CONTEXT_CACHE.get(galaxy_server)
     if context_or_future is not None:
         if asyncio.isfuture(context_or_future):
@@ -115,9 +120,12 @@ async def _get_cached_galaxy_context(aio_session: aiohttp.client.ClientSession,
 class GalaxyClient:
     """Class for querying the Galaxy REST API."""
 
-    def __init__(self, aio_session: aiohttp.client.ClientSession,
-                 galaxy_server: t.Optional[str] = None,
-                 context: t.Optional[GalaxyContext] = None) -> None:
+    def __init__(
+        self,
+        aio_session: aiohttp.client.ClientSession,
+        galaxy_server: t.Optional[str] = None,
+        context: t.Optional[GalaxyContext] = None,
+    ) -> None:
         """
         Create a GalaxyClient object to query the Galaxy Server.
 
@@ -134,21 +142,21 @@ class GalaxyClient:
             # TODO: deprecate
             if galaxy_server is not None and galaxy_server != context.server:
                 raise ValueError(
-                    f'galaxy_server ({galaxy_server}) does not coincide'
-                    f' with context.server ({context.server})'
+                    f"galaxy_server ({galaxy_server}) does not coincide"
+                    f" with context.server ({context.server})"
                 )
             galaxy_server = context.server
         self.galaxy_server = galaxy_server
         self.context = context
         self.aio_session = aio_session
-        self.headers: dict[str, str] = {'Accept': 'application/json'}
+        self.headers: dict[str, str] = {"Accept": "application/json"}
         self.params: dict[str, str] = {}
         if context:
             self._update_from_context(context)
 
     def _update_from_context(self, context: GalaxyContext) -> None:
         if context.version == GalaxyVersion.V2:
-            self.params['format'] = 'json'
+            self.params["format"] = "json"
 
     async def _ensure_context(self) -> GalaxyContext:
         """
@@ -158,14 +166,15 @@ class GalaxyClient:
         if context is not None:
             return context
         if self.galaxy_server is None:
-            raise RuntimeError('Unexpected None for GalaxyClient.galaxy_server')
+            raise RuntimeError("Unexpected None for GalaxyClient.galaxy_server")
         context = await _get_cached_galaxy_context(self.aio_session, self.galaxy_server)
         self.context = context
         self._update_from_context(context)
         return context
 
-    async def _get_galaxy_versions(self, context: GalaxyContext, versions_url: str,
-                                   add_params: bool = True) -> list[str]:
+    async def _get_galaxy_versions(
+        self, context: GalaxyContext, versions_url: str, add_params: bool = True
+    ) -> list[str]:
         """
         Retrieve the complete list of versions for a collection from a galaxy endpoint.
 
@@ -181,35 +190,42 @@ class GalaxyClient:
         if add_params:
             params = self.params.copy()
             if context.version == GalaxyVersion.V2:
-                params['page_size'] = '100'
+                params["page_size"] = "100"
             else:
-                params['limit'] = '50'
+                params["limit"] = "50"
         else:
             params = None
-        async with retry_get(self.aio_session, versions_url, params=params,
-                             headers=self.headers, acceptable_error_codes=[404]) as response:
+        async with retry_get(
+            self.aio_session,
+            versions_url,
+            params=params,
+            headers=self.headers,
+            acceptable_error_codes=[404],
+        ) as response:
             if response.status == 404:
-                raise NoSuchCollection(f'No collection found at: {versions_url}')
+                raise NoSuchCollection(f"No collection found at: {versions_url}")
             collection_info = await response.json()
 
         versions = []
         if context.version == GalaxyVersion.V2:
-            results = collection_info['results']
-            next_link = collection_info['next']
+            results = collection_info["results"]
+            next_link = collection_info["next"]
         else:
-            if 'data' in collection_info:
+            if "data" in collection_info:
                 # Apparently 'data' isn't always used...
-                results = collection_info['data']
+                results = collection_info["data"]
             else:
-                results = collection_info['results']
-            next_link = collection_info['links']['next']
+                results = collection_info["results"]
+            next_link = collection_info["links"]["next"]
             add_params = False
         for version_record in results:
-            versions.append(version_record['version'])
+            versions.append(version_record["version"])
         if next_link:
-            if next_link.startswith('/'):
+            if next_link.startswith("/"):
                 next_link = urljoin(context.server, next_link)
-            versions.extend(await self._get_galaxy_versions(context, next_link, add_params))
+            versions.extend(
+                await self._get_galaxy_versions(context, next_link, add_params)
+            )
 
         return versions
 
@@ -222,8 +238,8 @@ class GalaxyClient:
         """
         context = await self._ensure_context()
 
-        collection = collection.replace('.', '/')
-        galaxy_url = urljoin(context.base_url, f'collections/{collection}/versions/')
+        collection = collection.replace(".", "/")
+        galaxy_url = urljoin(context.base_url, f"collections/{collection}/versions/")
         retval = await self._get_galaxy_versions(context, galaxy_url)
         return retval
 
@@ -246,19 +262,25 @@ class GalaxyClient:
         """
         context = await self._ensure_context()
 
-        collection = collection.replace('.', '/')
-        galaxy_url = urljoin(context.base_url, f'collections/{collection}/')
+        collection = collection.replace(".", "/")
+        galaxy_url = urljoin(context.base_url, f"collections/{collection}/")
 
-        async with retry_get(self.aio_session, galaxy_url, params=self.params,
-                             headers=self.headers, acceptable_error_codes=[404]) as response:
+        async with retry_get(
+            self.aio_session,
+            galaxy_url,
+            params=self.params,
+            headers=self.headers,
+            acceptable_error_codes=[404],
+        ) as response:
             if response.status == 404:
-                raise NoSuchCollection(f'No collection found at: {galaxy_url}')
+                raise NoSuchCollection(f"No collection found at: {galaxy_url}")
             collection_info = await response.json()
 
         return collection_info
 
-    async def get_release_info(self, collection: str,
-                               version: str | semver.Version) -> dict[str, t.Any]:
+    async def get_release_info(
+        self, collection: str, version: str | semver.Version
+    ) -> dict[str, t.Any]:
         """
         Retrive information about a specific version of a collection.
 
@@ -278,20 +300,27 @@ class GalaxyClient:
         """
         context = await self._ensure_context()
 
-        collection = collection.replace('.', '/')
-        galaxy_url = urljoin(context.base_url, f'collections/{collection}/versions/{version}/')
+        collection = collection.replace(".", "/")
+        galaxy_url = urljoin(
+            context.base_url, f"collections/{collection}/versions/{version}/"
+        )
 
-        async with retry_get(self.aio_session, galaxy_url, params=self.params,
-                             headers=self.headers, acceptable_error_codes=[404]) as response:
+        async with retry_get(
+            self.aio_session,
+            galaxy_url,
+            params=self.params,
+            headers=self.headers,
+            acceptable_error_codes=[404],
+        ) as response:
             if response.status == 404:
-                raise NoSuchCollection(f'No collection found at: {galaxy_url}')
+                raise NoSuchCollection(f"No collection found at: {galaxy_url}")
             collection_info = await response.json()
 
         return collection_info
 
-    async def get_latest_matching_version(self, collection: str,
-                                          version_spec: str,
-                                          pre: bool = False) -> semver.Version:
+    async def get_latest_matching_version(
+        self, collection: str, version_spec: str, pre: bool = False
+    ) -> semver.Version:
         """
         Get the latest version of a collection that matches a specification.
 
@@ -334,17 +363,22 @@ class GalaxyClient:
             return prereleases[0]
 
         # No matching versions were found
-        raise NoSuchVersion(f'{version_spec} did not match with any version of {collection}.')
+        raise NoSuchVersion(
+            f"{version_spec} did not match with any version of {collection}."
+        )
 
 
 class CollectionDownloader(GalaxyClient):
     """Manage downloading collections from Galaxy."""
 
-    def __init__(self, aio_session: aiohttp.client.ClientSession,
-                 download_dir: str,
-                 galaxy_server: t.Optional[str] = None,
-                 collection_cache: str | None = None,
-                 context: t.Optional[GalaxyContext] = None) -> None:
+    def __init__(
+        self,
+        aio_session: aiohttp.client.ClientSession,
+        download_dir: str,
+        galaxy_server: t.Optional[str] = None,
+        collection_cache: str | None = None,
+        context: t.Optional[GalaxyContext] = None,
+    ) -> None:
         """
         Create an object to download collections from galaxy.
 
@@ -362,7 +396,11 @@ class CollectionDownloader(GalaxyClient):
         self.download_dir = download_dir
         self.collection_cache: t.Final[str | None] = collection_cache
 
-    async def download(self, collection: str, version: str | semver.Version, ) -> str:
+    async def download(
+        self,
+        collection: str,
+        version: str | semver.Version,
+    ) -> str:
         """
         Download a collection.
 
@@ -372,46 +410,56 @@ class CollectionDownloader(GalaxyClient):
         :arg version: Version of the collection to download.
         :returns: The full path to the downloaded collection.
         """
-        collection = collection.replace('.', '/')
+        collection = collection.replace(".", "/")
         release_info = await self.get_release_info(collection, version)
-        release_url = release_info['download_url']
+        release_url = release_info["download_url"]
 
-        download_filename = os.path.join(self.download_dir, release_info['artifact']['filename'])
-        sha256sum = release_info['artifact']['sha256']
+        download_filename = os.path.join(
+            self.download_dir, release_info["artifact"]["filename"]
+        )
+        sha256sum = release_info["artifact"]["sha256"]
 
         if self.collection_cache:
-            if release_info['artifact']['filename'] in os.listdir(self.collection_cache):
-                cached_copy = os.path.join(self.collection_cache,
-                                           release_info['artifact']['filename'])
+            if release_info["artifact"]["filename"] in os.listdir(
+                self.collection_cache
+            ):
+                cached_copy = os.path.join(
+                    self.collection_cache, release_info["artifact"]["filename"]
+                )
                 if await verify_hash(cached_copy, sha256sum):
                     shutil.copyfile(cached_copy, download_filename)
                 return download_filename
 
-        async with retry_get(self.aio_session, release_url,
-                             acceptable_error_codes=[404]) as response:
+        async with retry_get(
+            self.aio_session, release_url, acceptable_error_codes=[404]
+        ) as response:
             if response.status == 404:
-                raise NoSuchCollection(f'No collection found at: {release_url}')
+                raise NoSuchCollection(f"No collection found at: {release_url}")
 
-            async with aiofiles.open(download_filename, 'wb') as f:
+            async with aiofiles.open(download_filename, "wb") as f:
                 lib_ctx = app_context.lib_ctx.get()
                 while chunk := await response.content.read(lib_ctx.chunksize):
                     await f.write(chunk)
 
         # Verify the download
         if not await verify_hash(download_filename, sha256sum):
-            raise DownloadFailure(f'{release_url} failed to download correctly.'
-                                  f' Expected checksum: {sha256sum}')
+            raise DownloadFailure(
+                f"{release_url} failed to download correctly."
+                f" Expected checksum: {sha256sum}"
+            )
 
         # Copy downloaded collection into cache
         if self.collection_cache:
-            cached_copy = os.path.join(self.collection_cache,
-                                       release_info['artifact']['filename'])
+            cached_copy = os.path.join(
+                self.collection_cache, release_info["artifact"]["filename"]
+            )
             shutil.copyfile(download_filename, cached_copy)
 
         return download_filename
 
-    async def download_latest_matching(self, collection: str,
-                                       version_spec: str) -> DownloadResults:
+    async def download_latest_matching(
+        self, collection: str, version_spec: str
+    ) -> DownloadResults:
         """
         Download the latest version of a collection that matches a specification.
 

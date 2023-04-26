@@ -12,7 +12,7 @@ import re
 from antsibull_core.subprocess_util import async_log_run
 
 #: Regex to find toplevel directories in tar output
-TOPLEVEL_RE: re.Pattern = re.compile('^[^/]+/$')
+TOPLEVEL_RE: re.Pattern = re.compile("^[^/]+/$")
 
 
 class InvalidTarball(Exception):
@@ -28,21 +28,24 @@ async def unpack_tarball(tarname: str, destdir: str) -> str:
     :returns: Toplevel of the unpacked directory structure.  This will be
         a subdirectory of `destdir`.
     """
-    manifest = await async_log_run(['tar', '-xzvf', tarname, f'-C{destdir}'])
+    manifest = await async_log_run(["tar", "-xzvf", tarname, f"-C{destdir}"])
     toplevel_dirs = [
-        filename for filename in manifest.stdout.splitlines()
+        filename
+        for filename in manifest.stdout.splitlines()
         if TOPLEVEL_RE.match(filename)
     ]
 
     if len(toplevel_dirs) != 1:
-        raise InvalidTarball(f'The tarball {tarname} had more than a single toplevel dir')
+        raise InvalidTarball(
+            f"The tarball {tarname} had more than a single toplevel dir"
+        )
 
-    expected_dirname = tarname[:-len('.tar.gz')]
+    expected_dirname = tarname[: -len(".tar.gz")]
     if toplevel_dirs[0] != expected_dirname:
-        raise InvalidTarball(f'The directory in {tarname} was not {expected_dirname}')
+        raise InvalidTarball(f"The directory in {tarname} was not {expected_dirname}")
 
     return toplevel_dirs[0]
 
 
 async def pack_tarball(tarname: str, directory: str) -> str:
-    raise NotImplementedError('pack_tarball has not yet been implemented')
+    raise NotImplementedError("pack_tarball has not yet been implemented")

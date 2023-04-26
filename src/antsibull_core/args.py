@@ -29,15 +29,23 @@ def get_toplevel_parser(package, **kwargs) -> argparse.ArgumentParser:
         version = metadata.version(package)
     except metadata.PackageNotFoundError:
         # If there's no metadata foun, assume we're running from source
-        version = 'source'
+        version = "source"
 
     toplevel_parser = argparse.ArgumentParser(**kwargs)
-    toplevel_parser.add_argument('--version', action='version', version=version,
-                                 help='Print the antsibull version')
-    toplevel_parser.add_argument('--config-file', default=[], action='append',
-                                 help='Specify one or more config files to use to configure the'
-                                 ' program. If more than one are specified, keys from later'
-                                 ' config files override keys from earlier ones.')
+    toplevel_parser.add_argument(
+        "--version",
+        action="version",
+        version=version,
+        help="Print the antsibull version",
+    )
+    toplevel_parser.add_argument(
+        "--config-file",
+        default=[],
+        action="append",
+        help="Specify one or more config files to use to configure the"
+        " program. If more than one are specified, keys from later"
+        " config files override keys from earlier ones.",
+    )
     return toplevel_parser
 
 
@@ -54,5 +62,6 @@ def normalize_toplevel_options(args: argparse.Namespace) -> None:
     """
     for conf_file in args.config_file:
         if not os.path.isfile(conf_file):
-            raise InvalidArgumentError(f'The user specified config file, {conf_file},'
-                                       ' must exist.')
+            raise InvalidArgumentError(
+                f"The user specified config file, {conf_file}," " must exist."
+            )

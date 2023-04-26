@@ -12,6 +12,7 @@ from collections.abc import Hashable, Mapping, Sequence
 
 class ImmutableDict(Hashable, Mapping):
     """Dictionary that cannot be updated"""
+
     def __init__(self, *args, **kwargs):
         self._store = dict(*args, **kwargs)
 
@@ -37,7 +38,7 @@ class ImmutableDict(Hashable, Mapping):
         return False
 
     def __repr__(self):
-        return 'ImmutableDict({0})'.format(repr(self._store))
+        return "ImmutableDict({0})".format(repr(self._store))
 
     def union(self, overriding_mapping):
         """
@@ -103,7 +104,7 @@ def count(seq):
     deprecated and replaced when support for Python < 2.7 is dropped.
     """
     if not is_iterable(seq):
-        raise Exception('Argument provided  is not an iterable')
+        raise Exception("Argument provided  is not an iterable")
     counters = dict()
     for elem in seq:
         counters[elem] = counters.get(elem, 0) + 1

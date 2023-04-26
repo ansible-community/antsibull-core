@@ -212,7 +212,9 @@ import twiggy.levels  # type: ignore[import]
 #: is antsibull so that it is easy to setup an emitter for all of antsibull.  For those used to
 #: using the module's __name__ field as the name, the idiom we use here is to set the module name
 #: in the ``mod`` field.
-log = twiggy.log.name('antsibull').trace()  # pyre-ignore[16]: twiggy generates log dynamically
+log = twiggy.log.name(  # pyre-ignore[16]: twiggy generates log dynamically
+    "antsibull"
+).trace()
 
 # We disable logging at the library level so that we don't unnecessarily spam the user with output.
 # Applications which use the library should re-enable this and give the user the ability to control
@@ -220,7 +222,7 @@ log = twiggy.log.name('antsibull').trace()  # pyre-ignore[16]: twiggy generates 
 log.min_level = twiggy.levels.DISABLED
 
 mlog = log.fields(mod=__name__)
-mlog.debug('logging loaded')
+mlog.debug("logging loaded")
 
 
 def initialize_app_logging() -> None:
@@ -236,9 +238,9 @@ def initialize_app_logging() -> None:
 
     # Temporarily setup logging with defaults until we can get configuration from the user.
     _level = twiggy.levels.WARNING
-    if os.environ.get('ANTSIBULL_EARLY_DEBUG', False):
+    if os.environ.get("ANTSIBULL_EARLY_DEBUG", False):
         _level = twiggy.levels.DEBUG
     twiggy.quick_setup(min_level=_level)
 
 
-__all__ = ('log', 'initialize_app_logging')
+__all__ = ("log", "initialize_app_logging")

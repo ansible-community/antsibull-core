@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 def get_clean_environment() -> dict[str, str]:
     env = os.environ.copy()
     try:
-        del env['PYTHONPATH']
+        del env["PYTHONPATH"]
     except KeyError:
         # We just wanted to make sure there was no PYTHONPATH set...
         # all python libs will come from the venv
@@ -69,7 +69,7 @@ class VenvRunner:
         # we need pip19+ in order to work now.  RHEL8 and Ubuntu 18.04 contain a pip that's older
         # than that so we must upgrade to something even if it's not latest.
 
-        self.log_run(['pip', 'install', '--upgrade', 'pip'])
+        self.log_run(["pip", "install", "--upgrade", "pip"])
 
     def get_command(self, executable_name) -> sh.Command:
         """
@@ -82,7 +82,7 @@ class VenvRunner:
             This method is deprecated in favor of :method:`asnyc_log_run` and
             :method:`log_run`. It will be removed in antsibull_core 3.0.0.
         """
-        return sh.Command(os.path.join(self.venv_dir, 'bin', executable_name))
+        return sh.Command(os.path.join(self.venv_dir, "bin", executable_name))
 
     def install_package(self, package_name: str) -> subprocess.CompletedProcess:
         """
@@ -92,17 +92,17 @@ class VenvRunner:
             directly to :command:`pip install`.
         :returns: An :obj:`subprocess.CompletedProcess` for the pip output.
         """
-        return self.log_run(['pip', 'install', package_name])
+        return self.log_run(["pip", "install", package_name])
 
     async def async_log_run(
         self,
         args: Sequence[StrPath],
         logger: TwiggyLogger | StdLogger | None = None,
         stdout_loglevel: str | None = None,
-        stderr_loglevel: str | None = 'debug',
+        stderr_loglevel: str | None = "debug",
         check: bool = True,
         *,
-        errors: str = 'strict',
+        errors: str = "strict",
         **kwargs,
     ) -> subprocess.CompletedProcess[str]:
         """
@@ -111,16 +111,22 @@ class VenvRunner:
         do the heavy lifting. `args[0]` must be a filename that's installed in
         the venv. If it's not, a `ValueError` will be raised.
         """
-        kwargs.setdefault('env', get_clean_environment())
+        kwargs.setdefault("env", get_clean_environment())
         basename = args[0]
         if os.path.isabs(basename):
-            raise ValueError(f'{basename!r} must not be an absolute path!')
-        path = os.path.join(self.venv_dir, 'bin', basename)
+            raise ValueError(f"{basename!r} must not be an absolute path!")
+        path = os.path.join(self.venv_dir, "bin", basename)
         if not os.path.exists(path):
-            raise ValueError(f'{path!r} does not exist!')
+            raise ValueError(f"{path!r} does not exist!")
         args = [path, *args[1:]]
         return await subprocess_util.async_log_run(
-            args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
+            args,
+            logger,
+            stdout_loglevel,
+            stderr_loglevel,
+            check,
+            errors=errors,
+            **kwargs,
         )
 
     def log_run(
@@ -128,10 +134,10 @@ class VenvRunner:
         args: Sequence[StrPath],
         logger: TwiggyLogger | StdLogger | None = None,
         stdout_loglevel: str | None = None,
-        stderr_loglevel: str | None = 'debug',
+        stderr_loglevel: str | None = "debug",
         check: bool = True,
         *,
-        errors: str = 'strict',
+        errors: str = "strict",
         **kwargs,
     ) -> subprocess.CompletedProcess[str]:
         """
@@ -139,7 +145,13 @@ class VenvRunner:
         """
         return asyncio.run(
             self.async_log_run(
-                args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
+                args,
+                logger,
+                stdout_loglevel,
+                stderr_loglevel,
+                check,
+                errors=errors,
+                **kwargs,
             )
         )
 
@@ -158,10 +170,10 @@ class FakeVenvRunner:
         args: Sequence[StrPath],
         logger: TwiggyLogger | StdLogger | None = None,
         stdout_loglevel: str | None = None,
-        stderr_loglevel: str | None = 'debug',
+        stderr_loglevel: str | None = "debug",
         check: bool = True,
         *,
-        errors: str = 'strict',
+        errors: str = "strict",
         **kwargs,
     ) -> subprocess.CompletedProcess[str]:
         """
@@ -170,10 +182,16 @@ class FakeVenvRunner:
         It works the same as `antsibull_core.subprocess_util.async_log_run`,
         but 'python' will be replaced by `sys.executable`.
         """
-        if args and args[0] == 'python':
+        if args and args[0] == "python":
             args = [sys.executable, *args[1:]]
         return await subprocess_util.async_log_run(
-            args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
+            args,
+            logger,
+            stdout_loglevel,
+            stderr_loglevel,
+            check,
+            errors=errors,
+            **kwargs,
         )
 
     def log_run(
@@ -181,10 +199,10 @@ class FakeVenvRunner:
         args: Sequence[StrPath],
         logger: TwiggyLogger | StdLogger | None = None,
         stdout_loglevel: str | None = None,
-        stderr_loglevel: str | None = 'debug',
+        stderr_loglevel: str | None = "debug",
         check: bool = True,
         *,
-        errors: str = 'strict',
+        errors: str = "strict",
         **kwargs,
     ) -> subprocess.CompletedProcess[str]:
         """
@@ -192,7 +210,13 @@ class FakeVenvRunner:
         """
         return asyncio.run(
             self.async_log_run(
-                args, logger, stdout_loglevel, stderr_loglevel, check, errors=errors, **kwargs
+                args,
+                logger,
+                stdout_loglevel,
+                stderr_loglevel,
+                check,
+                errors=errors,
+                **kwargs,
             )
         )
 

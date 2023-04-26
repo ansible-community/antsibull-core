@@ -20,10 +20,10 @@ from .schemas.context import AppContext, LibContext
 mlog = log.fields(mod=__name__)
 
 #: System config file location.
-SYSTEM_CONFIG_FILE = '/etc/antsibull.cfg'
+SYSTEM_CONFIG_FILE = "/etc/antsibull.cfg"
 
 #: Per-user config file location.
-USER_CONFIG_FILE = '~/.antsibull.cfg'
+USER_CONFIG_FILE = "~/.antsibull.cfg"
 
 
 class ConfigError(Exception):
@@ -37,19 +37,19 @@ def find_config_files(conf_files: Iterable[str]) -> list[str]:
     :arg conf_files: An iterable of config filenames to search for.
     :returns: A List of filenames which actually existed on the system.
     """
-    flog = mlog.fields(func='find_config_file')
-    flog.fields(conf_files=conf_files).debug('Enter')
+    flog = mlog.fields(func="find_config_file")
+    flog.fields(conf_files=conf_files).debug("Enter")
 
     paths = [os.path.abspath(p) for p in conf_files]
-    flog.fields(paths=paths).info('Paths to check')
+    flog.fields(paths=paths).info("Paths to check")
 
     config_files = []
     for conf_path in paths:
         if os.path.exists(conf_path):
             config_files.append(conf_path)
-    flog.fields(paths=config_files).info('Paths found')
+    flog.fields(paths=config_files).info("Paths found")
 
-    flog.debug('Leave')
+    flog.debug("Leave")
     return config_files
 
 
@@ -60,24 +60,25 @@ def read_config(filename: str) -> ConfigModel:
     :arg filename: The filename of the config file to parse.
     :returns: A ConfigModel model containing the config data.
     """
-    flog = mlog.fields(func='read_config')
-    flog.debug('Enter')
+    flog = mlog.fields(func="read_config")
+    flog.debug("Enter")
 
     filename = os.path.abspath(filename)
 
-    flog.fields(filename=filename).info('loading config file')
+    flog.fields(filename=filename).info("loading config file")
     raw_config_data = perky.load(filename)
-    flog.debug('Validatinging the config file data')
+    flog.debug("Validatinging the config file data")
     # Note: We parse the object but discard the model because we want to validate the config but let
     # the context handle all setting of defaults
     ConfigModel.parse_obj(raw_config_data)
 
-    flog.debug('Leave')
+    flog.debug("Leave")
     return raw_config_data
 
 
-def validate_config(config: Mapping, filenames: list[str],
-                    app_context_model: type[AppContext]) -> None:
+def validate_config(
+    config: Mapping, filenames: list[str], app_context_model: type[AppContext]
+) -> None:
     """
     Validate configuration.
 
@@ -100,7 +101,8 @@ def validate_config(config: Mapping, filenames: list[str],
         app_context_model.parse_obj(app)
     except p.ValidationError as exc:
         raise ConfigError(
-            f"Error while parsing configuration from {', '.join(filenames)}:\n{exc}") from exc
+            f"Error while parsing configuration from {', '.join(filenames)}:\n{exc}"
+        ) from exc
 
 
 def _load_config_file(filename: str) -> Mapping:
@@ -111,14 +113,18 @@ def _load_config_file(filename: str) -> Mapping:
         return perky.load(filename)
     except OSError as exc:
         raise ConfigError(
-            f"Error while loading configuration from {filename}: {exc}") from exc
+            f"Error while loading configuration from {filename}: {exc}"
+        ) from exc
     except perky.PerkyFormatError as exc:
         raise ConfigError(
-            f"Error while parsing configuration from {filename}:\n{exc}") from exc
+            f"Error while parsing configuration from {filename}:\n{exc}"
+        ) from exc
 
 
-def load_config(conf_files: Iterable[str] | str | None = None,
-                app_context_model: type[AppContext] = AppContext) -> dict:
+def load_config(
+    conf_files: Iterable[str] | str | None = None,
+    app_context_model: type[AppContext] = AppContext,
+) -> dict:
     """
     Load configuration.
 
@@ -132,34 +138,37 @@ def load_config(conf_files: Iterable[str] | str | None = None,
         :obj:`AppContext`. If not provided, will use :obj:`AppContext` itself.
     :returns: A dict containing the configuration.
     """
-    flog = mlog.fields(func='load_config')
-    flog.debug('Enter')
+    flog = mlog.fields(func="load_config")
+    flog.debug("Enter")
 
     if isinstance(conf_files, str):
         conf_files = (conf_files,)
     elif conf_files is None:
         conf_files = ()
 
-    implicit_files = find_config_files((SYSTEM_CONFIG_FILE, os.path.expanduser(USER_CONFIG_FILE)))
+    implicit_files = find_config_files(
+        (SYSTEM_CONFIG_FILE, os.path.expanduser(USER_CONFIG_FILE))
+    )
     explicit_files = find_config_files(conf_files)
 
-    flog.fields(implicit_files=implicit_files,
-                explicit_files=explicit_files).debug('found config files')
+    flog.fields(implicit_files=implicit_files, explicit_files=explicit_files).debug(
+        "found config files"
+    )
 
-    flog.debug('loading implicit config files')
+    flog.debug("loading implicit config files")
     cfg: dict = {}
     for filename in implicit_files:
         cfg.update(_load_config_file(filename))
 
-    flog.debug('validating implicit configuration')
+    flog.debug("validating implicit configuration")
     validate_config(cfg, implicit_files, AppContext)
 
-    flog.debug('loading explicit config files')
+    flog.debug("loading explicit config files")
     for filename in explicit_files:
         cfg.update(_load_config_file(filename))
 
-    flog.debug('validating combined configuration')
+    flog.debug("validating combined configuration")
     validate_config(cfg, implicit_files + explicit_files, app_context_model)
 
-    flog.fields(config=cfg).debug('Leave')
+    flog.fields(config=cfg).debug("Leave")
     return cfg

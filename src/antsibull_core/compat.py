@@ -30,7 +30,9 @@ if sys.version_info < (3, 9, 11) or (
     # (https://docs.python.org/3.9/whatsnew/changelog.html#python-3-9-11-final).
     # Versions before these have to use the vendored version so that users can actually
     # use `--help` for affected subcommands.
-    from .vendored._argparse_booleanoptionalaction import BooleanOptionalAction  # type: ignore
+    from .vendored._argparse_booleanoptionalaction import (  # type: ignore
+        BooleanOptionalAction,
+    )
 else:
     BooleanOptionalAction = argparse.BooleanOptionalAction
 
@@ -39,4 +41,10 @@ best_get_loop = asyncio.get_running_loop
 asyncio_run = asyncio.run
 create_task = asyncio.create_task
 
-__all__ = ('BooleanOptionalAction', 'asyncio_run', 'best_get_loop', 'create_task', 'metadata')
+__all__ = (
+    "BooleanOptionalAction",
+    "asyncio_run",
+    "best_get_loop",
+    "create_task",
+    "metadata",
+)

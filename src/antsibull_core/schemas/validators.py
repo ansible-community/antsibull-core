@@ -17,7 +17,7 @@ def convert_none(value):
     When a setting is set to None in a config file, it could be the string "None" or "Null".
     This validator will convert those strings to  python None.
     """
-    if isinstance(value, str) and value.lower() in ('none', 'null'):
+    if isinstance(value, str) and value.lower() in ("none", "null"):
         value = None
     return value
 
@@ -36,9 +36,9 @@ def convert_bool(value):
     validator will convert a set of predetermined strings to Python True and False.
     """
     if isinstance(value, str):
-        if value.lower() in ('false', 'no', 'n', 'f', ''):
+        if value.lower() in ("false", "no", "n", "f", ""):
             value = False
-        elif value.lower() in ('true', 'yes', 'y', 't'):
+        elif value.lower() in ("true", "yes", "y", "t"):
             value = True
         else:
             try:

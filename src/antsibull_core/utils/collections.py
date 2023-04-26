@@ -33,8 +33,9 @@ def is_sequence(obj: t.Any, include_string: bool = False) -> bool:
     return False
 
 
-def compare_all_but(dict_a: Mapping, dict_b: Mapping,
-                    keys_to_ignore: Iterable | None = None) -> bool:
+def compare_all_but(
+    dict_a: Mapping, dict_b: Mapping, keys_to_ignore: Iterable | None = None
+) -> bool:
     """
     Compare two dictionaries, with the possibility to ignore some fields.
 
@@ -127,7 +128,7 @@ class ContextDict(ImmutableDict):
         yield cls.validate_and_convert
 
     @classmethod
-    def validate_and_convert(cls, value: Mapping) -> 'ContextDict':
+    def validate_and_convert(cls, value: Mapping) -> "ContextDict":
         if isinstance(value, ContextDict):
             # optimization.  If it's already an ImmutableContext, we don't need to recursively
             # convert things to immutable again.

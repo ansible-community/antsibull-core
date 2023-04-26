@@ -29,18 +29,18 @@ def _get_acls(path: str) -> str:
     acls = None
     if posix1e:
         acl = posix1e.ACL(file=path)
-        acls = acl.to_any_text(options=posix1e.TEXT_NUMERIC_IDS).decode('utf-8')
+        acls = acl.to_any_text(options=posix1e.TEXT_NUMERIC_IDS).decode("utf-8")
     else:
         try:
-            acls = log_run(['getfacl', path, '-n']).stdout
+            acls = log_run(["getfacl", path, "-n"]).stdout
         except FileNotFoundError:
             pass
         except Exception as e:
             # pylint:disable-next=raise-missing-from
-            raise CheckFailure(f'Error while trying to get acls for {path}: {e}')
+            raise CheckFailure(f"Error while trying to get acls for {path}: {e}")
 
     if not acls:
-        raise UnableToCheck(f'No way to determine acls for {path}')
+        raise UnableToCheck(f"No way to determine acls for {path}")
 
     return acls
 
@@ -60,28 +60,28 @@ def writable_via_acls(path: str, euid: int) -> bool:
     principal_has_write = False
 
     # Strip comments and blank lines.  Everything else is an acl
-    for acl in (a for a in acls.splitlines() if not a.startswith('#') and a):
-        type_, principal, permissions = acl.rsplit(':', 2)
+    for acl in (a for a in acls.splitlines() if not a.startswith("#") and a):
+        type_, principal, permissions = acl.rsplit(":", 2)
         # default acls have the same issues as acls directly on the directory
-        if type_.startswith('default:'):
-            dummy_, type_ = type_.split(':', 1)
+        if type_.startswith("default:"):
+            dummy_, type_ = type_.split(":", 1)
 
         # All the safe things:
 
         # ACL is for the user themselves
-        if type_ == 'user' and (not principal or principal == euid):
+        if type_ == "user" and (not principal or principal == euid):
             continue
 
-        if type_ == 'mask':
+        if type_ == "mask":
             # The mask does not allow acls to set write
-            if 'w' not in permissions:
+            if "w" not in permissions:
                 mask_has_write = False
                 break
             # No other mask values affect safety
             continue
 
         # The acl doesn't grant write permission
-        if 'w' not in permissions:
+        if "w" not in permissions:
             continue
 
         # Okay, the principal has write in this case

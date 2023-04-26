@@ -31,31 +31,32 @@ def _add_default_to_help_string(action):
     """
     help = action.help
 
-    if '%(default)' not in action.help:
+    if "%(default)" not in action.help:
         if action.default is not SUPPRESS:
             defaulting_nargs = [OPTIONAL, ZERO_OR_MORE]
             if action.option_strings or action.nargs in defaulting_nargs:
-                help += ' (default: %(default)s)'
+                help += " (default: %(default)s)"
     return help
 
 
 class BooleanOptionalAction(Action):
-    def __init__(self,
-                 option_strings,
-                 dest,
-                 default=None,
-                 type=None,
-                 choices=None,
-                 required=False,
-                 help=None,
-                 metavar=None):
-
+    def __init__(
+        self,
+        option_strings,
+        dest,
+        default=None,
+        type=None,
+        choices=None,
+        required=False,
+        help=None,
+        metavar=None,
+    ):
         _option_strings = []
         for option_string in option_strings:
             _option_strings.append(option_string)
 
-            if option_string.startswith('--'):
-                option_string = '--no-' + option_string[2:]
+            if option_string.startswith("--"):
+                option_string = "--no-" + option_string[2:]
                 _option_strings.append(option_string)
 
         # if help is not None and default is not None:
@@ -70,13 +71,14 @@ class BooleanOptionalAction(Action):
             choices=choices,
             required=required,
             help=help,
-            metavar=metavar)
+            metavar=metavar,
+        )
 
         self.help = _add_default_to_help_string(self)
 
     def __call__(self, parser, namespace, values, option_string=None):
         if option_string in self.option_strings:
-            setattr(namespace, self.dest, not option_string.startswith('--no-'))
+            setattr(namespace, self.dest, not option_string.startswith("--no-"))
 
     def format_usage(self):
-        return ' | '.join(self.option_strings)
+        return " | ".join(self.option_strings)

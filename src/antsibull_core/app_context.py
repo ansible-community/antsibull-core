@@ -112,7 +112,7 @@ from contextlib import contextmanager
 from .schemas.context import AppContext, LibContext
 from .vendored.collections import ImmutableDict
 
-AppContextT = t.TypeVar('AppContextT', bound=AppContext)
+AppContextT = t.TypeVar("AppContextT", bound=AppContext)
 
 
 #: lib_ctx should be restricted to things which do not belong in the API but an application or
@@ -126,7 +126,7 @@ AppContextT = t.TypeVar('AppContextT', bound=AppContext)
 #: for tweaking via a value saved in lib_ctx.  All values in lib_ctx need to have a default value
 #: so that code which uses it can fallback to something if the application or user did not
 #: specify a value.
-lib_ctx: contextvars.ContextVar[LibContext] = contextvars.ContextVar('lib_ctx')
+lib_ctx: contextvars.ContextVar[LibContext] = contextvars.ContextVar("lib_ctx")
 
 #: Values in app_ctx are things that form defaults in the application.  Even though it may be
 #: tempting to use them for library API, they should not be used there.  Instead, these values
@@ -146,7 +146,7 @@ lib_ctx: contextvars.ContextVar[LibContext] = contextvars.ContextVar('lib_ctx')
 #: server, the library can provide a class which takes the server's URL as a parameter and stores
 #: as an attribute and the functions can be converted into methods of the object.  Then the
 #: application code can initialize the object once and thereafter call the object's methods.
-app_ctx: contextvars.ContextVar[AppContext] = contextvars.ContextVar('app_ctx')
+app_ctx: contextvars.ContextVar[AppContext] = contextvars.ContextVar("app_ctx")
 
 
 class ContextReturn(t.Generic[AppContextT]):
@@ -174,9 +174,15 @@ class ContextReturn(t.Generic[AppContextT]):
     args: argparse.Namespace
     cfg: dict
 
-    # pylint: disable-next=redefined-outer-name
-    def __init__(self, app_ctx: AppContextT, lib_ctx: LibContext,
-                 args: argparse.Namespace, cfg: dict):
+    def __init__(
+        self,
+        # pylint: disable-next=redefined-outer-name
+        app_ctx: AppContextT,
+        # pylint: disable-next=redefined-outer-name
+        lib_ctx: LibContext,
+        args: argparse.Namespace,
+        cfg: dict,
+    ):
         self.app_ctx = app_ctx
         self.lib_ctx = lib_ctx
         self.args = args
@@ -191,15 +197,15 @@ class ContextReturn(t.Generic[AppContextT]):
             return self.args
         if index == 3:
             return self.cfg
-        raise IndexError('tuple index out of range')
+        raise IndexError("tuple index out of range")
 
     def __iter__(self) -> Iterable:
         return (self.app_ctx, self.lib_ctx, self.args, self.cfg).__iter__()
 
 
-def _extract_context_values(known_fields, args: argparse.Namespace | None,
-                            cfg: Mapping = ImmutableDict()) -> dict:
-
+def _extract_context_values(
+    known_fields, args: argparse.Namespace | None, cfg: Mapping = ImmutableDict()
+) -> dict:
     context_values = {}
     if cfg:
         for value in known_fields:
@@ -220,29 +226,32 @@ def _extract_context_values(known_fields, args: argparse.Namespace | None,
 
 
 @t.overload
-def create_contexts(args: argparse.Namespace | None = None,
-                    cfg: Mapping = ImmutableDict(),
-                    use_extra: bool = True,
-                    ) -> ContextReturn[AppContext]:
+def create_contexts(
+    args: argparse.Namespace | None = None,
+    cfg: Mapping = ImmutableDict(),
+    use_extra: bool = True,
+) -> ContextReturn[AppContext]:
     ...
 
 
 @t.overload
-def create_contexts(args: argparse.Namespace | None = None,
-                    cfg: Mapping = ImmutableDict(),
-                    use_extra: bool = True,
-                    *,
-                    app_context_model: type[AppContextT],
-                    ) -> ContextReturn[AppContextT]:
+def create_contexts(
+    args: argparse.Namespace | None = None,
+    cfg: Mapping = ImmutableDict(),
+    use_extra: bool = True,
+    *,
+    app_context_model: type[AppContextT],
+) -> ContextReturn[AppContextT]:
     ...
 
 
-def create_contexts(args: argparse.Namespace | None = None,
-                    cfg: Mapping = ImmutableDict(),
-                    use_extra: bool = True,
-                    *,
-                    app_context_model=AppContext,
-                    ) -> ContextReturn:
+def create_contexts(
+    args: argparse.Namespace | None = None,
+    cfg: Mapping = ImmutableDict(),
+    use_extra: bool = True,
+    *,
+    app_context_model=AppContext,
+) -> ContextReturn:
     """
     Create new contexts appropriate for setting the app and lib context.
 
@@ -293,7 +302,7 @@ def create_contexts(args: argparse.Namespace | None = None,
     # Unused values are saved in app_ctx.extra when use_extra is set
     if use_extra:
         unused_cfg.update(unused_args)
-        app_values['extra'] = unused_cfg
+        app_values["extra"] = unused_cfg
         unused_cfg = {}
         unused_args = {}
 
@@ -304,7 +313,11 @@ def create_contexts(args: argparse.Namespace | None = None,
     local_lib_ctx = LibContext(**lib_values)
 
     return ContextReturn(
-        app_ctx=local_app_ctx, lib_ctx=local_lib_ctx, args=unused_args_ns, cfg=unused_cfg)
+        app_ctx=local_app_ctx,
+        lib_ctx=local_lib_ctx,
+        args=unused_args_ns,
+        cfg=unused_cfg,
+    )
 
 
 def _copy_lib_context() -> LibContext:
@@ -328,7 +341,9 @@ def _copy_app_context() -> AppContext:
 
 
 @contextmanager
-def lib_context(new_context: LibContext | None = None) -> t.Generator[LibContext, None, None]:
+def lib_context(
+    new_context: LibContext | None = None,
+) -> t.Generator[LibContext, None, None]:
     """
     Set up a new lib_context.
 
@@ -373,8 +388,9 @@ def app_context(new_context=None):
 
 
 @contextmanager
-def app_and_lib_context(context_data: ContextReturn[AppContextT]
-                        ) -> t.Generator[tuple[AppContextT, LibContext], None, None]:
+def app_and_lib_context(
+    context_data: ContextReturn[AppContextT],
+) -> t.Generator[tuple[AppContextT, LibContext], None, None]:
     """
     Set the app and lib context at the same time.
 
@@ -399,7 +415,7 @@ class AppContextWrapper(t.Generic[AppContextT]):
 
     @property
     def name(self):
-        return 'app_ctx'
+        return "app_ctx"
 
     @staticmethod
     def get() -> AppContextT:

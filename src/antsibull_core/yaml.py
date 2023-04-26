@@ -39,7 +39,7 @@ def load_yaml_file(path: StrOrBytesPath) -> t.Any:
     """
     Load and parse YAML file ``path``.
     """
-    with open(path, 'rb') as stream:
+    with open(path, "rb") as stream:
         return yaml.load(stream, Loader=_SafeLoader)
 
 
@@ -47,15 +47,16 @@ def store_yaml_file(path: StrOrBytesPath, content: t.Any) -> None:
     """
     Store ``content`` as YAML file under ``path``.
     """
-    with open(path, 'wb') as stream:
+    with open(path, "wb") as stream:
         store_yaml_stream(stream, content)
 
 
-def store_yaml_stream(stream: SupportsWrite,
-                      content: t.Any) -> None:
+def store_yaml_stream(stream: SupportsWrite, content: t.Any) -> None:
     """
     Dump ``content`` as YAML to an IO ``stream``.
     """
     dumper = _SafeDumper
     dumper.ignore_aliases = lambda *args: True
-    yaml.dump(content, stream, default_flow_style=False, encoding='utf-8', Dumper=dumper)
+    yaml.dump(
+        content, stream, default_flow_style=False, encoding="utf-8", Dumper=dumper
+    )

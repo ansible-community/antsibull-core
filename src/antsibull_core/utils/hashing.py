@@ -14,7 +14,9 @@ import aiofiles
 from .. import app_context
 
 
-async def verify_hash(filename: str, hash_digest: str, algorithm: str = 'sha256') -> bool:
+async def verify_hash(
+    filename: str, hash_digest: str, algorithm: str = "sha256"
+) -> bool:
     """
     Verify whether a file has a given sha256sum.
 
@@ -25,7 +27,7 @@ async def verify_hash(filename: str, hash_digest: str, algorithm: str = 'sha256'
     :returns: True if the hash matches, otherwise False.
     """
     hasher = getattr(hashlib, algorithm)()
-    async with aiofiles.open(filename, 'rb') as f:
+    async with aiofiles.open(filename, "rb") as f:
         ctx = app_context.lib_ctx.get()
         while chunk := await f.read(ctx.chunksize):
             hasher.update(chunk)
