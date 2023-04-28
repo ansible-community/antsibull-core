@@ -388,7 +388,7 @@ class CollectionDownloader(GalaxyClient):
                                            release_info['artifact']['filename'])
                 if await verify_hash(cached_copy, sha256sum):
                     shutil.copyfile(cached_copy, download_filename)
-                return download_filename
+                    return download_filename
 
         async with retry_get(self.aio_session, release_url,
                              acceptable_error_codes=[404]) as response:
