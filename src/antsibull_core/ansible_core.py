@@ -30,11 +30,6 @@ if t.TYPE_CHECKING:
 
 mlog = log.fields(mod=__name__)
 
-#: URL to checkout ansible-core from.
-_ANSIBLE_CORE_URL = str(app_context.AppContext().ansible_base_url)
-#: URL to pypi.
-_PYPI_SERVER_URL = str(app_context.AppContext().pypi_url)
-
 
 class UnknownVersion(Exception):
     """Raised when a requested version does not exist."""
@@ -50,16 +45,19 @@ class AnsibleCorePyPiClient:
     def __init__(
         self,
         aio_session: "aiohttp.client.ClientSession",
-        pypi_server_url: str = _PYPI_SERVER_URL,
+        pypi_server_url: t.Optional[str] = None,
     ) -> None:
         """
         Initialize the AnsibleCorePypiClient class.
 
         :arg aio_session: :obj:`aiohttp.client.ClientSession` to make requests to pypi from.
-        :kwarg pypi_server_url: URL to the pypi server to use.
+        :kwarg pypi_server_url: URL to the pypi server to use. Defaults to
+            ``lib_ctx.get().pypi_url``.
         """
         self.aio_session = aio_session
-        self.pypi_server_url = pypi_server_url
+        if pypi_server_url is None:
+            pypi_server_url = str(app_context.lib_ctx.get().pypi_url)
+        self.pypi_server_url: str = pypi_server_url
 
     async def _get_json(self, query_url: str) -> dict[str, t.Any]:
         """
@@ -254,16 +252,17 @@ def source_is_correct_version(
     return False
 
 
-async def checkout_from_git(
-    download_dir: str, repo_url: str = _ANSIBLE_CORE_URL
-) -> str:
+async def checkout_from_git(download_dir: str, repo_url: t.Optional[str] = None) -> str:
     """
     Checkout the ansible-core git repo.
 
     :arg download_dir: Directory to checkout into.
-    :kwarg: repo_url: The url to the git repo.
+    :kwarg: repo_url: The URL to the git repo. Defaults to
+        ``lib_ctx.get().ansible_core_repo_url``.
     :return: The directory that ansible-core has been checked out to.
     """
+    if repo_url is None:
+        repo_url = str(app_context.lib_ctx.get().ansible_core_repo_url)
     ansible_core_dir = os.path.join(download_dir, "ansible-core")
     await async_log_run(["git", "clone", repo_url, ansible_core_dir])
 

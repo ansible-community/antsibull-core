@@ -27,10 +27,6 @@ if t.TYPE_CHECKING:
     import aiohttp.client
 
 
-#: URL to galaxy. (Get the default from the context default)
-_GALAXY_SERVER_URL = str(app_context.AppContext().galaxy_url)
-
-
 class NoSuchCollection(Exception):
     """Collection name does not map to a collection on Galaxy."""
 
@@ -65,8 +61,18 @@ class GalaxyContext:
 
     @classmethod
     async def create(
-        cls, aio_session: aiohttp.client.ClientSession, galaxy_server: str
+        cls,
+        aio_session: aiohttp.client.ClientSession,
+        galaxy_server: t.Optional[str] = None,
     ) -> GalaxyContext:
+        """
+        Create a new Galaxy context.
+
+        :arg aio_session: A ``aiohttp.client.ClientSession`` object.
+        :kwarg galaxy_server: A Galaxy server URL. Defaults to ``lib_ctx.get().galaxy_server``.
+        """
+        if galaxy_server is None:
+            galaxy_server = app_context.lib_ctx.get().galaxy_url
         api_url = urljoin(galaxy_server, "api/")
         async with retry_get(
             aio_session, api_url, headers={"Accept": "application/json"}
@@ -137,7 +143,7 @@ class GalaxyClient:
         """
         if galaxy_server is None and context is None:
             # TODO: deprecate
-            galaxy_server = _GALAXY_SERVER_URL
+            galaxy_server = app_context.lib_ctx.get().galaxy_url
         elif context is not None:
             # TODO: deprecate
             if galaxy_server is not None and galaxy_server != context.server:
@@ -391,9 +397,12 @@ class CollectionDownloader(GalaxyClient):
         :kwarg collection_cache: If given, a path to a directory containing collection tarballs.
             These tarballs will be used instead of downloading new tarballs provided that the
             versions match the criteria (latest compatible version known to galaxy).
+            Defaults to ``lib_ctx.get().collection_cache``.
         """
         super().__init__(aio_session, galaxy_server=galaxy_server, context=context)
         self.download_dir = download_dir
+        if collection_cache is None:
+            collection_cache = app_context.lib_ctx.get().collection_cache
         self.collection_cache: t.Final[str | None] = collection_cache
 
     async def download(
