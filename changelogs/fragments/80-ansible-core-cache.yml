@@ -1,0 +1,3 @@
+minor_changes:
+  - "Allow to cache ansible-core download artifacts with a new config file option ``ansible_core_cache`` (https://github.com/ansible-community/antsibull-core/pull/80)."
+  - "Allow to fully trust the ansible-core artifacts cache to avoid querying PyPI with a new config file option ``trust_ansible_core_cache`` (https://github.com/ansible-community/antsibull-core/pull/80)."

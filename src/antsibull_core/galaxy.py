@@ -402,7 +402,7 @@ class CollectionDownloader(GalaxyClient):
         :kwarg trust_collection_cache: If set to ``True``, will assume that if the collection
             cache contains an artifact, it is the current one available on the Galaxy server.
             This avoids making a request to the Galaxy server to figure out the artifact's
-            checksum and comparting it before trusting the cached artifact.
+            checksum and comparing it before trusting the cached artifact.
         """
         super().__init__(aio_session, galaxy_server=galaxy_server, context=context)
         self.download_dir = download_dir
