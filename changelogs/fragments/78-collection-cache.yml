@@ -1,0 +1,2 @@
+minor_changes:
+  - "Avoid using the collection artifact filename returned by the Galaxy server. Instead compose it in a uniform way (https://github.com/ansible-community/antsibull-core/pull/78)."

@@ -419,22 +419,18 @@ class CollectionDownloader(GalaxyClient):
         :arg version: Version of the collection to download.
         :returns: The full path to the downloaded collection.
         """
-        collection = collection.replace(".", "/")
-        release_info = await self.get_release_info(collection, version)
+        namespace, name = collection.split(".", 1)
+        filename = f"{namespace}-{name}-{version}.tar.gz"
+
+        release_info = await self.get_release_info(f"{namespace}/{name}", version)
         release_url = release_info["download_url"]
 
-        download_filename = os.path.join(
-            self.download_dir, release_info["artifact"]["filename"]
-        )
+        download_filename = os.path.join(self.download_dir, filename)
         sha256sum = release_info["artifact"]["sha256"]
 
         if self.collection_cache:
-            if release_info["artifact"]["filename"] in os.listdir(
-                self.collection_cache
-            ):
-                cached_copy = os.path.join(
-                    self.collection_cache, release_info["artifact"]["filename"]
-                )
+            if filename in os.listdir(self.collection_cache):
+                cached_copy = os.path.join(self.collection_cache, filename)
                 if await verify_hash(cached_copy, sha256sum):
                     shutil.copyfile(cached_copy, download_filename)
                     return download_filename
@@ -459,9 +455,7 @@ class CollectionDownloader(GalaxyClient):
 
         # Copy downloaded collection into cache
         if self.collection_cache:
-            cached_copy = os.path.join(
-                self.collection_cache, release_info["artifact"]["filename"]
-            )
+            cached_copy = os.path.join(self.collection_cache, filename)
             shutil.copyfile(download_filename, cached_copy)
 
         return download_filename
