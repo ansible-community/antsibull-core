@@ -20,11 +20,6 @@ LEVEL_CHOICES_F = p.Field(
     ..., regex="^(CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG|DISABLED)$"
 )
 
-#: Valid choices for a logging level field
-_DOC_PARSING_BACKEND_CHOICES_F = p.Field(
-    "ansible-internal", regex="^(auto|ansible-doc|ansible-core-2.13|ansible-internal)$"
-)
-
 #: Valid choice of the logging version field
 VERSION_CHOICES_F = p.Field(..., regex=r"1\.0")
 
@@ -112,29 +107,3 @@ DEFAULT_LOGGING_CONFIG = LoggingModel.parse_obj(
         },
     }
 )
-
-
-# This class is no longer needed, it will eventually be removed
-class ConfigModel(BaseModel):
-    # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    ansible_base_url: p.HttpUrl = "https://github.com/ansible/ansible"  # type: ignore[assignment]
-    chunksize: int = 4096
-    # DEPRECATED: doc_parsing_backend will be removed in antsibull-core 3.0.0
-    doc_parsing_backend: str = _DOC_PARSING_BACKEND_CHOICES_F
-    # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    galaxy_url: p.HttpUrl = "https://galaxy.ansible.com/"  # type: ignore[assignment]
-    logging_cfg: LoggingModel = DEFAULT_LOGGING_CONFIG
-    max_retries: int = 10
-    process_max: t.Optional[int] = None
-    # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    pypi_url: p.HttpUrl = "https://pypi.org/"  # type: ignore[assignment]
-    thread_max: int = 8
-    file_check_content: int = 262144
-    collection_cache: t.Optional[str] = None
-
-    _convert_nones = p.validator("process_max", pre=True, allow_reuse=True)(
-        convert_none
-    )
-    _convert_paths = p.validator("collection_cache", pre=True, allow_reuse=True)(
-        convert_path
-    )

@@ -1,0 +1,2 @@
+removed_features:
+  - "The ``antsibull_core.schemas.config.ConfigModel`` model has been removed (https://github.com/ansible-community/antsibull-core/pull/79)."
