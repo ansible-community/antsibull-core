@@ -384,6 +384,7 @@ class CollectionDownloader(GalaxyClient):
         galaxy_server: t.Optional[str] = None,
         collection_cache: str | None = None,
         context: t.Optional[GalaxyContext] = None,
+        trust_collection_cache: t.Optional[bool] = None,
     ) -> None:
         """
         Create an object to download collections from galaxy.
@@ -398,12 +399,19 @@ class CollectionDownloader(GalaxyClient):
             These tarballs will be used instead of downloading new tarballs provided that the
             versions match the criteria (latest compatible version known to galaxy).
             Defaults to ``lib_ctx.get().collection_cache``.
+        :kwarg trust_collection_cache: If set to ``True``, will assume that if the collection
+            cache contains an artifact, it is the latest one available on the Galaxy server.
+            This avoids making a request to the Galaxy server to figure out the artifact's
+            checksum and comparting it before trusting the cached artifact.
         """
         super().__init__(aio_session, galaxy_server=galaxy_server, context=context)
         self.download_dir = download_dir
         if collection_cache is None:
             collection_cache = app_context.lib_ctx.get().collection_cache
         self.collection_cache: t.Final[str | None] = collection_cache
+        if trust_collection_cache is None:
+            trust_collection_cache = app_context.lib_ctx.get().trust_collection_cache
+        self.trust_collection_cache = trust_collection_cache
 
     async def download(
         self,
@@ -421,6 +429,14 @@ class CollectionDownloader(GalaxyClient):
         """
         namespace, name = collection.split(".", 1)
         filename = f"{namespace}-{name}-{version}.tar.gz"
+
+        if self.collection_cache and self.trust_collection_cache:
+            filename = f"{namespace}-{name}-{version}.tar.gz"
+            if filename in os.listdir(self.collection_cache):
+                cached_copy = os.path.join(self.collection_cache, filename)
+                download_filename = os.path.join(self.download_dir, filename)
+                shutil.copyfile(cached_copy, download_filename)
+                return download_filename
 
         release_info = await self.get_release_info(f"{namespace}/{name}", version)
         release_url = release_info["download_url"]

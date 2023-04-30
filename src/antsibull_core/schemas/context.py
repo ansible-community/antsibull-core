@@ -11,7 +11,7 @@ import pydantic as p
 
 from ..utils.collections import ContextDict
 from .config import DEFAULT_LOGGING_CONFIG, LoggingModel
-from .validators import convert_none, convert_path
+from .validators import convert_bool, convert_none, convert_path
 
 
 class BaseModel(p.BaseModel):
@@ -111,6 +111,10 @@ class LibContext(BaseModel):
     :ivar pypi_url: URL of the pypi server to query for information
     :ivar collection_cache: If set, must be a path pointing to a directory where collection
         tarballs are cached so they do not need to be downloaded from Galaxy twice.
+    :ivar trust_collection_cache: If set to ``True``, will assume that if the collection
+        cache contains an artifact, it is the latest one available on the Galaxy server.
+        This avoids making a request to the Galaxy server to figure out the artifact's
+        checksum and comparting it before trusting the cached artifact.
     """
 
     chunksize: int = 4096
@@ -131,6 +135,7 @@ class LibContext(BaseModel):
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
     pypi_url: p.HttpUrl = "https://pypi.org/"  # type: ignore[assignment]
     collection_cache: t.Optional[str] = None
+    trust_collection_cache: bool = False
 
     # pylint: disable-next=unused-private-member
     __convert_nones = p.validator("process_max", pre=True, allow_reuse=True)(
@@ -139,4 +144,8 @@ class LibContext(BaseModel):
     # pylint: disable-next=unused-private-member
     __convert_paths = p.validator("collection_cache", pre=True, allow_reuse=True)(
         convert_path
+    )
+    # pylint: disable-next=unused-private-member
+    __convert_bools = p.validator("trust_collection_cache", pre=True, allow_reuse=True)(
+        convert_bool
     )
