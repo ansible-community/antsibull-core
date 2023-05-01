@@ -48,22 +48,35 @@ class AppContext(BaseModel):
         values stored in extras need default values, they need to be set outside of the context
         or the entries can be given an actual entry in the AppContext to take advantage of the
         schema's checking, normalization, and default setting.
-    :ivar ansible_base_url: Url to the ansible-core git repo.
-    :ivar galaxy_url: URL of the galaxy server to get collection info from
-    :ivar logging_cfg: Configuration of the application logging
-    :ivar pypi_url: URL of the pypi server to query for information
+    :ivar ansible_base_url: Url to the ansible-core git repo. DEPRECATED: use the field
+        ``ansible_core_repo_url`` in library context instead.
+    :ivar galaxy_url: URL of the galaxy server to get collection info from. DEPRECATED: use the
+        field of the same name in library context instead.
+    :ivar logging_cfg: Configuration of the application logging.
+    :ivar pypi_url: URL of the pypi server to query for information. DEPRECATED: use the field
+        of the same name in library context instead.
     :ivar collection_cache: If set, must be a path pointing to a directory where collection
-        tarballs are cached so they do not need to be downloaded from Galaxy twice.
+        tarballs are cached so they do not need to be downloaded from Galaxy twice. DEPRECATED:
+        use the field of the same name in library context instead.
     """
 
     extra: ContextDict = ContextDict()
+
+    # DEPRECATED: ansible_base_url will be removed in antsibull-core 3.0.0.
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
     ansible_base_url: p.HttpUrl = "https://github.com/ansible/ansible/"  # type: ignore[assignment]
+
+    # DEPRECATED: galaxy_url will be removed in antsibull-core 3.0.0.
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
     galaxy_url: p.HttpUrl = "https://galaxy.ansible.com/"  # type: ignore[assignment]
+
     logging_cfg: LoggingModel = LoggingModel.parse_obj(DEFAULT_LOGGING_CONFIG)
+
+    # DEPRECATED: pypi_url will be removed in antsibull-core 3.0.0.
     # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
     pypi_url: p.HttpUrl = "https://pypi.org/"  # type: ignore[assignment]
+
+    # DEPRECATED: collection_cache will be removed in antsibull-core 3.0.0.
     collection_cache: t.Optional[str] = None
 
     # pylint: disable-next=unused-private-member
@@ -92,17 +105,38 @@ class LibContext(BaseModel):
         'ansible-internal' is the fastest, but does not work with ansible-core 2.13+.
         'ansible-core-2.13' is also very fast, but requires ansible-core 2.13+.
         'ansible-doc' exists in case of problems with the ansible-internal backend.
+    :ivar ansible_core_repo_url: Url to the ansible-core git repo.
+    :ivar galaxy_url: URL of the galaxy server to get collection info from
+    :ivar logging_cfg: Configuration of the application logging
+    :ivar pypi_url: URL of the pypi server to query for information
+    :ivar collection_cache: If set, must be a path pointing to a directory where collection
+        tarballs are cached so they do not need to be downloaded from Galaxy twice.
     """
 
     chunksize: int = 4096
+
     # DEPRECATED: doc_parsing_backend will be removed in antsibull-core 3.0.0
     doc_parsing_backend: str = "auto"
+
     max_retries: int = 10
     process_max: t.Optional[int] = None
     thread_max: int = 8
     file_check_content: int = 262144
+    # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
+    ansible_core_repo_url: p.HttpUrl = (
+        "https://github.com/ansible/ansible/"  # type: ignore[assignment]
+    )
+    # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
+    galaxy_url: p.HttpUrl = "https://galaxy.ansible.com/"  # type: ignore[assignment]
+    # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
+    pypi_url: p.HttpUrl = "https://pypi.org/"  # type: ignore[assignment]
+    collection_cache: t.Optional[str] = None
 
     # pylint: disable-next=unused-private-member
     __convert_nones = p.validator("process_max", pre=True, allow_reuse=True)(
         convert_none
+    )
+    # pylint: disable-next=unused-private-member
+    __convert_paths = p.validator("collection_cache", pre=True, allow_reuse=True)(
+        convert_path
     )
