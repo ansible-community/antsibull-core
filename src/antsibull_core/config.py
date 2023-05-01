@@ -14,7 +14,6 @@ import perky  # type: ignore[import]
 import pydantic as p
 
 from .logging import log
-from .schemas.config import ConfigModel
 from .schemas.context import AppContext, LibContext
 
 mlog = log.fields(mod=__name__)
@@ -51,29 +50,6 @@ def find_config_files(conf_files: Iterable[str]) -> list[str]:
 
     flog.debug("Leave")
     return config_files
-
-
-def read_config(filename: str) -> ConfigModel:
-    """
-    Parse a config file and return the data from it.
-
-    :arg filename: The filename of the config file to parse.
-    :returns: A ConfigModel model containing the config data.
-    """
-    flog = mlog.fields(func="read_config")
-    flog.debug("Enter")
-
-    filename = os.path.abspath(filename)
-
-    flog.fields(filename=filename).info("loading config file")
-    raw_config_data = perky.load(filename)
-    flog.debug("Validatinging the config file data")
-    # Note: We parse the object but discard the model because we want to validate the config but let
-    # the context handle all setting of defaults
-    ConfigModel.parse_obj(raw_config_data)
-
-    flog.debug("Leave")
-    return raw_config_data
 
 
 def validate_config(
