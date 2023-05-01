@@ -112,7 +112,7 @@ class LibContext(BaseModel):
     :ivar collection_cache: If set, must be a path pointing to a directory where collection
         tarballs are cached so they do not need to be downloaded from Galaxy twice.
     :ivar trust_collection_cache: If set to ``True``, will assume that if the collection
-        cache contains an artifact, it is the latest one available on the Galaxy server.
+        cache contains an artifact, it is the current one available on the Galaxy server.
         This avoids making a request to the Galaxy server to figure out the artifact's
         checksum and comparting it before trusting the cached artifact.
     """
