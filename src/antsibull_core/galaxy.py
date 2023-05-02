@@ -10,7 +10,6 @@ from __future__ import annotations
 import asyncio
 import dataclasses
 import os.path
-import shutil
 import typing as t
 from enum import Enum
 from urllib.parse import urljoin
@@ -21,6 +20,7 @@ import semantic_version as semver
 from . import app_context
 from .utils.hashing import verify_hash
 from .utils.http import retry_get
+from .utils.io import copy_file
 
 # The type checker can handle finding aiohttp.client but flake8 cannot :-(
 if t.TYPE_CHECKING:
@@ -384,6 +384,7 @@ class CollectionDownloader(GalaxyClient):
         galaxy_server: t.Optional[str] = None,
         collection_cache: str | None = None,
         context: t.Optional[GalaxyContext] = None,
+        trust_collection_cache: t.Optional[bool] = None,
     ) -> None:
         """
         Create an object to download collections from galaxy.
@@ -398,12 +399,20 @@ class CollectionDownloader(GalaxyClient):
             These tarballs will be used instead of downloading new tarballs provided that the
             versions match the criteria (latest compatible version known to galaxy).
             Defaults to ``lib_ctx.get().collection_cache``.
+        :kwarg trust_collection_cache: If set to ``True``, will assume that if the collection
+            cache contains an artifact, it is the current one available on the Galaxy server.
+            This avoids making a request to the Galaxy server to figure out the artifact's
+            checksum and comparting it before trusting the cached artifact.
         """
         super().__init__(aio_session, galaxy_server=galaxy_server, context=context)
         self.download_dir = download_dir
+        lib_ctx = app_context.lib_ctx.get()
         if collection_cache is None:
-            collection_cache = app_context.lib_ctx.get().collection_cache
+            collection_cache = lib_ctx.collection_cache
         self.collection_cache: t.Final[str | None] = collection_cache
+        if trust_collection_cache is None:
+            trust_collection_cache = lib_ctx.trust_collection_cache
+        self.trust_collection_cache: t.Final[bool] = trust_collection_cache
 
     async def download(
         self,
@@ -419,24 +428,26 @@ class CollectionDownloader(GalaxyClient):
         :arg version: Version of the collection to download.
         :returns: The full path to the downloaded collection.
         """
-        collection = collection.replace(".", "/")
-        release_info = await self.get_release_info(collection, version)
+        namespace, name = collection.split(".", 1)
+        filename = f"{namespace}-{name}-{version}.tar.gz"
+        download_filename = os.path.join(self.download_dir, filename)
+
+        if self.collection_cache and self.trust_collection_cache:
+            cached_copy = os.path.join(self.collection_cache, filename)
+            if os.path.isfile(cached_copy):
+                await copy_file(cached_copy, download_filename, check_content=False)
+                return download_filename
+
+        release_info = await self.get_release_info(f"{namespace}/{name}", version)
         release_url = release_info["download_url"]
 
-        download_filename = os.path.join(
-            self.download_dir, release_info["artifact"]["filename"]
-        )
         sha256sum = release_info["artifact"]["sha256"]
 
         if self.collection_cache:
-            if release_info["artifact"]["filename"] in os.listdir(
-                self.collection_cache
-            ):
-                cached_copy = os.path.join(
-                    self.collection_cache, release_info["artifact"]["filename"]
-                )
+            cached_copy = os.path.join(self.collection_cache, filename)
+            if os.path.isfile(cached_copy):
                 if await verify_hash(cached_copy, sha256sum):
-                    shutil.copyfile(cached_copy, download_filename)
+                    await copy_file(cached_copy, download_filename, check_content=False)
                     return download_filename
 
         async with retry_get(
@@ -459,10 +470,8 @@ class CollectionDownloader(GalaxyClient):
 
         # Copy downloaded collection into cache
         if self.collection_cache:
-            cached_copy = os.path.join(
-                self.collection_cache, release_info["artifact"]["filename"]
-            )
-            shutil.copyfile(download_filename, cached_copy)
+            cached_copy = os.path.join(self.collection_cache, filename)
+            await copy_file(download_filename, cached_copy, check_content=False)
 
         return download_filename
 
