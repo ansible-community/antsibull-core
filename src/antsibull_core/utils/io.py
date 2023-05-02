@@ -22,8 +22,9 @@ if t.TYPE_CHECKING:
 mlog = log.fields(mod=__name__)
 
 
-async def copy_file(source_path: StrOrBytesPath, dest_path: StrOrBytesPath,
-                    check_content: bool = True) -> None:
+async def copy_file(
+    source_path: StrOrBytesPath, dest_path: StrOrBytesPath, check_content: bool = True
+) -> None:
     """
     Copy content from one file to another.
 
