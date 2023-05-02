@@ -1,3 +1,4 @@
 minor_changes:
   - "Avoid using the collection artifact filename returned by the Galaxy server. Instead compose it in a uniform way (https://github.com/ansible-community/antsibull-core/pull/78)."
   - "Allow the Galaxy downloader to trust its collection cache to avoid having to query the Galaxy server if an artifact exists in the cache. This can be set with the new configuration file option ``trust_collection_cache`` (https://github.com/ansible-community/antsibull-core/pull/78)."
+  - "Allow to skip content check when doing async file copying using ``antsibull_core.utils.io.copy_file()`` (https://github.com/ansible-community/antsibull-core/pull/78)."
