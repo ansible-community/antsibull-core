@@ -22,18 +22,22 @@ if t.TYPE_CHECKING:
 mlog = log.fields(mod=__name__)
 
 
-async def copy_file(source_path: StrOrBytesPath, dest_path: StrOrBytesPath) -> None:
+async def copy_file(source_path: StrOrBytesPath, dest_path: StrOrBytesPath,
+                    check_content: bool = True) -> None:
     """
     Copy content from one file to another.
 
     :arg source_path: Source path. Must be a file.
     :arg dest_path: Destination path.
+    :kwarg check_content: If ``True`` (default) and ``lib_ctx.file_check_content > 0`` and the
+        destination file exists, first check whether source and destination are potentially equal
+        before actually copying,
     """
     flog = mlog.fields(func="copy_file")
     flog.debug("Enter")
 
     lib_ctx = app_context.lib_ctx.get()
-    if lib_ctx.file_check_content > 0:
+    if check_content and lib_ctx.file_check_content > 0:
         # Check whether the destination file exists and has the same content as the source file,
         # in which case we won't overwrite the destination file
         try:
