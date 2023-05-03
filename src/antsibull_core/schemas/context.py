@@ -115,6 +115,12 @@ class LibContext(BaseModel):
         cache contains an artifact, it is the current one available on the Galaxy server.
         This avoids making a request to the Galaxy server to figure out the artifact's
         checksum and comparing it before trusting the cached artifact.
+    :ivar ansible_core_cache: If set, must be a path pointing to a directory where ansible-core
+        tarballs are cached so they do not need to be downloaded from PyPI twice.
+    :ivar trust_ansible_core_cache: If set to ``True``, will assume that if the ansible-core
+        cache contains an artifact, it is the current one available on PyPI. This avoids making a
+        request to PyPI to figure out the artifact's checksum and comparing it before trusting
+        the cached artifact.
     """
 
     chunksize: int = 4096
@@ -136,16 +142,18 @@ class LibContext(BaseModel):
     pypi_url: p.HttpUrl = "https://pypi.org/"  # type: ignore[assignment]
     collection_cache: t.Optional[str] = None
     trust_collection_cache: bool = False
+    ansible_core_cache: t.Optional[str] = None
+    trust_ansible_core_cache: bool = False
 
     # pylint: disable-next=unused-private-member
     __convert_nones = p.validator("process_max", pre=True, allow_reuse=True)(
         convert_none
     )
     # pylint: disable-next=unused-private-member
-    __convert_paths = p.validator("collection_cache", pre=True, allow_reuse=True)(
-        convert_path
-    )
+    __convert_paths = p.validator(
+        "ansible_core_cache", "collection_cache", pre=True, allow_reuse=True
+    )(convert_path)
     # pylint: disable-next=unused-private-member
-    __convert_bools = p.validator("trust_collection_cache", pre=True, allow_reuse=True)(
-        convert_bool
-    )
+    __convert_bools = p.validator(
+        "trust_ansible_core_cache", "trust_collection_cache", pre=True, allow_reuse=True
+    )(convert_bool)

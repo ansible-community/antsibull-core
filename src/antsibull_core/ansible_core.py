@@ -22,7 +22,9 @@ from packaging.version import Version as PypiVer
 from . import app_context
 from .logging import log
 from .subprocess_util import async_log_run
+from .utils.hashing import verify_a_hash
 from .utils.http import retry_get
+from .utils.io import copy_file
 
 if t.TYPE_CHECKING:
     import aiohttp.client
@@ -67,10 +69,13 @@ class AnsibleCorePyPiClient:
             pkg_info = await response.json()
         return pkg_info
 
-    async def get_release_info(self) -> dict[str, t.Any]:
+    async def get_release_info(
+        self, package_name: t.Optional[str] = None
+    ) -> dict[str, t.Any]:
         """
         Retrieve information about releases of the ansible-core/ansible-base package from pypi.
 
+        :arg package_name: Either 'ansible-core', 'ansible-base', or None.
         :returns: The dict which represents the release info keyed by version number.
             To examine the data structure, use::
 
@@ -80,14 +85,23 @@ class AnsibleCorePyPiClient:
         """
         # Retrieve the ansible-base and ansible-core package info from pypi
         tasks = []
-        for package_name in ("ansible-core", "ansible-base"):
-            query_url = urljoin(self.pypi_server_url, f"pypi/{package_name}/json")
+        for a_package_name in (
+            ("ansible-core", "ansible-base")
+            if package_name is None
+            else (package_name,)
+        ):
+            query_url = urljoin(self.pypi_server_url, f"pypi/{a_package_name}/json")
             tasks.append(asyncio.create_task(self._get_json(query_url)))
 
         # Note: gather maintains the order of results
         results = await asyncio.gather(*tasks)
-        release_info = results[1]["releases"]  # ansible-base information
-        release_info.update(results[0]["releases"])  # ansible-core information
+        if len(results) > 1:
+            release_info = results[1]["releases"]  # ansible-base information
+            release_info.update(results[0]["releases"])  # ansible-core information
+        elif len(results) == 1:
+            release_info = results[0]["releases"]
+        else:
+            release_info = {}
 
         return release_info
 
@@ -128,15 +142,26 @@ class AnsibleCorePyPiClient:
         :returns: The name of the downloaded tarball.
         """
         package_name = get_ansible_core_package_name(ansible_core_version)
-        release_info = await self.get_release_info()
+        release_info = await self.get_release_info(package_name)
 
-        pypi_url = tar_filename = ""
+        tar_filename = f"{package_name}-{ansible_core_version}.tar.gz"
+        tar_path = os.path.join(download_dir, tar_filename)
+
+        lib_ctx = app_context.lib_ctx.get()
+        if lib_ctx.ansible_core_cache and lib_ctx.trust_ansible_core_cache:
+            cached_path = os.path.join(lib_ctx.ansible_core_cache, tar_filename)
+            if os.path.isfile(cached_path):
+                await copy_file(cached_path, tar_path, check_content=False)
+                return tar_path
+
+        pypi_url = ""
+        digests = {}
         for release in release_info[ansible_core_version]:
             if release["filename"].startswith(
                 f"{package_name}-{ansible_core_version}.tar."
             ):
-                tar_filename = release["filename"]
                 pypi_url = release["url"]
+                digests = release["digests"]
                 break
         else:  # for-else: http://bit.ly/1ElPkyg
             raise UnknownVersion(
@@ -144,14 +169,23 @@ class AnsibleCorePyPiClient:
                 " exist on {self.pypi_server_url}"
             )
 
-        tar_filename = os.path.join(download_dir, tar_filename)
+        if lib_ctx.ansible_core_cache and "sha256" in digests:
+            cached_path = os.path.join(lib_ctx.ansible_core_cache, tar_filename)
+            if os.path.isfile(cached_path):
+                if await verify_a_hash(cached_path, digests):
+                    await copy_file(cached_path, tar_path, check_content=False)
+                    return tar_path
+
         async with retry_get(self.aio_session, pypi_url) as response:
-            async with aiofiles.open(tar_filename, "wb") as f:
-                lib_ctx = app_context.lib_ctx.get()
+            async with aiofiles.open(tar_path, "wb") as f:
                 while chunk := await response.content.read(lib_ctx.chunksize):
                     await f.write(chunk)
 
-        return tar_filename
+        if lib_ctx.ansible_core_cache:
+            cached_path = os.path.join(lib_ctx.ansible_core_cache, tar_filename)
+            await copy_file(tar_path, cached_path, check_content=False)
+
+        return tar_path
 
 
 def get_ansible_core_package_name(ansible_core_version: str | PypiVer) -> str:
