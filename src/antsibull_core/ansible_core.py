@@ -85,9 +85,11 @@ class AnsibleCorePyPiClient:
         """
         # Retrieve the ansible-base and ansible-core package info from pypi
         tasks = []
-        for a_package_name in ("ansible-core", "ansible-base"):
-            if package_name is not None and a_package_name != package_name:
-                continue
+        for a_package_name in (
+            ("ansible-core", "ansible-base")
+            if package_name is None
+            else (package_name,)
+        ):
             query_url = urljoin(self.pypi_server_url, f"pypi/{a_package_name}/json")
             tasks.append(asyncio.create_task(self._get_json(query_url)))
 
