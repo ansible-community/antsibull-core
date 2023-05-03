@@ -8,7 +8,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "antsibull-core"
-version = "2.0.0a2.post0"
+version = "2.0.0"
 description = "Tools for building the Ansible Distribution"
 license = "GPL-3.0-or-later AND BSD-2-Clause AND MIT AND PSF-2.0"
 license-files = {globs=["LICENSES/*.txt"]}
