@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import hashlib
+import typing as t
 from collections.abc import Mapping
 
 import aiofiles
@@ -15,8 +16,24 @@ import aiofiles
 from .. import app_context
 
 
+class _AlgorithmData(t.NamedTuple):
+    name: str
+    algorithm: str
+    kwargs: dict
+
+
+_PREFERRED_HASHES = [
+    # https://pypi.org/help/#verify-hashes, https://github.com/pypi/warehouse/issues/9628
+    _AlgorithmData("sha256", "sha256", {}),
+    _AlgorithmData("blake2b_256", "blake2b", {'digest_size': 32}),
+]
+
+
 async def verify_hash(
-    filename: str, hash_digest: str, algorithm: str = "sha256"
+    filename: str,
+    hash_digest: str,
+    algorithm: str = "sha256",
+    algorithm_kwargs: dict | None = None,
 ) -> bool:
     """
     Verify whether a file has a given sha256sum.
@@ -25,9 +42,10 @@ async def verify_hash(
     :arg hash_digest: The hash that is expected.
     :kwarg algorithm: The hash algorithm to use.  This must be present in hashlib on this
         system.  The default is 'sha256'
+    :kwarg algorithm_kwargs: Parameters to provide to the hash algorithm's constructor.
     :returns: True if the hash matches, otherwise False.
     """
-    hasher = getattr(hashlib, algorithm)()
+    hasher = getattr(hashlib, algorithm)(**(algorithm_kwargs or {}))
     async with aiofiles.open(filename, "rb") as f:
         ctx = app_context.lib_ctx.get()
         while chunk := await f.read(ctx.chunksize):
@@ -47,9 +65,12 @@ async def verify_a_hash(filename: str, hash_digests: Mapping[str, str]) -> bool:
     :arg hash_digest: A mapping of hash types to digests.
     :returns: True if the hash matches, otherwise False.
     """
-    for algorithm in ("sha256", "blake2b_256"):
-        if algorithm in hash_digests:
+    for algorithm_data in _PREFERRED_HASHES:
+        if algorithm_data.name in hash_digests:
             return await verify_hash(
-                filename, hash_digests[algorithm], algorithm=algorithm
+                filename,
+                hash_digests[algorithm_data.name],
+                algorithm=algorithm_data.algorithm,
+                algorithm_kwargs=algorithm_data.kwargs,
             )
     return False
