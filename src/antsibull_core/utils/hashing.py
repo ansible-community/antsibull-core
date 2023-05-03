@@ -25,7 +25,7 @@ class _AlgorithmData(t.NamedTuple):
 _PREFERRED_HASHES = [
     # https://pypi.org/help/#verify-hashes, https://github.com/pypi/warehouse/issues/9628
     _AlgorithmData("sha256", "sha256", {}),
-    _AlgorithmData("blake2b_256", "blake2b", {'digest_size': 32}),
+    _AlgorithmData("blake2b_256", "blake2b", {"digest_size": 32}),
 ]
 
 
