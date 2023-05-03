@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import typing as t
 from collections.abc import Mapping
@@ -16,24 +17,25 @@ import aiofiles
 from .. import app_context
 
 
-class _AlgorithmData(t.NamedTuple):
+@dataclasses.dataclass(frozen=True)
+class _AlgorithmData:
     name: str
     algorithm: str
-    kwargs: dict
+    kwargs: dict[str, t.Any]
 
 
-_PREFERRED_HASHES = [
+_PREFERRED_HASHES: tuple[_AlgorithmData, ...] = (
     # https://pypi.org/help/#verify-hashes, https://github.com/pypi/warehouse/issues/9628
-    _AlgorithmData("sha256", "sha256", {}),
-    _AlgorithmData("blake2b_256", "blake2b", {"digest_size": 32}),
-]
+    _AlgorithmData(name="sha256", algorithm="sha256", kwargs={}),
+    _AlgorithmData(name="blake2b_256", algorithm="blake2b", kwargs={"digest_size": 32}),
+)
 
 
 async def verify_hash(
     filename: str,
     hash_digest: str,
     algorithm: str = "sha256",
-    algorithm_kwargs: dict | None = None,
+    algorithm_kwargs: dict[str, t.Any] | None = None,
 ) -> bool:
     """
     Verify whether a file has a given sha256sum.
