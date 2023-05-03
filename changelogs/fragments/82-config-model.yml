@@ -1,2 +1,0 @@
-removed_features:
-  - "The unused ``antsibull_core.schemas.config.ConfigModel`` model and the unused ``antsibull_core.config.read_config`` function have been removed (https://github.com/ansible-community/antsibull-core/pull/82)."

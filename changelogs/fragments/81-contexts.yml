@@ -1,4 +1,0 @@
-minor_changes:
-  - "The fields ``ansible_core_repo_url``, ``galaxy_url``, and ``pypi_url`` have been added to the library context. If ``ansible_core_repo_url`` is not provided, it will be populated from the field ``ansible_base_url`` if that has been provided (https://github.com/ansible-community/antsibull-core/pull/81)."
-deprecated_features:
-  - "The fields ``ansible_base_url``, ``galaxy_url``, and ``pypi_url`` of the app context have been deprecated. Use the fields ``ansible_core_repo_url``, ``galaxy_url``, and ``pypi_url``, respectively, of the library context instead (https://github.com/ansible-community/antsibull-core/pull/81)."

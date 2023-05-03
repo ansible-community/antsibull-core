@@ -94,6 +94,45 @@ releases:
     - 13-no-blocking-io-async.yaml
     - 14-StrOrBytesPath.yaml
     release_date: '2022-11-27'
+  2.0.0:
+    changes:
+      bugfixes:
+      - Fix a bug in Galaxy download code when the filename is found in the cache,
+        but the checksum does not match. In that case, the collection was not copied
+        to the destination, and the code did not try to download the correct file
+        (https://github.com/ansible-community/antsibull-core/pull/76).
+      deprecated_features:
+      - The fields ``ansible_base_url``, ``galaxy_url``, and ``pypi_url`` of the app
+        context have been deprecated. Use the fields ``ansible_core_repo_url``, ``galaxy_url``,
+        and ``pypi_url``, respectively, of the library context instead (https://github.com/ansible-community/antsibull-core/pull/81).
+      minor_changes:
+      - Allow the Galaxy downloader to trust its collection cache to avoid having
+        to query the Galaxy server if an artifact exists in the cache. This can be
+        set with the new configuration file option ``trust_collection_cache`` (https://github.com/ansible-community/antsibull-core/pull/78).
+      - Allow to cache ansible-core download artifacts with a new config file option
+        ``ansible_core_cache`` (https://github.com/ansible-community/antsibull-core/pull/80).
+      - Allow to fully trust the ansible-core artifacts cache to avoid querying PyPI
+        with a new config file option ``trust_ansible_core_cache`` (https://github.com/ansible-community/antsibull-core/pull/80).
+      - Allow to skip content check when doing async file copying using ``antsibull_core.utils.io.copy_file()``
+        (https://github.com/ansible-community/antsibull-core/pull/78).
+      - Avoid using the collection artifact filename returned by the Galaxy server.
+        Instead compose it in a uniform way (https://github.com/ansible-community/antsibull-core/pull/78).
+      - The fields ``ansible_core_repo_url``, ``galaxy_url``, and ``pypi_url`` have
+        been added to the library context. If ``ansible_core_repo_url`` is not provided,
+        it will be populated from the field ``ansible_base_url`` if that has been
+        provided (https://github.com/ansible-community/antsibull-core/pull/81).
+      release_summary: New major release
+      removed_features:
+      - The unused ``antsibull_core.schemas.config.ConfigModel`` model and the unused
+        ``antsibull_core.config.read_config`` function have been removed (https://github.com/ansible-community/antsibull-core/pull/82).
+    fragments:
+    - 2.0.0.yml
+    - 76-galaxy-download-cache.yml
+    - 78-collection-cache.yml
+    - 80-ansible-core-cache.yml
+    - 81-contexts.yml
+    - 82-config-model.yml
+    release_date: '2023-05-03'
   2.0.0a1:
     changes:
       breaking_changes:
