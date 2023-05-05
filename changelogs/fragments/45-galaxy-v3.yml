@@ -1,2 +1,0 @@
-minor_changes:
-  - "Allow Galaxy client to communicate with the Galaxy v3 API (https://github.com/ansible-community/antsibull-core/pull/45)."

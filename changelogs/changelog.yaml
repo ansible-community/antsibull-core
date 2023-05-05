@@ -113,3 +113,25 @@ releases:
     - 1.5.1.yml
     - 31-sh.yml
     release_date: '2023-02-10'
+  1.6.0:
+    changes:
+      bugfixes:
+      - Fix a bug in Galaxy download code when the filename is found in the cache,
+        but the checksum does not match. In that case, the collection was not copied
+        to the destination, and the code did not try to download the correct file
+        (https://github.com/ansible-community/antsibull-core/pull/76).
+      - Remove improper usage of ``@functools.lru_cache`` on async functions in the
+        ``antsibull_core.ansible_core`` module (https://github.com/ansible-community/antsibull-core/pull/67,
+        https://github.com/ansible-community/antsibull-core/pull/69).
+      - Restrict the ``pydantic`` dependency to major version 1 (https://github.com/ansible-community/antsibull-core/pull/35).
+      minor_changes:
+      - Allow Galaxy client to communicate with the Galaxy v3 API (https://github.com/ansible-community/antsibull-core/pull/45).
+      release_summary: Feature and bugfix release that adds support for Galaxy v3
+        API.
+    fragments:
+    - 1.6.0.yml
+    - 35-pydantic.yml
+    - 45-galaxy-v3.yml
+    - 67-cache.yaml
+    - 76-galaxy-download-cache.yml
+    release_date: '2023-05-05'

@@ -5,6 +5,26 @@ antsibull-core Release Notes
 .. contents:: Topics
 
 
+v1.6.0
+======
+
+Release Summary
+---------------
+
+Feature and bugfix release that adds support for Galaxy v3 API.
+
+Minor Changes
+-------------
+
+- Allow Galaxy client to communicate with the Galaxy v3 API (https://github.com/ansible-community/antsibull-core/pull/45).
+
+Bugfixes
+--------
+
+- Fix a bug in Galaxy download code when the filename is found in the cache, but the checksum does not match. In that case, the collection was not copied to the destination, and the code did not try to download the correct file (https://github.com/ansible-community/antsibull-core/pull/76).
+- Remove improper usage of ``@functools.lru_cache`` on async functions in the ``antsibull_core.ansible_core`` module (https://github.com/ansible-community/antsibull-core/pull/67, https://github.com/ansible-community/antsibull-core/pull/69).
+- Restrict the ``pydantic`` dependency to major version 1 (https://github.com/ansible-community/antsibull-core/pull/35).
+
 v1.5.1
 ======
 
