@@ -50,14 +50,27 @@ def parse_pieces_file(pieces_file: StrPath) -> list[str]:
     return collections
 
 
+def parse_pieces_mapping_file(pieces_file: StrPath) -> dict[str, str]:
+    """
+    Parse a pieces file into a Python dictionary
+    """
+
+    lines = parse_pieces_file(pieces_file)
+    mapping: dict[str, str] = {}
+    for line in lines:
+        entries = [entry.strip() for entry in line.split(":", 1)]
+        if len(entries) == 1:
+            raise InvalidFileFormat(f"Invalid line: {line!r}. No ':' found.")
+        mapping[entries[0]] = entries[1]
+    return mapping
+
+
 def _parse_name_version_spec_file(filename: StrPath) -> DependencyFileData:
     deps: dict[str, str] = {}
     ansible_core_version: str | None = None
     ansible_version: str | None = None
 
-    for line in parse_pieces_file(filename):
-        record = [entry.strip() for entry in line.split(":", 1)]
-
+    for record in parse_pieces_mapping_file(filename).items():
         if record[0] in ("_ansible_version", "_acd_version"):
             if ansible_version is not None:
                 raise InvalidFileFormat(
