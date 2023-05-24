@@ -181,9 +181,27 @@ class BuildFile:
     def __init__(self, build_file: StrPath) -> None:
         self.filename: str = str(build_file)
 
-    def parse(self) -> DependencyFileData:
-        """Parse the build from a dependency file."""
-        return _parse_name_version_spec_file(self.filename)
+    def parse(self, constraints_file: StrPath | None = None) -> DependencyFileData:
+        """
+        Parse the build from a dependency file.
+
+        :arg constraints_file: Extra constraints file to apply to the
+            DependencyFileData object
+        """
+        data = _parse_name_version_spec_file(self.filename)
+        if not constraints_file:
+            return data
+        constraints = parse_pieces_mapping_file(constraints_file)
+        for collection, constraint in constraints.items():
+            if collection not in data.deps:
+                raise InvalidFileFormat(
+                    f"{collection} is pinned in the constraints file"
+                    " but not listed in the build file"
+                )
+            if collection.startswith("_"):
+                raise InvalidFileFormat(f"Invalid key: {collection}")
+            data.deps[collection] = constraint
+        return data
 
     def write(
         self,

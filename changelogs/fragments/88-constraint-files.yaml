@@ -2,3 +2,6 @@
 minor_changes:
   - "Add ``antsibull_core.dependency_files.parse_pieces_mapping_file()`` function to parse a pieces file into a Python dictionary
      (https://github.com/ansible-community/antsibull/pull/88)."
+  - "Add support for reading constraints files to the ``dependency_files`` module
+     by adding a ``constraints_file`` argument to the ``BuildFile.parse()`` method
+     (https://github.com/ansible-community/antsibull/pull/88)."
