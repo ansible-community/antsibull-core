@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: Ansible Project
 
+from pathlib import Path
+
 import pytest
 
 from antsibull_core import dependency_files as df
@@ -109,6 +111,12 @@ PARSED_BUILD_2_DEPS = {
     "dellemc.os10": ">=1.0.0,<1.1.0",
 }
 
+CONSTRAINTS_FILE_2 = """
+dellemc.os10: ==1.0.0
+"""
+
+PARSED_CONSTRAINTS_FILE_2 = {"dellemc.os10": "==1.0.0"}
+
 
 def test_parse_pieces(tmp_path):
     pieces_filename = tmp_path / "pieces.in"
@@ -155,3 +163,55 @@ def test_build_file_2_parse(tmp_path):
     assert parsed_build.ansible_version == PARSED_BUILD_2_ANSIBLE_VERSION
     assert parsed_build.ansible_core_version == PARSED_BUILD_2_ANSIBLE_CORE_VERSION
     assert parsed_build.deps == PARSED_BUILD_2_DEPS
+
+
+def test_constraints_file(tmp_path: Path):
+    build_filename = tmp_path / "build.in"
+    build_filename.write_text(BUILD_2)
+
+    constraints_filename = tmp_path / "constraints"
+    constraints_filename.write_text(CONSTRAINTS_FILE_2)
+
+    parsed_build = df.BuildFile(build_filename).parse(constraints_filename)
+
+    assert parsed_build.ansible_version == PARSED_BUILD_2_ANSIBLE_VERSION
+    assert parsed_build.ansible_core_version == PARSED_BUILD_2_ANSIBLE_CORE_VERSION
+    assert parsed_build.deps == (PARSED_BUILD_2_DEPS | PARSED_CONSTRAINTS_FILE_2)
+
+
+def test_constraints_file_invalid_key(tmp_path: Path):
+    build_filename = tmp_path / "build.in"
+    build_filename.write_text(BUILD_2)
+
+    constraints_filename = tmp_path / "constraints"
+    constraints_filename.write_text(
+        CONSTRAINTS_FILE_2 + "_ansible_core_version: 2.15.0\n"
+    )
+
+    with pytest.raises(
+        df.InvalidFileFormat,
+        match=rf"{constraints_filename}: Invalid key: _ansible_core_version",
+    ):
+        df.BuildFile(build_filename).parse(constraints_filename)
+
+
+def test_parse_pieces_invalid_repeated(tmp_path: Path):
+    pieces_filename = tmp_path / "pieces"
+    pieces_filename.write_text("key1: abc\nkey1: xyz\n")
+
+    with pytest.raises(
+        df.InvalidFileFormat,
+        match=f"{pieces_filename}: Duplicated key: 'key1'",
+    ):
+        df.parse_pieces_mapping_file(pieces_filename)
+
+
+def test_parse_pieces_invalid_colon(tmp_path: Path):
+    pieces_filename = tmp_path / "pieces"
+    pieces_filename.write_text("abc: 123\nxyz\n")
+
+    with pytest.raises(
+        df.InvalidFileFormat,
+        match=f"{pieces_filename}: Invalid line: 'xyz'. No ':' found.",
+    ):
+        df.parse_pieces_mapping_file(pieces_filename)

@@ -205,14 +205,15 @@ class BuildFile:
             return data
         constraints = parse_pieces_mapping_file(constraints_file)
         for collection, constraint in constraints.items():
+            if collection.startswith("_"):
+                raise InvalidFileFormat(f"Invalid key: {collection}", constraints_file)
+
             if collection not in data.deps:
                 raise InvalidFileFormat(
                     f"{collection} is pinned in the constraints file"
                     f" but not listed in the build file ({self.filename})",
                     constraints_file,
                 )
-            if collection.startswith("_"):
-                raise InvalidFileFormat(f"Invalid key: {collection}", constraints_file)
             data.deps[collection] = constraint
         return data
 
