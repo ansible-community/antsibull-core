@@ -5,3 +5,6 @@ minor_changes:
   - "Add support for reading constraints files to the ``dependency_files`` module
      by adding a ``constraints_file`` argument to the ``BuildFile.parse()`` method
      (https://github.com/ansible-community/antsibull/pull/88)."
+  - "Improve error handling for the ``dependency_files`` parsers
+     by including file names in the error message and checking for duplicates
+     (https://github.com/ansible-community/antsibull/pull/88)."

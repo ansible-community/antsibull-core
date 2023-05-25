@@ -33,7 +33,11 @@ class DependencyFileData(t.NamedTuple):
 
 
 class InvalidFileFormat(Exception):
-    pass
+    def __init__(self, message: str, file: StrPath | None = None) -> None:
+        self.file: StrPath | None = file
+        if self.file:
+            message = f"{self.file}: {message}"
+        super().__init__(message)
 
 
 def parse_pieces_file(pieces_file: StrPath) -> list[str]:
@@ -60,7 +64,11 @@ def parse_pieces_mapping_file(pieces_file: StrPath) -> dict[str, str]:
     for line in lines:
         entries = [entry.strip() for entry in line.split(":", 1)]
         if len(entries) == 1:
-            raise InvalidFileFormat(f"Invalid line: {line!r}. No ':' found.")
+            raise InvalidFileFormat(
+                f"Invalid line: {line!r}. No ':' found.", pieces_file
+            )
+        if entries[0] in mapping:
+            raise InvalidFileFormat(f"Duplicated key: {entries[0]!r}", pieces_file)
         mapping[entries[0]] = entries[1]
     return mapping
 
@@ -75,7 +83,8 @@ def _parse_name_version_spec_file(filename: StrPath) -> DependencyFileData:
             if ansible_version is not None:
                 raise InvalidFileFormat(
                     f"{filename} specified _ansible_version/_acd_version"
-                    " more than once"
+                    " more than once",
+                    filename,
                 )
             ansible_version = record[1]
             continue
@@ -84,7 +93,8 @@ def _parse_name_version_spec_file(filename: StrPath) -> DependencyFileData:
             if ansible_core_version is not None:
                 raise InvalidFileFormat(
                     f"{filename} specified _ansible_base_version/_ansible_core_version more than"
-                    " once"
+                    " once",
+                    filename,
                 )
             ansible_core_version = record[1]
             continue
@@ -94,12 +104,14 @@ def _parse_name_version_spec_file(filename: StrPath) -> DependencyFileData:
     if ansible_core_version is None:
         raise InvalidFileFormat(
             f"{filename} was invalid.  It did not contain"
-            " the required ansible_core_version field"
+            " the required ansible_core_version field",
+            filename,
         )
     if ansible_version is None:
         raise InvalidFileFormat(
             f"{filename} was invalid.  It did not contain"
-            " the required ansible_version field"
+            " the required ansible_version field",
+            filename,
         )
 
     return DependencyFileData(ansible_version, ansible_core_version, deps)
@@ -196,10 +208,11 @@ class BuildFile:
             if collection not in data.deps:
                 raise InvalidFileFormat(
                     f"{collection} is pinned in the constraints file"
-                    " but not listed in the build file"
+                    f" but not listed in the build file ({self.filename})",
+                    constraints_file,
                 )
             if collection.startswith("_"):
-                raise InvalidFileFormat(f"Invalid key: {collection}")
+                raise InvalidFileFormat(f"Invalid key: {collection}", constraints_file)
             data.deps[collection] = constraint
         return data
 
