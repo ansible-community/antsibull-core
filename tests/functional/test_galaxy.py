@@ -213,6 +213,4 @@ async def test_galaxy_v3(tmp_path_factory):
         context = await GalaxyContext.create(aio_session, galaxy_url)
         assert context.version == GalaxyVersion.V3
         assert context.base_url == galaxy_url + "/api/v3/"
-        await galaxy_client_test(
-            aio_session, context, tmp_path_factory, skip_versions_test=True
-        )
+        await galaxy_client_test(aio_session, context, tmp_path_factory)
