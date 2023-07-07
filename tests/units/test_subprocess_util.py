@@ -35,7 +35,7 @@ def test_log_run_multi() -> None:
     assert proc.args == args
     assert proc.returncode == 0
 
-    assert logger.debug.called_once_with(f"Running subprocess: {args}")
+    logger.debug.assert_called_once_with(f"Running subprocess: {args}")
     assert logger.warn.call_count == 15
     assert logger.info.call_count == 15
     expected_out: list[str] = []
