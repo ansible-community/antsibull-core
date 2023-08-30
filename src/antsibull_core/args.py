@@ -16,20 +16,27 @@ class InvalidArgumentError(Exception):
     """A problem parsing or validating a command line argument."""
 
 
-def get_toplevel_parser(package, **kwargs) -> argparse.ArgumentParser:
+def get_toplevel_parser(
+    package: str, *, package_version: str | None = None, **kwargs
+) -> argparse.ArgumentParser:
     """
     Create a toplevel argument parser with options common across all scripts.
 
     :arg package: The Python package containing this CLI program.
+    :arg package_version: If provided, use this instead of the version for ``package``
+        provided by ``importlib.metadata.version()``
     :args kwargs: This function takes any keyword arguments and passes them directly on to
         the :class:`argparse.ArgumentParser` constructor.
     :returns: :class:`argparse.ArgumentParser` with common script arguments added.
     """
-    try:
-        version = metadata.version(package)
-    except metadata.PackageNotFoundError:
-        # If there's no metadata foun, assume we're running from source
-        version = "source"
+    if package_version is None:
+        try:
+            version = metadata.version(package)
+        except metadata.PackageNotFoundError:
+            # If there's no metadata foun, assume we're running from source
+            version = "source"
+    else:
+        version = package_version
 
     toplevel_parser = argparse.ArgumentParser(**kwargs)
     toplevel_parser.add_argument(
