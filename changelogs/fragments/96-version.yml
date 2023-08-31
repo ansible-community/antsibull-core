@@ -1,2 +1,2 @@
 minor_changes:
-  - "Allow to overwrite the version when using ``antsibull_core.args.get_toplevel_parser()`` (https://github.com/ansible-community/antsibull-core/pull/96)."
+  - "Allow to overwrite the version and the program name when using ``antsibull_core.args.get_toplevel_parser()`` (https://github.com/ansible-community/antsibull-core/pull/96)."
