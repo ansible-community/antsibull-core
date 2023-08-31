@@ -41,9 +41,6 @@ def get_toplevel_parser(
             # If there's no metadata foun, assume we're running from source
             package_version = "source"
 
-    if program_name is None:
-        program_name = package
-
     toplevel_parser = argparse.ArgumentParser(**kwargs)
     toplevel_parser.add_argument(
         "--version",
