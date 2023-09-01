@@ -38,7 +38,7 @@ def get_toplevel_parser(
         try:
             package_version = metadata.version(package)
         except metadata.PackageNotFoundError:
-            # If there's no metadata foun, assume we're running from source
+            # If there's no metadata found, assume we're running from source
             package_version = "source"
 
     toplevel_parser = argparse.ArgumentParser(**kwargs)
