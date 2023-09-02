@@ -5,6 +5,19 @@ antsibull-core Release Notes
 .. contents:: Topics
 
 
+v2.1.0
+======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- Allow to overwrite the version and the program name when using ``antsibull_core.args.get_toplevel_parser()`` (https://github.com/ansible-community/antsibull-core/pull/96).
+
 v2.0.0
 ======
 

@@ -202,3 +202,13 @@ releases:
     - 54-config.yml
     - 67-cache.yaml
     release_date: '2023-04-19'
+  2.1.0:
+    changes:
+      minor_changes:
+      - Allow to overwrite the version and the program name when using ``antsibull_core.args.get_toplevel_parser()``
+        (https://github.com/ansible-community/antsibull-core/pull/96).
+      release_summary: Feature release.
+    fragments:
+    - 2.1.0.yml
+    - 96-version.yml
+    release_date: '2023-09-02'
