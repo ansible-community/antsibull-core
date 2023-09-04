@@ -26,13 +26,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out antsibull-core
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: antsibull-core
 
       # antsibull 0.52.0 depends on antsibull-changelog >= 0.14.0 as well, so install 0.14.0 of that
       - name: Check out antsibull-changelog 0.14.0
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ansible-community/antsibull-changelog
           ref: 0.14.0
@@ -40,7 +40,7 @@ jobs:
 
       # nb: this is the first version of antsibull that declares support for antsibull-core v2
       - name: Check out antsibull 0.52.0
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ansible-community/antsibull
           ref: 0.52.0
