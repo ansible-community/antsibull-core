@@ -26,14 +26,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out antsibull-core
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: antsibull-core
 
       # nb: this is the first version of antsibull-docs that declares support
       # for antsibull-core v2
       - name: Check out antsibull-docs 1.8.0
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ansible-community/antsibull-docs
           ref: 1.8.0
