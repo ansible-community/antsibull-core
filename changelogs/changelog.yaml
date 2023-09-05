@@ -171,7 +171,7 @@ releases:
       - Restrict the ``pydantic`` dependency to major version 1 (https://github.com/ansible-community/antsibull-core/pull/35).
       - Restrict the ``sh`` dependency to versions before 2.0.0 (https://github.com/ansible-community/antsibull-core/pull/31).
       deprecated_features:
-      - Deprecate the ``get_command()`` methods of ``antsibull_core.venv.VenvRunner`
+      - Deprecate the ``get_command()`` methods of ``antsibull_core.venv.VenvRunner``
         and ``antsibull_core.venv.FakeVenvRunner``. These methods will be removed
         in antsibull-core 3.0.0. Use the new ``log_run()`` and ``async_run()`` methods
         instead (https://github.com/ansible-community/antsibull-core/pull/50).
@@ -180,7 +180,7 @@ releases:
         as antsibull-docs, must ensure they allow and validate this option themselves
         (https://github.com/ansible-community/antsibull-core/pull/59).
       minor_changes:
-      - Add ``async_log_run()`` and ``log_run()`` methods to ``antsibull_core.venv.VenvRunner`
+      - Add ``async_log_run()`` and ``log_run()`` methods to ``antsibull_core.venv.VenvRunner``
         and ``antsibull_core.venv.FakeVenvRunner``. These should be used instead of
         ``get_command()`` (https://github.com/ansible-community/antsibull-core/pull/50).
       - Add a new ``antsibull_core.subprocess_util`` module to help run subprocesses

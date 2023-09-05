@@ -29,7 +29,7 @@ New major release
 Minor Changes
 -------------
 
-- Add ``async_log_run()`` and ``log_run()`` methods to ``antsibull_core.venv.VenvRunner` and ``antsibull_core.venv.FakeVenvRunner``. These should be used instead of ``get_command()`` (https://github.com/ansible-community/antsibull-core/pull/50).
+- Add ``async_log_run()`` and ``log_run()`` methods to ``antsibull_core.venv.VenvRunner`` and ``antsibull_core.venv.FakeVenvRunner``. These should be used instead of ``get_command()`` (https://github.com/ansible-community/antsibull-core/pull/50).
 - Add a ``store_yaml_stream`` function to ``antsibull_core.yaml`` to dump YAML to an IO stream (https://github.com/ansible-community/antsibull-core/pull/24).
 - Add a new ``antsibull_core.subprocess_util`` module to help run subprocesses output and log their output (https://github.com/ansible-community/antsibull-core/pull/40).
 - Allow Galaxy client to communicate with the Galaxy v3 API (https://github.com/ansible-community/antsibull-core/pull/45).
@@ -52,7 +52,7 @@ Breaking Changes / Porting Guide
 Deprecated Features
 -------------------
 
-- Deprecate the ``get_command()`` methods of ``antsibull_core.venv.VenvRunner` and ``antsibull_core.venv.FakeVenvRunner``. These methods will be removed in antsibull-core 3.0.0. Use the new ``log_run()`` and ``async_run()`` methods instead (https://github.com/ansible-community/antsibull-core/pull/50).
+- Deprecate the ``get_command()`` methods of ``antsibull_core.venv.VenvRunner`` and ``antsibull_core.venv.FakeVenvRunner``. These methods will be removed in antsibull-core 3.0.0. Use the new ``log_run()`` and ``async_run()`` methods instead (https://github.com/ansible-community/antsibull-core/pull/50).
 - The ``antsibull_core.compat`` module deprecates the ``metadata`` module. Use ``importlib.metadata`` instead, which is available from Python 3.8 on (https://github.com/ansible-community/antsibull-core/pull/16).
 - The ``antsibull_core.compat`` module deprecates the functions ``asyncio_run``, ``best_get_loop``, and ``create_task``. Replace ``asyncio_run`` with ``asyncio.run``, ``create_task`` with ``asyncio.create_task``, and ``best_get_loop`` with ``asyncio.get_running_loop`` (https://github.com/ansible-community/antsibull-core/pull/16).
 - The ``doc_parsing_backend`` option from the library context is deprecated and will be removed in antsibull-core 3.0.0. Applications that need it, such as antsibull-docs, must ensure they allow and validate this option themselves (https://github.com/ansible-community/antsibull-core/pull/59).
