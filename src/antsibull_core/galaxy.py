@@ -325,7 +325,11 @@ class GalaxyClient:
         return collection_info
 
     async def get_latest_matching_version(
-        self, collection: str, version_spec: str, pre: bool = False
+        self,
+        collection: str,
+        version_spec: str,
+        pre: bool = False,
+        constraint: semver.SimpleSpec | None = None,
     ) -> semver.Version:
         """
         Get the latest version of a collection that matches a specification.
@@ -338,6 +342,7 @@ class GalaxyClient:
             and pre=True, if the available versions are 2.0.0-a1 and 2.0.0-a2, then 2.0.0-a2
             will be returned.  If the available versions are 2.0.0 and 2.1.0-b2, 2.0.0 will be
             returned since non-pre-releases are preferred.  The default is False
+        :kwarg constraint: If provided, only consider versions that match this specification.
         :returns: :obj:`semantic_version.Version` of the latest collection version that satisfied
             the specification.
 
@@ -356,6 +361,8 @@ class GalaxyClient:
         spec = semver.SimpleSpec(version_spec)
         prereleases = []
         for version in (v for v in sem_versions if v in spec):
+            if constraint is not None and version not in constraint:
+                continue
             # If this is a pre-release, first check if there's a non-pre-release that
             # will satisfy the version_spec.
             if version.prerelease:

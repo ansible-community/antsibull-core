@@ -1,0 +1,2 @@
+minor_changes:
+  - "Allow to specify constraints when determining the latest version of a collection from Galaxy (https://github.com/ansible-community/antsibull-core/pull/99)."
