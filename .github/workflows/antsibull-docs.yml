@@ -88,3 +88,5 @@ jobs:
         run: |
           ./build.sh
         working-directory: antsibull-docs
+        env:
+          ANSIBLE_COLLECTIONS_PATH: ~/.ansible/collections/
