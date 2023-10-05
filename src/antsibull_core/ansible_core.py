@@ -28,6 +28,7 @@ from .utils.io import copy_file
 
 if t.TYPE_CHECKING:
     import aiohttp.client
+    from _typeshed import StrPath
 
 
 mlog = log.fields(mod=__name__)
@@ -133,7 +134,7 @@ class AnsibleCorePyPiClient:
         versions = await self.get_versions()
         return versions[0]
 
-    async def retrieve(self, ansible_core_version: str, download_dir: str) -> str:
+    async def retrieve(self, ansible_core_version: str, download_dir: StrPath) -> str:
         """
         Get the release from pypi.
 
@@ -205,7 +206,7 @@ def get_ansible_core_package_name(ansible_core_version: str | PypiVer) -> str:
     return "ansible-core"
 
 
-def _get_source_version(ansible_core_source: str) -> PypiVer:
+def _get_source_version(ansible_core_source: StrPath) -> PypiVer:
     with open(
         os.path.join(ansible_core_source, "lib", "ansible", "release.py"),
         "r",
@@ -238,7 +239,7 @@ def _version_is_devel(version: PypiVer) -> bool:
     return bool(dev_version.match(version.public))
 
 
-def source_is_devel(ansible_core_source: str | None) -> bool:
+def source_is_devel(ansible_core_source: StrPath | None) -> bool:
     """
     :arg ansible_core_source: A path to an Ansible-core checkout or expanded sdist or None.
         This will be used instead of downloading an ansible-core package if the version matches
@@ -257,7 +258,7 @@ def source_is_devel(ansible_core_source: str | None) -> bool:
 
 
 def source_is_correct_version(
-    ansible_core_source: str | None, ansible_core_version: PypiVer
+    ansible_core_source: StrPath | None, ansible_core_version: PypiVer
 ) -> bool:
     """
     :arg ansible_core_source: A path to an Ansible-core checkout or expanded sdist or None.
@@ -286,7 +287,9 @@ def source_is_correct_version(
     return False
 
 
-async def checkout_from_git(download_dir: str, repo_url: t.Optional[str] = None) -> str:
+async def checkout_from_git(
+    download_dir: StrPath, repo_url: t.Optional[str] = None
+) -> str:
     """
     Checkout the ansible-core git repo.
 
@@ -303,7 +306,7 @@ async def checkout_from_git(download_dir: str, repo_url: t.Optional[str] = None)
     return ansible_core_dir
 
 
-async def create_sdist(source_dir: str, dest_dir: str) -> str:
+async def create_sdist(source_dir: StrPath, dest_dir: StrPath) -> str:
     """
     Create an sdist for the python package at a given path.
 
@@ -313,7 +316,11 @@ async def create_sdist(source_dir: str, dest_dir: str) -> str:
     """
 
     # Make a subdir of dest_dir for returning the dist in
-    dist_dir_prefix = os.path.join(os.path.basename(source_dir))
+    dist_dir_prefix = os.path.join(
+        os.path.basename(
+            source_dir  # pyre-ignore[6]: basename() accepts path-like object
+        )
+    )
     dist_dir = tempfile.mkdtemp(prefix=dist_dir_prefix, dir=dest_dir)
 
     try:
@@ -342,8 +349,8 @@ async def create_sdist(source_dir: str, dest_dir: str) -> str:
 async def get_ansible_core(
     aio_session: "aiohttp.client.ClientSession",
     ansible_core_version: str,
-    tmpdir: str,
-    ansible_core_source: str | None = None,
+    tmpdir: StrPath,
+    ansible_core_source: StrPath | None = None,
 ) -> str:
     """
     Create an ansible-core directory of the requested version.
@@ -363,7 +370,7 @@ async def get_ansible_core(
         if source_is_devel(ansible_core_source):
             # source_is_devel() protects against this.  This assert is to inform the type checker
             assert ansible_core_source is not None
-            source_location: str = ansible_core_source
+            source_location: StrPath = ansible_core_source
 
         else:
             source_location = await checkout_from_git(tmpdir)

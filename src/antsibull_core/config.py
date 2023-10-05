@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import os.path
+import typing as t
 from collections.abc import Iterable, Mapping
 
 import perky  # type: ignore[import]
@@ -15,6 +16,9 @@ import pydantic as p
 
 from .logging import log
 from .schemas.context import AppContext, LibContext
+
+if t.TYPE_CHECKING:
+    from _typeshed import StrPath
 
 mlog = log.fields(mod=__name__)
 
@@ -29,7 +33,7 @@ class ConfigError(Exception):
     pass
 
 
-def find_config_files(conf_files: Iterable[str]) -> list[str]:
+def find_config_files(conf_files: Iterable[StrPath] | Iterable[str]) -> list[str]:
     """
     Find all config files that exist.
 
@@ -39,13 +43,16 @@ def find_config_files(conf_files: Iterable[str]) -> list[str]:
     flog = mlog.fields(func="find_config_file")
     flog.fields(conf_files=conf_files).debug("Enter")
 
-    paths = [os.path.abspath(p) for p in conf_files]
+    paths = [
+        os.path.abspath(p)  # pyre-ignore[6]: abspath() accepts path-like object
+        for p in conf_files
+    ]
     flog.fields(paths=paths).info("Paths to check")
 
     config_files = []
     for conf_path in paths:
         if os.path.exists(conf_path):
-            config_files.append(conf_path)
+            config_files.append(f"{conf_path}")
     flog.fields(paths=config_files).info("Paths found")
 
     flog.debug("Leave")
@@ -53,7 +60,9 @@ def find_config_files(conf_files: Iterable[str]) -> list[str]:
 
 
 def validate_config(
-    config: Mapping, filenames: list[str], app_context_model: type[AppContext]
+    config: Mapping,
+    filenames: list[StrPath] | list[str],
+    app_context_model: type[AppContext],
 ) -> None:
     """
     Validate configuration.
@@ -76,12 +85,13 @@ def validate_config(
         LibContext.parse_obj(lib)
         app_context_model.parse_obj(app)
     except p.ValidationError as exc:
+        joined_filenames = ", ".join(f"{fn}" for fn in filenames)
         raise ConfigError(
-            f"Error while parsing configuration from {', '.join(filenames)}:\n{exc}"
+            f"Error while parsing configuration from {joined_filenames}:\n{exc}"
         ) from exc
 
 
-def _load_config_file(filename: str) -> Mapping:
+def _load_config_file(filename: StrPath) -> Mapping:
     """
     Load configuration from one file and return the raw data.
     """

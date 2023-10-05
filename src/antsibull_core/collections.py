@@ -9,8 +9,12 @@ from __future__ import annotations
 
 import asyncio
 import os
+import typing as t
 
 from .subprocess_util import async_log_run
+
+if t.TYPE_CHECKING:
+    from _typeshed import StrPath
 
 
 class CollectionFormatError(Exception):
@@ -18,18 +22,21 @@ class CollectionFormatError(Exception):
 
 
 async def install_together(
-    collection_tarballs: list[str], ansible_collections_dir: str
+    collection_tarballs: list[StrPath], ansible_collections_dir: StrPath
 ) -> None:
     installers = []
     for pathname in collection_tarballs:
-        namespace, collection, _dummy = os.path.basename(pathname).split("-", 2)
+        basename = os.path.basename(
+            pathname  # pyre-ignore[6]: basename() accepts path-like object
+        )
+        namespace, collection, _dummy = basename.split("-", 2)
         collection_dir = os.path.join(ansible_collections_dir, namespace, collection)
         # Note: mkdir -p equivalent is okay because we created package_dir ourselves as a directory
         # that only we can access
         os.makedirs(collection_dir, mode=0o700, exist_ok=False)
         installers.append(
             asyncio.create_task(
-                async_log_run(["tar", "-xf", pathname, "-C", collection_dir])
+                async_log_run(["tar", "-xf", f"{pathname}", "-C", collection_dir])
             )
         )
 
@@ -37,7 +44,7 @@ async def install_together(
 
 
 async def install_separately(
-    collection_tarballs: list[str], collection_dir: str
+    collection_tarballs: list[StrPath], collection_dir: StrPath
 ) -> list[str]:
     installers = []
     collection_dirs: list[str] = []
@@ -46,7 +53,9 @@ async def install_separately(
         return collection_dirs
 
     for pathname in collection_tarballs:
-        filename = os.path.basename(pathname)
+        filename = os.path.basename(
+            pathname  # pyre-ignore[6]: basename() accepts path-like object
+        )
         namespace, collection, version_ext = filename.split("-", 2)
         version = None
         for ext in (".tar.gz",):
@@ -76,7 +85,7 @@ async def install_separately(
 
         installers.append(
             asyncio.create_task(
-                async_log_run(["tar", "-xf", pathname, "-C", collection_dir])
+                async_log_run(["tar", "-xf", f"{pathname}", "-C", collection_dir])
             )
         )
 

@@ -7,6 +7,8 @@
 
 from __future__ import annotations
 
+import typing as t
+
 from antsibull_core.subprocess_util import log_run
 
 try:
@@ -14,6 +16,9 @@ try:
     import posix1e  # type: ignore[import] # pyre-ignore[21]
 except ImportError:
     posix1e = None
+
+if t.TYPE_CHECKING:
+    from _typeshed import StrPath
 
 
 class UnableToCheck(Exception):
@@ -24,15 +29,15 @@ class CheckFailure(Exception):
     """We checking failed unexpectedly."""
 
 
-def _get_acls(path: str) -> str:
+def _get_acls(path: StrPath) -> str:
     """Return the acls for a given file or raise an exception."""
     acls = None
     if posix1e:
-        acl = posix1e.ACL(file=path)
+        acl = posix1e.ACL(file=f"{path}")
         acls = acl.to_any_text(options=posix1e.TEXT_NUMERIC_IDS).decode("utf-8")
     else:
         try:
-            acls = log_run(["getfacl", path, "-n"]).stdout
+            acls = log_run(["getfacl", f"{path}", "-n"]).stdout
         except FileNotFoundError:
             pass
         except Exception as e:
@@ -45,7 +50,7 @@ def _get_acls(path: str) -> str:
     return acls
 
 
-def writable_via_acls(path: str, euid: int) -> bool:
+def writable_via_acls(path: StrPath, euid: int) -> bool:
     """
     Check whether acls gives someone other than the user write access to a path.
 
