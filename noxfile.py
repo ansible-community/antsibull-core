@@ -30,6 +30,10 @@ def install(session: nox.Session, *args, editable=False, **kwargs):
     # This ensures that the wheel contains all of the correct files.
     if editable and ALLOW_EDITABLE:
         args = ("-e", *args)
+    # TODO: Remove this once aiohttp's extension module supports Python 3.12
+    if session.python == "3.12":
+        kwargs.setdefault("env", {})["AIOHTTP_NO_EXTENSIONS"] = "1"
+
     session.install(*args, "-U", **kwargs)
 
 
