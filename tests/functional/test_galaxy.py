@@ -198,7 +198,7 @@ async def galaxy_client_test(
 
 @pytest.mark.asyncio
 async def test_galaxy_v2(tmp_path_factory):
-    galaxy_url = "https://galaxy.ansible.com"
+    galaxy_url = "https://old-galaxy.ansible.com"
     async with aiohttp.ClientSession() as aio_session:
         context = await GalaxyContext.create(aio_session, galaxy_url)
         assert context.version == GalaxyVersion.V2
@@ -208,7 +208,7 @@ async def test_galaxy_v2(tmp_path_factory):
 
 @pytest.mark.asyncio
 async def test_galaxy_v3(tmp_path_factory):
-    galaxy_url = "https://beta-galaxy.ansible.com"
+    galaxy_url = "https://galaxy.ansible.com"
     async with aiohttp.ClientSession() as aio_session:
         context = await GalaxyContext.create(aio_session, galaxy_url)
         assert context.version == GalaxyVersion.V3
