@@ -59,7 +59,7 @@ jobs:
 
       - name: Use antsibull-docs sphinx-init
         run: |
-          poetry run antsibull-docs sphinx-init --lenient --dest-dir . --use-current --sphinx-theme sphinx_rtd_theme
+          poetry run antsibull-docs sphinx-init --lenient --dest-dir . --use-current --sphinx-theme sphinx_rtd_theme ansible.builtin community.crypto community.docker sensu.sensu_go
         working-directory: antsibull-docs
 
       - name: Patch build.sh to use poetry run
