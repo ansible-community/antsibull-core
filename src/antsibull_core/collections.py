@@ -36,7 +36,7 @@ async def install_together(
         os.makedirs(collection_dir, mode=0o700, exist_ok=False)
         installers.append(
             asyncio.create_task(
-                async_log_run(["tar", "-xf", f"{pathname}", "-C", collection_dir])
+                async_log_run(["tar", "-xf", pathname, "-C", collection_dir])
             )
         )
 
@@ -71,7 +71,7 @@ async def install_separately(
 
         package_dir = os.path.join(
             collection_dir,
-            f"ansible-collections-{namespace}." f"{collection}-{version}",
+            f"ansible-collections-{namespace}.{collection}-{version}",
         )
         os.mkdir(package_dir, mode=0o700)
         collection_dirs.append(package_dir)
@@ -85,7 +85,7 @@ async def install_separately(
 
         installers.append(
             asyncio.create_task(
-                async_log_run(["tar", "-xf", f"{pathname}", "-C", collection_dir])
+                async_log_run(["tar", "-xf", pathname, "-C", collection_dir])
             )
         )
 
