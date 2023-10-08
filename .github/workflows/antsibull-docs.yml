@@ -86,6 +86,7 @@ jobs:
 
       - name: Build docsite
         run: |
+          ansible-galaxy collection list
           ./build.sh
         working-directory: antsibull-docs
         env:
