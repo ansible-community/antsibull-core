@@ -59,7 +59,7 @@ jobs:
 
       - name: Use antsibull-docs sphinx-init
         run: |
-          poetry run antsibull-docs sphinx-init --lenient --dest-dir . --use-current --sphinx-theme sphinx_rtd_theme
+          poetry run antsibull-docs sphinx-init --lenient --dest-dir . --use-current --sphinx-theme sphinx_rtd_theme ansible.builtin community.crypto community.docker sensu.sensu_go
         working-directory: antsibull-docs
 
       - name: Patch build.sh to use poetry run
@@ -70,14 +70,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry run pip install ansible-core
+          poetry run pip install ansible-core==2.14.10
           poetry run pip install -r requirements.txt
         working-directory: antsibull-docs
 
       - name: Install collections
         run: |
-          ansible-galaxy collection install community.docker sensu.sensu_go
-          git clone https://github.com/ansible-collections/community.crypto.git ~/.ansible/collections/ansible_collections/community/crypto
+          ansible-galaxy collection install "community.docker:==3.0.0" "sensu.sensu_go:==1.7.0" --force -p ~/.ansible/collections/
+          git clone https://github.com/ansible-collections/community.crypto.git --branch stable-1 ~/.ansible/collections/ansible_collections/community/crypto
 
       - name: Lint collection docs
         run: |
@@ -86,5 +86,8 @@ jobs:
 
       - name: Build docsite
         run: |
+          ansible-galaxy collection list
           ./build.sh
         working-directory: antsibull-docs
+        env:
+          ANSIBLE_COLLECTIONS_PATH: ~/.ansible/collections/
