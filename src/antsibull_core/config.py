@@ -33,7 +33,7 @@ class ConfigError(Exception):
     pass
 
 
-def find_config_files(conf_files: Iterable[StrPath] | Iterable[str]) -> list[str]:
+def find_config_files(conf_files: Iterable[StrPath]) -> list[str]:
     """
     Find all config files that exist.
 
