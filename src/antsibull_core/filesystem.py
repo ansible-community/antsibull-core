@@ -33,11 +33,11 @@ def _get_acls(path: StrPath) -> str:
     """Return the acls for a given file or raise an exception."""
     acls = None
     if posix1e:
-        acl = posix1e.ACL(file=f"{path}")
+        acl = posix1e.ACL(file=path)
         acls = acl.to_any_text(options=posix1e.TEXT_NUMERIC_IDS).decode("utf-8")
     else:
         try:
-            acls = log_run(["getfacl", f"{path}", "-n"]).stdout
+            acls = log_run(["getfacl", path, "-n"]).stdout
         except FileNotFoundError:
             pass
         except Exception as e:
