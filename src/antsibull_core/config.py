@@ -52,7 +52,7 @@ def find_config_files(conf_files: Iterable[StrPath]) -> list[str]:
     config_files = []
     for conf_path in paths:
         if os.path.exists(conf_path):
-            config_files.append(f"{conf_path}")
+            config_files.append(str(conf_path))
     flog.fields(paths=config_files).info("Paths found")
 
     flog.debug("Leave")

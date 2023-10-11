@@ -32,7 +32,7 @@ async def unpack_tarball(tarname: StrPath, destdir: StrPath) -> str:
     :returns: Toplevel of the unpacked directory structure.  This will be
         a subdirectory of `destdir`.
     """
-    tarname_str = f"{tarname}"
+    tarname_str = str(tarname)
     manifest = await async_log_run(["tar", "-xzvf", tarname_str, f"-C{destdir}"])
     toplevel_dirs = [
         filename
