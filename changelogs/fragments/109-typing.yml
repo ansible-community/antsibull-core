@@ -1,0 +1,2 @@
+bugfixes:
+  - "Fix typing for ``antsibull_core.app_context.app_context()`` functions (https://github.com/ansible-community/antsibull-core/pull/109)."
