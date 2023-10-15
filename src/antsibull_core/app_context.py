@@ -107,7 +107,7 @@ import argparse
 import contextvars
 import typing as t
 from collections.abc import Iterable, Mapping
-from contextlib import contextmanager
+from contextlib import AbstractContextManager, contextmanager
 
 from .schemas.context import AppContext, LibContext
 from .vendored.collections import ImmutableDict
@@ -368,14 +368,12 @@ def lib_context(
 
 
 @t.overload
-@contextmanager
-def app_context() -> t.ContextManager[AppContext]:
+def app_context() -> AbstractContextManager[AppContext]:
     ...
 
 
 @t.overload
-@contextmanager
-def app_context(new_context: AppContextT) -> t.ContextManager[AppContextT]:
+def app_context(new_context: AppContextT) -> AbstractContextManager[AppContextT]:
     ...
 
 
