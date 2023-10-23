@@ -56,7 +56,7 @@ jobs:
           python -m venv venv
           . ./venv/bin/activate
           python -m pip install --upgrade pip
-          python -m pip install . ../antsibull-changelog ../antsibull-core "pyre-check ~= 0.9" ansible-core "wheel"
+          python -m pip install . ../antsibull-changelog ../antsibull-core "pyre-check == 0.9.18" ansible-core "wheel"
           ansible-galaxy collection install community.general
         working-directory: antsibull
 
