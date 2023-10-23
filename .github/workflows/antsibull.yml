@@ -65,6 +65,7 @@ jobs:
         run: |
           . ./venv/bin/activate
           sed -i 's|poetry run||' ./lint-pyre.sh
+          sed -i 's|--search-path ../antsibull-docs/src/||' ./lint-pyre.sh
           ./lint-pyre.sh
         working-directory: antsibull
 
