@@ -23,7 +23,7 @@ antsibull-core is covered by the [Ansible Code of Conduct](https://docs.ansible.
 
 From version 1.0.0 on, antsibull-core sticks to semantic versioning and aims at providing no backwards compatibility breaking changes during a major release cycle. We might make exceptions from this in case of security fixes for vulnerabilities that are severe enough.
 
-The current major version is 2.x.y. Development for 2.x.y occurs on the `main` branch. 2.x.y mainly differs from 1.x.y by dropping support for Python 3.6, 3.7, and 3.8. It deprecates several compatibility functions for older Python versions that are no longer needed; see the changelog for details. 1.x.y is still developed on the `stable-1` branch, but only security fixes, major bugfixes, and other changes that are absolutely necessary for the other antsibull projects will be backported.
+The current major version is 2.x.y. Development for 2.x.y occurs on the `main` branch. 1.x.y is End of Life and was developed on the `stable-1` branch. It is no longer updated. 2.x.y mainly differs from 1.x.y by dropping support for Python 3.6, 3.7, and 3.8. It deprecates several compatibility functions for older Python versions that are no longer needed; see the changelog for details.
 
 ## Development
 
