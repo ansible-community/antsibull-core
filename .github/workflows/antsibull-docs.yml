@@ -75,8 +75,8 @@ jobs:
       - name: Install collections
         run: |
           . ./venv/bin/activate
-          ansible-galaxy collection install community.docker sensu.sensu_go
-          git clone https://github.com/ansible-collections/community.crypto.git ~/.ansible/collections/ansible_collections/community/crypto
+          ansible-galaxy collection install 'community.docker:==3.0.0' 'sensu.sensu_go:==1.14.0'
+          git clone https://github.com/ansible-collections/community.crypto.git ~/.ansible/collections/ansible_collections/community/crypto --branch 2.15.0
         working-directory: antsibull-docs
 
       - name: Lint collection docs
