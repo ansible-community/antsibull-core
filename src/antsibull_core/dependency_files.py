@@ -22,6 +22,7 @@ from collections.abc import Mapping
 from packaging.version import Version as PypiVer
 
 if t.TYPE_CHECKING:
+    from _typeshed import StrPath
     from semantic_version import Version as SemVer
 
 
@@ -35,7 +36,7 @@ class InvalidFileFormat(Exception):
     pass
 
 
-def parse_pieces_file(pieces_file: str) -> list[str]:
+def parse_pieces_file(pieces_file: StrPath) -> list[str]:
     with open(pieces_file, "rb") as f:
         contents = f.read()
 
@@ -49,7 +50,7 @@ def parse_pieces_file(pieces_file: str) -> list[str]:
     return collections
 
 
-def _parse_name_version_spec_file(filename: str) -> DependencyFileData:
+def _parse_name_version_spec_file(filename: StrPath) -> DependencyFileData:
     deps: dict[str, str] = {}
     ansible_core_version: str | None = None
     ansible_version: str | None = None
@@ -60,7 +61,7 @@ def _parse_name_version_spec_file(filename: str) -> DependencyFileData:
         if record[0] in ("_ansible_version", "_acd_version"):
             if ansible_version is not None:
                 raise InvalidFileFormat(
-                    f"{filename} specified _ansible_version/_acd_version"
+                    f"{filename!r} specified _ansible_version/_acd_version"
                     " more than once"
                 )
             ansible_version = record[1]
@@ -69,7 +70,7 @@ def _parse_name_version_spec_file(filename: str) -> DependencyFileData:
         if record[0] in ("_ansible_base_version", "_ansible_core_version"):
             if ansible_core_version is not None:
                 raise InvalidFileFormat(
-                    f"{filename} specified _ansible_base_version/_ansible_core_version more than"
+                    f"{filename!r} specified _ansible_base_version/_ansible_core_version more than"
                     " once"
                 )
             ansible_core_version = record[1]
@@ -79,12 +80,12 @@ def _parse_name_version_spec_file(filename: str) -> DependencyFileData:
 
     if ansible_core_version is None:
         raise InvalidFileFormat(
-            f"{filename} was invalid.  It did not contain"
+            f"{filename!r} was invalid.  It did not contain"
             " the required ansible_core_version field"
         )
     if ansible_version is None:
         raise InvalidFileFormat(
-            f"{filename} was invalid.  It did not contain"
+            f"{filename!r} was invalid.  It did not contain"
             " the required ansible_version field"
         )
 
@@ -111,13 +112,13 @@ class DepsFile:
     ansible-core version, not an exact dependency on that precise version.
     """
 
-    def __init__(self, deps_file: str) -> None:
+    def __init__(self, deps_file: StrPath) -> None:
         """
         Create a :mod:`DepsFile`.
 
         :arg deps_file: filename of the `DepsFile`.
         """
-        self.filename: str = deps_file
+        self.filename: StrPath = deps_file
 
     def parse(self) -> DependencyFileData:
         """Parse the deps from a dependency file."""
@@ -164,8 +165,8 @@ class DepsFile:
 
 
 class BuildFile:
-    def __init__(self, build_file: str) -> None:
-        self.filename: str = build_file
+    def __init__(self, build_file: StrPath) -> None:
+        self.filename: StrPath = build_file
 
     def parse(self) -> DependencyFileData:
         """Parse the build from a dependency file."""

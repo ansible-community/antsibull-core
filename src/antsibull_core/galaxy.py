@@ -25,6 +25,7 @@ from .utils.io import copy_file
 # The type checker can handle finding aiohttp.client but flake8 cannot :-(
 if t.TYPE_CHECKING:
     import aiohttp.client
+    from _typeshed import StrPath
 
 
 class NoSuchCollection(Exception):
@@ -380,7 +381,7 @@ class CollectionDownloader(GalaxyClient):
     def __init__(
         self,
         aio_session: aiohttp.client.ClientSession,
-        download_dir: str,
+        download_dir: StrPath,
         galaxy_server: t.Optional[str] = None,
         collection_cache: str | None = None,
         context: t.Optional[GalaxyContext] = None,

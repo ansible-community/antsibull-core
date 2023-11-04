@@ -16,6 +16,9 @@ import aiofiles
 
 from .. import app_context
 
+if t.TYPE_CHECKING:
+    from _typeshed import StrOrBytesPath
+
 
 @dataclasses.dataclass(frozen=True)
 class _AlgorithmData:
@@ -32,7 +35,7 @@ _PREFERRED_HASHES: tuple[_AlgorithmData, ...] = (
 
 
 async def verify_hash(
-    filename: str,
+    filename: StrOrBytesPath,
     hash_digest: str,
     algorithm: str = "sha256",
     algorithm_kwargs: dict[str, t.Any] | None = None,
@@ -58,7 +61,9 @@ async def verify_hash(
     return True
 
 
-async def verify_a_hash(filename: str, hash_digests: Mapping[str, str]) -> bool:
+async def verify_a_hash(
+    filename: StrOrBytesPath, hash_digests: Mapping[str, str]
+) -> bool:
     """
     Verify whether a file has a given hash, given a set of digests with different algorithms.
     Will only test trustworthy hashes and return ``False`` if none matches.
