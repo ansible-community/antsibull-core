@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import os
 import typing as t
+from collections.abc import Sequence
 
 from .subprocess_util import async_log_run
 
@@ -22,7 +23,7 @@ class CollectionFormatError(Exception):
 
 
 async def install_together(
-    collection_tarballs: list[StrPath], ansible_collections_dir: StrPath
+    collection_tarballs: Sequence[StrPath], ansible_collections_dir: StrPath
 ) -> None:
     installers = []
     for pathname in collection_tarballs:
@@ -44,7 +45,7 @@ async def install_together(
 
 
 async def install_separately(
-    collection_tarballs: list[StrPath], collection_dir: StrPath
+    collection_tarballs: Sequence[StrPath], collection_dir: StrPath
 ) -> list[str]:
     installers = []
     collection_dirs: list[str] = []
