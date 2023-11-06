@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import os.path
 import typing as t
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 
 import perky  # type: ignore[import]
 import pydantic as p
@@ -61,7 +61,7 @@ def find_config_files(conf_files: Iterable[StrPath]) -> list[str]:
 
 def validate_config(
     config: Mapping,
-    filenames: list[StrPath] | list[str],
+    filenames: Sequence[StrPath],
     app_context_model: type[AppContext],
 ) -> None:
     """
