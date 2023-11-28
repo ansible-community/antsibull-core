@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - "``subprocess_util`` - escape brackets in the subprocess output before
+    logging output with twiggy
+    (https://github.com/ansible-community/antsibull-core/pull/116)."

@@ -18,13 +18,14 @@ from functools import partial
 from inspect import isawaitable
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
+from twiggy.logger import Logger as TwiggyLogger  # type: ignore[import]
+
 from antsibull_core.logging import log
 
 if TYPE_CHECKING:
     from logging import Logger as StdLogger
 
     from _typeshed import StrOrBytesPath
-    from twiggy.logger import Logger as TwiggyLogger  # type: ignore[import]
     from typing_extensions import ParamSpec, TypeAlias
 
     _T = TypeVar("_T")
@@ -50,6 +51,18 @@ async def _sync_or_async(
     if isawaitable(out):
         return await out
     return cast("_T", out)
+
+
+def _escape_brackets(func: Callable[[str], Any]) -> Callable[[str], Any]:
+    """
+    Return a function that takes a string, escapes brackets, and then calls
+    `func`
+    """
+
+    def inner(string: str, /):
+        func(string.replace("{", "{{").replace("}", "}}"))
+
+    return inner
 
 
 async def _stream_log(
@@ -127,7 +140,11 @@ async def async_log_run(
             stdout_logfunc = stdout_loglevel
             stdout_log_prefix = ""
         else:
-            stdout_logfunc = getattr(logger, stdout_loglevel)
+            stdout_logfunc = cast(
+                "Callable[[str], Any]", getattr(logger, stdout_loglevel)
+            )
+            if isinstance(logger, TwiggyLogger):
+                stdout_logfunc = _escape_brackets(stdout_logfunc)
     stderr_logfunc: Callable[[str], Any] | None = None
     stderr_log_prefix = "stderr: "
     if stderr_loglevel:
@@ -135,7 +152,11 @@ async def async_log_run(
             stderr_logfunc = stderr_loglevel
             stderr_log_prefix = ""
         else:
-            stderr_logfunc = getattr(logger, stderr_loglevel)
+            stderr_logfunc = cast(
+                "Callable[[str], Any]", getattr(logger, stderr_loglevel)
+            )
+            if isinstance(logger, TwiggyLogger):
+                stderr_logfunc = _escape_brackets(stderr_logfunc)
     logger.debug(f"Running subprocess: {args!r}")
     kwargs["stdout"] = asyncio.subprocess.PIPE
     kwargs["stderr"] = asyncio.subprocess.PIPE
