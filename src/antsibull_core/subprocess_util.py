@@ -100,6 +100,22 @@ async def _stream_log(
     return "".join(lines)
 
 
+def _get_log_func_and_prefix(
+    name: str, loglevel: str | OutputCallbackType | None, logger: Any
+) -> tuple[OutputCallbackType | None, str]:
+    logfunc: Callable[[str], Any] | None = None
+    log_prefix = f"{name}: "
+    if loglevel:
+        if callable(loglevel):
+            logfunc = loglevel
+            log_prefix = ""
+        else:
+            logfunc = cast("Callable[[str], Any]", getattr(logger, loglevel))
+            if isinstance(logger, TwiggyLogger):
+                logfunc = _escape_brackets(logfunc)
+    return logfunc, log_prefix
+
+
 async def async_log_run(
     args: Sequence[StrOrBytesPath],
     logger: TwiggyLogger | StdLogger | None = None,
@@ -133,30 +149,12 @@ async def async_log_run(
         How to handle UTF-8 decoding errors. Default is ``strict``.
     """
     logger = logger or mlog
-    stdout_logfunc: Callable[[str], Any] | None = None
-    stdout_log_prefix = "stdout: "
-    if stdout_loglevel:
-        if callable(stdout_loglevel):
-            stdout_logfunc = stdout_loglevel
-            stdout_log_prefix = ""
-        else:
-            stdout_logfunc = cast(
-                "Callable[[str], Any]", getattr(logger, stdout_loglevel)
-            )
-            if isinstance(logger, TwiggyLogger):
-                stdout_logfunc = _escape_brackets(stdout_logfunc)
-    stderr_logfunc: Callable[[str], Any] | None = None
-    stderr_log_prefix = "stderr: "
-    if stderr_loglevel:
-        if callable(stderr_loglevel):
-            stderr_logfunc = stderr_loglevel
-            stderr_log_prefix = ""
-        else:
-            stderr_logfunc = cast(
-                "Callable[[str], Any]", getattr(logger, stderr_loglevel)
-            )
-            if isinstance(logger, TwiggyLogger):
-                stderr_logfunc = _escape_brackets(stderr_logfunc)
+    stdout_logfunc, stdout_log_prefix = _get_log_func_and_prefix(
+        "stdout", stdout_loglevel, logger
+    )
+    stderr_logfunc, stderr_log_prefix = _get_log_func_and_prefix(
+        "stderr", stderr_loglevel, logger
+    )
     logger.debug(f"Running subprocess: {args!r}")
     kwargs["stdout"] = asyncio.subprocess.PIPE
     kwargs["stderr"] = asyncio.subprocess.PIPE
