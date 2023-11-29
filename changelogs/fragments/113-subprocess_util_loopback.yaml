@@ -1,0 +1,6 @@
+---
+minor_changes:
+  - "``subprocess_util.async_log_run()``, ``subprocess_util.log_run()``, and
+    the corresponding functions  in ``venv`` now support passing generic
+    callback functions for ``stdout_loglevel`` and ``stderr_loglevel``
+    (https://github.com/ansible-community/antsibull-core/pull/113)."

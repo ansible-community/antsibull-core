@@ -93,6 +93,7 @@ typing = [
     "pyre-check >= 0.9.17",
     "types-aiofiles",
     "types-PyYAML",
+    "typing-extensions",
 ]
 dev = [
     # Used by nox sessions

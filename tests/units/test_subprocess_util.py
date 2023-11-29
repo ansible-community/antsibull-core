@@ -72,3 +72,20 @@ def test_log_run_long_line(count: int) -> None:
     assert proc.args == args
     assert proc.returncode == 0
     assert proc.stdout == ("\u0000" * count) + "\nfoo\n"
+
+
+def test_log_run_callback() -> None:
+    stdout_lines: list[str] = []
+    stderr_lines: list[str] = []
+
+    async def add_to_stderr(string: str, /) -> None:
+        stderr_lines.append(string)
+
+    antsibull_core.subprocess_util.log_run(
+        ["sh", "-c", "echo Never; echo gonna >&2; echo give"],
+        None,
+        stdout_lines.append,
+        add_to_stderr,
+    )
+    assert stdout_lines == ["Never", "give"]
+    assert stderr_lines == ["gonna"]
