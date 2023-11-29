@@ -16,6 +16,7 @@ from asyncio.exceptions import IncompleteReadError, LimitOverrunError
 from collections.abc import Awaitable, Callable, Sequence
 from functools import partial
 from inspect import isawaitable
+from logging import Logger as StdLogger
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from twiggy.logger import Logger as TwiggyLogger  # type: ignore[import]
@@ -23,8 +24,6 @@ from twiggy.logger import Logger as TwiggyLogger  # type: ignore[import]
 from antsibull_core.logging import log
 
 if TYPE_CHECKING:
-    from logging import Logger as StdLogger
-
     from _typeshed import StrOrBytesPath
     from typing_extensions import ParamSpec, TypeAlias
 
@@ -51,18 +50,6 @@ async def _sync_or_async(
     if isawaitable(out):
         return await out
     return cast("_T", out)
-
-
-def _escape_brackets(func: Callable[[str], Any]) -> Callable[[str], Any]:
-    """
-    Return a function that takes a string, escapes brackets, and then calls
-    `func`
-    """
-
-    def inner(string: str, /):
-        func(string.replace("{", "{{").replace("}", "}}"))
-
-    return inner
 
 
 async def _stream_log(
@@ -110,9 +97,18 @@ def _get_log_func_and_prefix(
             logfunc = loglevel
             log_prefix = ""
         else:
-            logfunc = cast("Callable[[str], Any]", getattr(logger, loglevel))
+            # fmt: off
+            func = getattr(logger, loglevel)
             if isinstance(logger, TwiggyLogger):
-                logfunc = _escape_brackets(logfunc)
+                def logfunc(string: str, /):
+                    func("{0}", string)
+            elif isinstance(logger, StdLogger):
+                def logfunc(string: str, /):
+                    func("%s", string)
+            else:
+                logfunc = func
+            # fmt: on
+
     return logfunc, log_prefix
 
 

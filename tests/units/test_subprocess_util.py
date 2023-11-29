@@ -3,6 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 
+import logging as stdlog
 from unittest.mock import MagicMock, call
 
 import pytest
@@ -10,9 +11,6 @@ import twiggy
 
 import antsibull_core.subprocess_util
 from antsibull_core import logging
-
-BRACKETS_ESCAPE_TEST = "{abc} {x} }{}"
-BRACKET_ESCAPE_TEST_ESCAPED = "{{abc}} {{x}} }}{{}}"
 
 
 def test_log_run() -> None:
@@ -96,20 +94,31 @@ def test_log_run_callback() -> None:
     assert stderr_lines == ["gonna"]
 
 
-def test__escape_brackets() -> None:
-    d: list[str] = []
-    antsibull_core.subprocess_util._escape_brackets(d.append)(BRACKETS_ESCAPE_TEST)
-    assert d == [BRACKET_ESCAPE_TEST_ESCAPED]
-
-
-def test_log_run_brackets_escape(capsys: pytest.CaptureFixture) -> None:
+def test_log_run_brackets_twiggy(capsys: pytest.CaptureFixture) -> None:
     try:
         logging.initialize_app_logging()
-        args = ("echo", BRACKETS_ESCAPE_TEST)
+        msg = "{abc} {x} }{}"
+        args = ("echo", msg)
         antsibull_core.subprocess_util.log_run(
             args, logger=logging.log, stdout_loglevel="error"
         )
         _, stderr = capsys.readouterr()
-        assert stderr == f"ERROR:antsibull|stdout: {BRACKETS_ESCAPE_TEST}\n"
+        assert stderr == f"ERROR:antsibull|stdout: {msg}\n"
     finally:
         logging.log.min_level = twiggy.levels.DISABLED
+
+
+def test_log_run_percent_logging(capsys: pytest.CaptureFixture) -> None:
+    logger = stdlog.Logger("test_logger")
+    logger.setLevel(stdlog.WARNING)
+    ch = stdlog.StreamHandler()
+    ch.setLevel(stdlog.WARNING)
+    formatter = stdlog.Formatter("%(levelname)s:%(name)s|%(message)s")
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
+    msg = "%s %(abc)s % %%"
+    args = ("echo", msg)
+    antsibull_core.subprocess_util.log_run(args, logger=logger, stdout_loglevel="error")
+    _, stderr = capsys.readouterr()
+    assert stderr == f"ERROR:test_logger|stdout: {msg}\n"
