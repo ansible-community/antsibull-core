@@ -124,10 +124,6 @@ class ContextDict(ImmutableDict):
         super().__init__(toplevel)
 
     @classmethod
-    def __get_validators__(cls):
-        yield cls.validate_and_convert
-
-    @classmethod
     def validate_and_convert(cls, value: Mapping) -> "ContextDict":
         if isinstance(value, ContextDict):
             # optimization.  If it's already an ImmutableContext, we don't need to recursively

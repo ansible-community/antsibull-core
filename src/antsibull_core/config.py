@@ -71,7 +71,7 @@ def validate_config(
     splits up the config into lib context and app context part and validates both parts with the
     given model. Raises a :obj:`ConfigError` if validation fails.
     """
-    lib_fields = set(LibContext.__fields__)
+    lib_fields = set(LibContext.model_fields)
     lib = {}
     app = {}
     for key, value in config.items():
@@ -82,8 +82,8 @@ def validate_config(
     # Note: We parse the object but discard the model because we want to validate the config but let
     # the context handle all setting of defaults
     try:
-        LibContext.parse_obj(lib)
-        app_context_model.parse_obj(app)
+        LibContext.model_validate(lib)
+        app_context_model.model_validate(app)
     except p.ValidationError as exc:
         joined_filenames = ", ".join(f"{fn}" for fn in filenames)
         raise ConfigError(

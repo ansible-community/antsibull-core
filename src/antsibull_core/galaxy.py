@@ -73,7 +73,7 @@ class GalaxyContext:
         :kwarg galaxy_server: A Galaxy server URL. Defaults to ``lib_ctx.get().galaxy_server``.
         """
         if galaxy_server is None:
-            galaxy_server = app_context.lib_ctx.get().galaxy_url
+            galaxy_server = str(app_context.lib_ctx.get().galaxy_url)
         api_url = urljoin(galaxy_server, "api/")
         async with retry_get(
             aio_session, api_url, headers={"Accept": "application/json"}
@@ -144,7 +144,7 @@ class GalaxyClient:
         """
         if galaxy_server is None and context is None:
             # TODO: deprecate
-            galaxy_server = app_context.lib_ctx.get().galaxy_url
+            galaxy_server = str(app_context.lib_ctx.get().galaxy_url)
         elif context is not None:
             # TODO: deprecate
             if galaxy_server is not None and galaxy_server != context.server:

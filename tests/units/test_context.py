@@ -4,6 +4,8 @@
 
 import argparse
 
+from pydantic import HttpUrl
+
 import antsibull_core.app_context as ap
 from antsibull_core.schemas.config import LoggingModel
 from antsibull_core.utils.collections import ContextDict
@@ -23,9 +25,9 @@ def test_default():
 
     app_ctx = ap.app_ctx.get()
     assert app_ctx.extra == ContextDict()
-    assert app_ctx.galaxy_url == "https://galaxy.ansible.com/"
+    assert app_ctx.galaxy_url == HttpUrl("https://galaxy.ansible.com/")
     assert isinstance(app_ctx.logging_cfg, LoggingModel)
-    assert app_ctx.pypi_url == "https://pypi.org/"
+    assert app_ctx.pypi_url == HttpUrl("https://pypi.org/")
 
 
 def test_create_contexts_with_cfg():
@@ -42,9 +44,9 @@ def test_create_contexts_with_cfg():
     assert lib_ctx.max_retries == 10
 
     assert app_ctx.extra == ContextDict({"unknown": True})
-    assert app_ctx.galaxy_url == "https://galaxy.ansible.com/"
+    assert app_ctx.galaxy_url == HttpUrl("https://galaxy.ansible.com/")
     assert isinstance(app_ctx.logging_cfg, LoggingModel)
-    assert app_ctx.pypi_url == "https://test.pypi.org/"
+    assert app_ctx.pypi_url == HttpUrl("https://test.pypi.org/")
 
 
 def test_create_contexts_with_args():
@@ -62,9 +64,9 @@ def test_create_contexts_with_args():
     assert lib_ctx.max_retries == 10
 
     assert app_ctx.extra == ContextDict({"unknown": True})
-    assert app_ctx.galaxy_url == "https://galaxy.ansible.com/"
+    assert app_ctx.galaxy_url == HttpUrl("https://galaxy.ansible.com/")
     assert isinstance(app_ctx.logging_cfg, LoggingModel)
-    assert app_ctx.pypi_url == "https://test.pypi.org/"
+    assert app_ctx.pypi_url == HttpUrl("https://test.pypi.org/")
 
 
 def test_create_contexts_with_args_and_cfg():
@@ -95,9 +97,9 @@ def test_create_contexts_with_args_and_cfg():
     assert lib_ctx.max_retries == 10
 
     assert app_ctx.extra == ContextDict({"unknown": False, "cfg": 1, "args": 2})
-    assert app_ctx.galaxy_url == "https://dev.galaxy.ansible.com/"
+    assert app_ctx.galaxy_url == HttpUrl("https://dev.galaxy.ansible.com/")
     assert isinstance(app_ctx.logging_cfg, LoggingModel)
-    assert app_ctx.pypi_url == "https://other.pypi.org/"
+    assert app_ctx.pypi_url == HttpUrl("https://other.pypi.org/")
 
 
 def test_create_contexts_without_extra():
@@ -118,9 +120,9 @@ def test_create_contexts_without_extra():
     assert lib_ctx.max_retries == 10
 
     assert app_ctx.extra == ContextDict()
-    assert app_ctx.galaxy_url == "https://galaxy.ansible.com/"
+    assert app_ctx.galaxy_url == HttpUrl("https://galaxy.ansible.com/")
     assert isinstance(app_ctx.logging_cfg, LoggingModel)
-    assert app_ctx.pypi_url == "https://pypi.org/"
+    assert app_ctx.pypi_url == HttpUrl("https://pypi.org/")
 
 
 #
@@ -135,11 +137,11 @@ def test_context_overrides():
 
     with ap.app_context(data.app_ctx) as app_ctx:
         # Test that the app_context that was returned has the new values
-        assert app_ctx.galaxy_url == "https://dev.galaxy.ansible.com/"
+        assert app_ctx.galaxy_url == HttpUrl("https://dev.galaxy.ansible.com/")
 
         # Test that the context that we can retrieve has the new values too
         app_ctx = ap.app_ctx.get()
-        assert app_ctx.galaxy_url == "https://dev.galaxy.ansible.com/"
+        assert app_ctx.galaxy_url == HttpUrl("https://dev.galaxy.ansible.com/")
 
     with ap.lib_context(data.lib_ctx) as lib_ctx:
         # Test that the returned lib_ctx has the new values
@@ -152,9 +154,9 @@ def test_context_overrides():
     # Check that once we return from the context managers, the old values have been restored
     app_ctx = ap.app_ctx.get()
     assert app_ctx.extra == ContextDict()
-    assert app_ctx.galaxy_url == "https://galaxy.ansible.com/"
+    assert app_ctx.galaxy_url == HttpUrl("https://galaxy.ansible.com/")
     assert isinstance(app_ctx.logging_cfg, LoggingModel)
-    assert app_ctx.pypi_url == "https://pypi.org/"
+    assert app_ctx.pypi_url == HttpUrl("https://pypi.org/")
 
     lib_ctx = ap.lib_ctx.get()
     assert lib_ctx.chunksize == 4096
@@ -200,11 +202,11 @@ def test_app_and_lib_context():
 
     with ap.app_and_lib_context(data) as (app_ctx, lib_ctx):
         # Test that the app_context that was returned has the new values
-        assert app_ctx.galaxy_url == "https://dev.galaxy.ansible.com/"
+        assert app_ctx.galaxy_url == HttpUrl("https://dev.galaxy.ansible.com/")
 
         # Test that the context that we can retrieve has the new values too
         app_ctx = ap.app_ctx.get()
-        assert app_ctx.galaxy_url == "https://dev.galaxy.ansible.com/"
+        assert app_ctx.galaxy_url == HttpUrl("https://dev.galaxy.ansible.com/")
 
         # Test that the returned lib_ctx has the new values
         assert lib_ctx.chunksize == 5
@@ -216,9 +218,9 @@ def test_app_and_lib_context():
     # Check that once we return from the context manager, the old values have been restored
     app_ctx = ap.app_ctx.get()
     assert app_ctx.extra == ContextDict()
-    assert app_ctx.galaxy_url == "https://galaxy.ansible.com/"
+    assert app_ctx.galaxy_url == HttpUrl("https://galaxy.ansible.com/")
     assert isinstance(app_ctx.logging_cfg, LoggingModel)
-    assert app_ctx.pypi_url == "https://pypi.org/"
+    assert app_ctx.pypi_url == HttpUrl("https://pypi.org/")
 
     lib_ctx = ap.lib_ctx.get()
     assert lib_ctx.chunksize == 4096
