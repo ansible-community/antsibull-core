@@ -212,3 +212,22 @@ releases:
     - 2.1.0.yml
     - 96-version.yml
     release_date: '2023-09-02'
+  2.2.0:
+    changes:
+      bugfixes:
+      - Fix typing for ``antsibull_core.app_context.app_context()`` functions (https://github.com/ansible-community/antsibull-core/pull/109).
+      - '``subprocess_util.log_run`` - use proper string formatting when passing command
+        output to the logger (https://github.com/ansible-community/antsibull-core/pull/116).'
+      minor_changes:
+      - Declare support for Python 3.12 (https://github.com/ansible-community/antsibull-core/pull/103).
+      - '``subprocess_util.async_log_run()``, ``subprocess_util.log_run()``, and the
+        corresponding functions  in ``venv`` now support passing generic callback
+        functions for ``stdout_loglevel`` and ``stderr_loglevel`` (https://github.com/ansible-community/antsibull-core/pull/113).'
+      release_summary: Add support for Python 3.12 and improve ``subprocess_util``
+    fragments:
+    - 103-312.yaml
+    - 109-typing.yml
+    - 113-subprocess_util_loopback.yaml
+    - 116-subprocess_util_escape.yaml
+    - 2.2.0.yml
+    release_date: '2023-12-01'

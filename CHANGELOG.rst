@@ -5,6 +5,26 @@ antsibull-core Release Notes
 .. contents:: Topics
 
 
+v2.2.0
+======
+
+Release Summary
+---------------
+
+Add support for Python 3.12 and improve ``subprocess_util``
+
+Minor Changes
+-------------
+
+- Declare support for Python 3.12 (https://github.com/ansible-community/antsibull-core/pull/103).
+- ``subprocess_util.async_log_run()``, ``subprocess_util.log_run()``, and the corresponding functions  in ``venv`` now support passing generic callback functions for ``stdout_loglevel`` and ``stderr_loglevel`` (https://github.com/ansible-community/antsibull-core/pull/113).
+
+Bugfixes
+--------
+
+- Fix typing for ``antsibull_core.app_context.app_context()`` functions (https://github.com/ansible-community/antsibull-core/pull/109).
+- ``subprocess_util.log_run`` - use proper string formatting when passing command output to the logger (https://github.com/ansible-community/antsibull-core/pull/116).
+
 v2.1.0
 ======
 
