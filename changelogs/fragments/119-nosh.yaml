@@ -1,0 +1,6 @@
+---
+removed_features:
+  - "Remove dependency on ``sh``
+    (https://github.com/ansible-community/antsibull-core/pull/119)."
+  - "``venv`` - remove ``get_command()`` method from ``VenvRunner`` and ``FakeVenvRunner``
+    (https://github.com/ansible-community/antsibull-core/pull/119)."
