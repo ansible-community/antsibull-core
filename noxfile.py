@@ -236,5 +236,5 @@ def publish(session: nox.Session):
     session.run("hatch", "publish", *session.posargs)
     version = session.run("hatch", "version", silent=True).strip()
     session.run("hatch", "version", "post")
-    session.run("git", "add", "pyproject.toml", external=True)
+    session.run("git", "add", "src/antsibull_core/__init__.py", external=True)
     session.run("git", "commit", "-m", "Post-release version bump.", external=True)
