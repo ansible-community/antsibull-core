@@ -30,34 +30,43 @@ jobs:
         with:
           path: antsibull-core
 
+      - name: Checkout antsibull-docs-parser main
+        uses: actions/checkout@v4
+        with:
+          repository: ansible-community/antsibull-docs-parser
+          ref: main
+          path: antsibull-docs-parser
+
       # nb: this is the first version of antsibull-docs that declares support
-      # for antsibull-core v2
-      - name: Check out antsibull-docs 1.8.0
+      # for antsibull-core v3.
+      # TODO: Change ref to a released version once antsibull-docs officially
+      # supports antsibull-core.
+      - name: Check out antsibull-docs main
         uses: actions/checkout@v4
         with:
           repository: ansible-community/antsibull-docs
-          ref: 1.8.0
+          ref: main
           path: antsibull-docs
 
       - name: Set up Python 3.11
+        id: python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
+        env:
+          PYTHON: "${{ steps.python.outputs.python-path }}"
         run: |
-          python3 -m venv venv
+          pipx install --python "${PYTHON}" nox
+          python -m venv venv
           . ./venv/bin/activate
-          python -m pip install --upgrade pip
-          python -m pip install . ../antsibull-core "pyre-check ~= 0.9"
+          python -m pip install . ../antsibull-core
         working-directory: antsibull-docs
 
-      # pyre should complain if a signature changed in an incompatible way
-      - name: Lint with pyre
+      - name: Run type checkers
         run: |
-          . ./venv/bin/activate
-          sed -i 's|poetry run||' ./lint-pyre.sh
-          ./lint-pyre.sh
+          nox -e typing
         working-directory: antsibull-docs
 
       - name: Use antsibull-docs sphinx-init
