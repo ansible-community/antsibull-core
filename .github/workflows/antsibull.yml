@@ -38,35 +38,38 @@ jobs:
           ref: 0.14.0
           path: antsibull-changelog
 
-      # nb: this is the first version of antsibull that declares support for antsibull-core v2
-      - name: Check out antsibull 0.52.0
+      # nb: this is the first version of antsibull that declares support
+      # for antsibull-core v3.
+      # TODO: Change ref to a released version once antsibull officially
+      # supports antsibull-core.
+      - name: Check out antsibull main
         uses: actions/checkout@v4
         with:
           repository: ansible-community/antsibull
-          ref: 0.52.0
+          ref: main
           path: antsibull
 
       - name: Set up Python 3.11
+        id: python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
+        env:
+          PYTHON: "${{ steps.python.outputs.python-path }}"
         run: |
+          pipx install --python "${PYTHON}" nox
           python -m venv venv
           . ./venv/bin/activate
-          python -m pip install --upgrade pip
-          python -m pip install . ../antsibull-changelog ../antsibull-core "pyre-check ~= 0.9" ansible-core "wheel"
+          python -m pip install . ../antsibull-core ../antsibull-changelog
           ansible-galaxy collection install community.general
         working-directory: antsibull
 
-      # pyre should complain if a signature changed in an incompatible way
-      - name: Lint with pyre
+      - name: Run type checkers
         run: |
-          . ./venv/bin/activate
-          sed -i 's|poetry run||' ./lint-pyre.sh
-          sed -i 's|--search-path ../antsibull-docs/src/||' ./lint-pyre.sh
-          ./lint-pyre.sh
+          touch ../antsibull-changelog/src/antsibull_changelog/py.typed
+          nox -e typing
         working-directory: antsibull
 
       - name: "Test building a release: Ansible 7 with ansible-core 2.14"
