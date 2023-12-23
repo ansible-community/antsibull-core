@@ -1,0 +1,6 @@
+---
+deprecated_features:
+  - Support for building ``ansible`` package versions less than ``6.0.0`` is
+    deprecated in antsibull-core
+    (https://github.com/ansible-community/antsibull-core/issues/123,
+    https://github.com/ansible-community/antsibull-core/pull/130).
