@@ -285,12 +285,6 @@ def create_contexts(
     known_fields = fields_in_app_ctx.union(fields_in_lib_ctx)
 
     normalized_cfg = dict(cfg)
-    if (
-        "ansible_base_url" in normalized_cfg
-        and "ansible_core_repo_url" not in normalized_cfg
-    ):
-        # TODO: maybe remove this normalization in 3.0.0?
-        normalized_cfg["ansible_core_repo_url"] = normalized_cfg["ansible_base_url"]
 
     lib_values = _extract_context_values(fields_in_lib_ctx, args, normalized_cfg)
     app_values = _extract_context_values(fields_in_app_ctx, args, normalized_cfg)

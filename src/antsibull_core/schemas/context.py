@@ -38,16 +38,7 @@ class AppContext(BaseModel):
         values stored in extras need default values, they need to be set outside of the context
         or the entries can be given an actual entry in the AppContext to take advantage of the
         schema's checking, normalization, and default setting.
-    :ivar ansible_base_url: Url to the ansible-core git repo. DEPRECATED: use the field
-        ``ansible_core_repo_url`` in library context instead.
-    :ivar galaxy_url: URL of the galaxy server to get collection info from. DEPRECATED: use the
-        field of the same name in library context instead.
     :ivar logging_cfg: Configuration of the application logging.
-    :ivar pypi_url: URL of the pypi server to query for information. DEPRECATED: use the field
-        of the same name in library context instead.
-    :ivar collection_cache: If set, must be a path pointing to a directory where collection
-        tarballs are cached so they do not need to be downloaded from Galaxy twice. DEPRECATED:
-        use the field of the same name in library context instead.
     """
 
     model_config = p.ConfigDict(frozen=True, extra="allow", validate_default=True)
@@ -58,21 +49,7 @@ class AppContext(BaseModel):
         d = (self.__pydantic_extra__ or {}).get("extra", {})
         return ContextDict.validate_and_convert(d)
 
-    # DEPRECATED: ansible_base_url will be removed in antsibull-core 3.0.0.
-    ansible_base_url: p.HttpUrl = p.HttpUrl("https://github.com/ansible/ansible/")
-
-    # DEPRECATED: galaxy_url will be removed in antsibull-core 3.0.0.
-    galaxy_url: p.HttpUrl = p.HttpUrl("https://galaxy.ansible.com/")
-
     logging_cfg: LoggingModel = LoggingModel.model_validate(DEFAULT_LOGGING_CONFIG)
-
-    # DEPRECATED: pypi_url will be removed in antsibull-core 3.0.0.
-    pypi_url: p.HttpUrl = p.HttpUrl("https://pypi.org/")
-
-    # DEPRECATED: collection_cache will be removed in antsibull-core 3.0.0.
-    collection_cache: t.Optional[str] = None
-
-    __convert_paths = p.field_validator("collection_cache", mode="before")(convert_path)
 
 
 class LibContext(BaseModel):
@@ -88,13 +65,6 @@ class LibContext(BaseModel):
         disable.
     :ivar max_retries: Maximum number of times to retry an http request (in case of timeouts and
         other transient problems.
-    :ivar doc_parsing_backend: The backend to use for parsing the documentation strings from
-        plugins.  This is DEPRECATED and will be removed from the library context in
-        antsibull-core 3.0.0.
-        'auto' selects a backend depending on the ansible-core version.
-        'ansible-internal' is the fastest, but does not work with ansible-core 2.13+.
-        'ansible-core-2.13' is also very fast, but requires ansible-core 2.13+.
-        'ansible-doc' exists in case of problems with the ansible-internal backend.
     :ivar ansible_core_repo_url: Url to the ansible-core git repo.
     :ivar galaxy_url: URL of the galaxy server to get collection info from
     :ivar logging_cfg: Configuration of the application logging
@@ -114,9 +84,6 @@ class LibContext(BaseModel):
     """
 
     chunksize: int = 4096
-
-    # DEPRECATED: doc_parsing_backend will be removed in antsibull-core 3.0.0
-    doc_parsing_backend: str = "auto"
 
     max_retries: int = 10
     process_max: t.Optional[int] = None
