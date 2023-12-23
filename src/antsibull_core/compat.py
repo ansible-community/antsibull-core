@@ -13,9 +13,7 @@ PARTS OF THIS MODULE ARE DEPRECATED AND WILL BE REMOVED IN ANTSIBULL-CORE 3.0.0:
 from __future__ import annotations
 
 import argparse
-import asyncio
 import sys
-from importlib import metadata
 
 BooleanOptionalAction: type[argparse.BooleanOptionalAction]
 
@@ -37,14 +35,4 @@ else:
     BooleanOptionalAction = argparse.BooleanOptionalAction
 
 
-best_get_loop = asyncio.get_running_loop
-asyncio_run = asyncio.run
-create_task = asyncio.create_task
-
-__all__ = (
-    "BooleanOptionalAction",
-    "asyncio_run",
-    "best_get_loop",
-    "create_task",
-    "metadata",
-)
+__all__ = ("BooleanOptionalAction",)
