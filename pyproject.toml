@@ -38,9 +38,6 @@ dependencies = [
     "pydantic >= 1.0.0, < 2.0.0",
     "PyYAML",
     "semantic_version",
-    # sh v2 has breaking changes.
-    # https://github.com/ansible-community/antsibull-core/issues/34
-    "sh >= 1.0.0, < 2.0.0",
     # 0.5.0 introduces dict_config
     "twiggy >= 0.5.0",
 ]

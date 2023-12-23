@@ -14,8 +14,6 @@ import venv  # pyre-ignore[21]
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, NoReturn
 
-import sh  # type: ignore[import]
-
 from antsibull_core import subprocess_util
 
 if TYPE_CHECKING:
@@ -41,10 +39,9 @@ class VenvRunner:
     """
     Makes running a command in a venv easy.
 
-    Combines venv functionality with sh.
+    Combines venv functionality with ``antsibull_core.subprocess_util``.
 
     .. seealso::
-        * `sh <https://amoffat.github.io/sh/>`_
         * :python:mod:`venv`
     """
 
@@ -70,19 +67,6 @@ class VenvRunner:
         # than that so we must upgrade to something even if it's not latest.
 
         self.log_run(["pip", "install", "--upgrade", "pip"])
-
-    def get_command(self, executable_name) -> sh.Command:
-        """
-        Return an :sh:obj:`sh.Command` for the given program installed within the venv.
-
-        :arg executable_name: Program to return a command for.
-        :returns: An :obj:`sh.Command` that will invoke the program.
-
-        .. deprecated:: 2.0.0
-            This method is deprecated in favor of :method:`asnyc_log_run` and
-            :method:`log_run`. It will be removed in antsibull_core 3.0.0.
-        """
-        return sh.Command(os.path.join(self.venv_dir, "bin", executable_name))
 
     def install_package(self, package_name: str) -> subprocess.CompletedProcess:
         """
@@ -161,7 +145,6 @@ class FakeVenvRunner:
     Simply runs commands.
 
     .. seealso::
-        * `sh <https://amoffat.github.io/sh/>`_
         * :python:mod:`venv`
     """
 
@@ -219,20 +202,6 @@ class FakeVenvRunner:
                 **kwargs,
             )
         )
-
-    @staticmethod
-    def get_command(executable_name) -> sh.Command:
-        """
-        Return an :sh:obj:`sh.Command` for the given program installed within the venv.
-
-        :arg executable_name: Program to return a command for.
-        :returns: An :obj:`sh.Command` that will invoke the program.
-
-        .. deprecated:: 2.0.0
-            This function is deprecated in favor of :method:`asnyc_log_run` and
-            :method:`log_run`. It will be removed in antsibull_core 3.0.0.
-        """
-        return sh.Command(executable_name)
 
     @staticmethod
     def install_package(package_name: str) -> NoReturn:
