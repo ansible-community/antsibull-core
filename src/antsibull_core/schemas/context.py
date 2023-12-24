@@ -6,6 +6,7 @@
 """Schemas for app and lib contexts."""
 
 import typing as t
+from functools import cached_property
 
 import pydantic as p
 
@@ -18,25 +19,14 @@ class BaseModel(p.BaseModel):
     """
     Configuration for all Context object classes.
 
-    :cvar Config: Sets the following information
+    :cvar model_config: Sets the following information
 
-        :cvar allow_mutation: ``False``.  Prevents setattr on the contexts.
-        :cvar extra: ``p.Extra.forbid``.  Prevents extra fields on the contexts.
-        :cvar validate_all: ``True``.  Validates default values as well as user supplied ones.
+        :arg allow_mutation: ``False``.  Prevents setattr on the contexts.
+        :arg extra: ``p.Extra.forbid``.  Prevents extra fields on the contexts.
+        :arg validate_all: ``True``.  Validates default values as well as user supplied ones.
     """
 
-    class Config:
-        """
-        Set default configuration for building the context models.
-
-        :cvar allow_mutation: ``False``.  Prevents setattr on the contexts.
-        :cvar extra: ``p.Extra.forbid``.  Prevents extra fields on the contexts.
-        :cvar validate_all: ``True``.  Validates default values as well as user supplied ones.
-        """
-
-        allow_mutation = False
-        extra = p.Extra.forbid
-        validate_all = True
+    model_config = p.ConfigDict(frozen=True, extra="forbid", validate_default=True)
 
 
 class AppContext(BaseModel):
@@ -60,29 +50,29 @@ class AppContext(BaseModel):
         use the field of the same name in library context instead.
     """
 
-    extra: ContextDict = ContextDict()
+    model_config = p.ConfigDict(frozen=True, extra="allow", validate_default=True)
+
+    @cached_property
+    def extra(self) -> ContextDict:
+        # pylint: disable-next=no-member
+        d = (self.__pydantic_extra__ or {}).get("extra", {})
+        return ContextDict.validate_and_convert(d)
 
     # DEPRECATED: ansible_base_url will be removed in antsibull-core 3.0.0.
-    # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    ansible_base_url: p.HttpUrl = "https://github.com/ansible/ansible/"  # type: ignore[assignment]
+    ansible_base_url: p.HttpUrl = p.HttpUrl("https://github.com/ansible/ansible/")
 
     # DEPRECATED: galaxy_url will be removed in antsibull-core 3.0.0.
-    # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    galaxy_url: p.HttpUrl = "https://galaxy.ansible.com/"  # type: ignore[assignment]
+    galaxy_url: p.HttpUrl = p.HttpUrl("https://galaxy.ansible.com/")
 
-    logging_cfg: LoggingModel = LoggingModel.parse_obj(DEFAULT_LOGGING_CONFIG)
+    logging_cfg: LoggingModel = LoggingModel.model_validate(DEFAULT_LOGGING_CONFIG)
 
     # DEPRECATED: pypi_url will be removed in antsibull-core 3.0.0.
-    # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    pypi_url: p.HttpUrl = "https://pypi.org/"  # type: ignore[assignment]
+    pypi_url: p.HttpUrl = p.HttpUrl("https://pypi.org/")
 
     # DEPRECATED: collection_cache will be removed in antsibull-core 3.0.0.
     collection_cache: t.Optional[str] = None
 
-    # pylint: disable-next=unused-private-member
-    __convert_paths = p.validator("collection_cache", pre=True, allow_reuse=True)(
-        convert_path
-    )
+    __convert_paths = p.field_validator("collection_cache", mode="before")(convert_path)
 
 
 class LibContext(BaseModel):
@@ -132,28 +122,21 @@ class LibContext(BaseModel):
     process_max: t.Optional[int] = None
     thread_max: int = 8
     file_check_content: int = 262144
-    # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    ansible_core_repo_url: p.HttpUrl = (
-        "https://github.com/ansible/ansible/"  # type: ignore[assignment]
-    )
-    # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    galaxy_url: p.HttpUrl = "https://galaxy.ansible.com/"  # type: ignore[assignment]
-    # pyre-ignore[8]: https://github.com/samuelcolvin/pydantic/issues/1684
-    pypi_url: p.HttpUrl = "https://pypi.org/"  # type: ignore[assignment]
+    ansible_core_repo_url: p.HttpUrl = p.HttpUrl("https://github.com/ansible/ansible/")
+    galaxy_url: p.HttpUrl = p.HttpUrl("https://galaxy.ansible.com/")
+    pypi_url: p.HttpUrl = p.HttpUrl("https://pypi.org/")
     collection_cache: t.Optional[str] = None
     trust_collection_cache: bool = False
     ansible_core_cache: t.Optional[str] = None
     trust_ansible_core_cache: bool = False
 
     # pylint: disable-next=unused-private-member
-    __convert_nones = p.validator("process_max", pre=True, allow_reuse=True)(
-        convert_none
-    )
+    __convert_nones = p.field_validator("process_max", mode="before")(convert_none)
     # pylint: disable-next=unused-private-member
-    __convert_paths = p.validator(
-        "ansible_core_cache", "collection_cache", pre=True, allow_reuse=True
+    __convert_paths = p.field_validator(
+        "ansible_core_cache", "collection_cache", mode="before"
     )(convert_path)
     # pylint: disable-next=unused-private-member
-    __convert_bools = p.validator(
-        "trust_ansible_core_cache", "trust_collection_cache", pre=True, allow_reuse=True
+    __convert_bools = p.field_validator(
+        "trust_ansible_core_cache", "trust_collection_cache", mode="before"
     )(convert_bool)

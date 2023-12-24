@@ -15,11 +15,11 @@ import twiggy.outputs  # type: ignore[import]
 
 #: Valid choices for a logging level field
 LEVEL_CHOICES_F = p.Field(
-    ..., regex="^(CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG|DISABLED)$"
+    ..., pattern="^(CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG|DISABLED)$"
 )
 
 #: Valid choice of the logging version field
-VERSION_CHOICES_F = p.Field(..., regex=r"1\.0")
+VERSION_CHOICES_F = p.Field(..., pattern=r"1\.0")
 
 
 #
@@ -28,10 +28,7 @@ VERSION_CHOICES_F = p.Field(..., regex=r"1\.0")
 
 
 class BaseModel(p.BaseModel):
-    class Config:
-        allow_mutation = False
-        extra = p.Extra.forbid
-        validate_all = True
+    model_config = p.ConfigDict(frozen=True, extra="forbid", validate_default=True)
 
 
 # pyre-ignore[13]: BaseModel initializes attributes when data is loaded
@@ -55,23 +52,25 @@ class LogOutputModel(BaseModel):
     format: t.Union[str, Callable] = twiggy.formats.line_format
     kwargs: Mapping[str, t.Any] = {}
 
-    @p.validator("args")
+    @p.field_validator("args")
     # pylint:disable=no-self-argument
     def expand_home_dir_args(
-        cls, args_field: MutableSequence, values: Mapping
+        cls, args_field: MutableSequence, info: p.ValidationInfo
     ) -> MutableSequence:
         """Expand tilde in the arguments of specific outputs."""
+        values = info.data
         if values["output"] in ("twiggy.outputs.FileOutput", twiggy.outputs.FileOutput):
             if args_field:
                 args_field[0] = os.path.expanduser(args_field[0])
         return args_field
 
-    @p.validator("kwargs")
+    @p.field_validator("kwargs")
     # pylint:disable=no-self-argument
     def expand_home_dir_kwargs(
-        cls, kwargs_field: MutableMapping, values: Mapping
+        cls, kwargs_field: MutableMapping, info: p.ValidationInfo
     ) -> MutableMapping:
         """Expand tilde in the keyword arguments of specific outputs."""
+        values = info.data
         if values["output"] in ("twiggy.outputs.FileOutput", twiggy.outputs.FileOutput):
             if "name" in kwargs_field:
                 kwargs_field["name"] = os.path.expanduser(kwargs_field["name"])
@@ -86,7 +85,7 @@ class LoggingModel(BaseModel):
 
 
 #: Default logging configuration
-DEFAULT_LOGGING_CONFIG = LoggingModel.parse_obj(
+DEFAULT_LOGGING_CONFIG = LoggingModel.model_validate(
     {
         "version": "1.0",
         "outputs": {

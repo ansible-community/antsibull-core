@@ -280,8 +280,8 @@ def create_contexts(
         If the field is only used via the :attr:`AppContext.extra` mechanism (not explictly set),
         then you should ignore this section and use :python:mod:`argparse`'s default mechanism.
     """
-    fields_in_lib_ctx = set(LibContext.__fields__)
-    fields_in_app_ctx = set(app_context_model.__fields__)
+    fields_in_lib_ctx = set(LibContext.model_fields)
+    fields_in_app_ctx = set(app_context_model.model_fields)
     known_fields = fields_in_app_ctx.union(fields_in_lib_ctx)
 
     normalized_cfg = dict(cfg)
@@ -335,7 +335,7 @@ def _copy_lib_context() -> LibContext:
         old_context = LibContext()
 
     # Copy just in case contexts are allowed to be writable in the the future
-    return old_context.copy()
+    return old_context.model_copy()
 
 
 def _copy_app_context() -> AppContext:
@@ -345,7 +345,7 @@ def _copy_app_context() -> AppContext:
         old_context = AppContext()
 
     # Copy just in case contexts are allowed to be writable in the the future
-    return old_context.copy()
+    return old_context.model_copy()
 
 
 @contextmanager

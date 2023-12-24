@@ -35,7 +35,7 @@ dependencies = [
     "packaging >= 20.0",
     "perky",
     # pydantic v2 is a major rewrite
-    "pydantic >= 1.0.0, < 2.0.0",
+    "pydantic ~= 2.0",
     "PyYAML",
     "semantic_version",
     # 0.5.0 introduces dict_config
