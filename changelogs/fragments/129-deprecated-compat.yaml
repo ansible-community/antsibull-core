@@ -1,0 +1,6 @@
+---
+removed_features:
+  - "``antsibull_core.compat`` - remove deprecated ``asyncio_run``,
+    ``best_get_loop``, ``create_task`` and ``metadata``
+    (https://github.com/ansible-community/antsibull-core/issues/124,
+    https://github.com/ansible-community/antsibull-core/pull/129)."
