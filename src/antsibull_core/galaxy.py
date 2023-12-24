@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import dataclasses
 import os.path
 import typing as t
@@ -70,7 +69,7 @@ class GalaxyContext:
         Create a new Galaxy context.
 
         :arg aio_session: A ``aiohttp.client.ClientSession`` object.
-        :kwarg galaxy_server: A Galaxy server URL. Defaults to ``lib_ctx.get().galaxy_server``.
+        :kwarg galaxy_server: A Galaxy server URL. Defaults to ``lib_ctx.get().galaxy_url``.
         """
         if galaxy_server is None:
             galaxy_server = str(app_context.lib_ctx.get().galaxy_url)
@@ -96,64 +95,26 @@ class GalaxyContext:
         return cls(galaxy_server, version, base_url)
 
 
-_GALAXY_CONTEXT_CACHE: dict[str, t.Union[GalaxyContext, asyncio.Future]] = {}
-
-
-async def _get_cached_galaxy_context(
-    aio_session: aiohttp.client.ClientSession, galaxy_server: str
-) -> GalaxyContext:
-    context_or_future = _GALAXY_CONTEXT_CACHE.get(galaxy_server)
-    if context_or_future is not None:
-        if asyncio.isfuture(context_or_future):
-            return await context_or_future
-        return t.cast(GalaxyContext, context_or_future)
-
-    loop = asyncio.get_running_loop()
-    future = loop.create_future()
-
-    async def _init():
-        try:
-            context = await GalaxyContext.create(aio_session, galaxy_server)
-            future.set_result(context)
-            _GALAXY_CONTEXT_CACHE[galaxy_server] = context
-        except Exception as exc:  # pylint: disable=broad-exception-caught
-            future.set_exception(exc)
-
-    loop.create_task(_init())
-    _GALAXY_CONTEXT_CACHE[galaxy_server] = future
-    return await future
-
-
 class GalaxyClient:
     """Class for querying the Galaxy REST API."""
 
     def __init__(
         self,
         aio_session: aiohttp.client.ClientSession,
-        galaxy_server: t.Optional[str] = None,
-        context: t.Optional[GalaxyContext] = None,
+        *,
+        context: GalaxyContext,
     ) -> None:
         """
         Create a GalaxyClient object to query the Galaxy Server.
 
         :arg aio_session: :obj:`aiohttp.ClientSession` with which to perform all
             requests to galaxy.
-        :kwarg galaxy_server: URL to the galaxy server. ``context`` must be provided instead
-            in the future.
-        :kwarg context: A ``GalaxyContext`` instance. Must be provided in the future.
+        :kwarg context: A ``GalaxyContext`` instance. Must be provided.
         """
-        if galaxy_server is None and context is None:
-            # TODO: deprecate
-            galaxy_server = str(app_context.lib_ctx.get().galaxy_url)
-        elif context is not None:
-            # TODO: deprecate
-            if galaxy_server is not None and galaxy_server != context.server:
-                raise ValueError(
-                    f"galaxy_server ({galaxy_server}) does not coincide"
-                    f" with context.server ({context.server})"
-                )
-            galaxy_server = context.server
-        self.galaxy_server = galaxy_server
+        if context is None:
+            raise ValueError(
+                "The context parameter must be provided to the GalaxyClient constructor"
+            )
         self.context = context
         self.aio_session = aio_session
         self.headers: dict[str, str] = {"Accept": "application/json"}
@@ -164,20 +125,6 @@ class GalaxyClient:
     def _update_from_context(self, context: GalaxyContext) -> None:
         if context.version == GalaxyVersion.V2:
             self.params["format"] = "json"
-
-    async def _ensure_context(self) -> GalaxyContext:
-        """
-        Ensure that ``self.context`` is present.
-        """
-        context = self.context
-        if context is not None:
-            return context
-        if self.galaxy_server is None:
-            raise RuntimeError("Unexpected None for GalaxyClient.galaxy_server")
-        context = await _get_cached_galaxy_context(self.aio_session, self.galaxy_server)
-        self.context = context
-        self._update_from_context(context)
-        return context
 
     async def _get_galaxy_versions(
         self, context: GalaxyContext, versions_url: str, add_params: bool = True
@@ -243,7 +190,7 @@ class GalaxyClient:
         :arg collection: Name of the collection to get version info for.
         :returns: List of all the versions of this collection on galaxy.
         """
-        context = await self._ensure_context()
+        context = self.context
 
         collection = collection.replace(".", "/")
         galaxy_url = urljoin(context.base_url, f"collections/{collection}/versions/")
@@ -267,7 +214,7 @@ class GalaxyClient:
             and the `Galaxy v3 REST API
             <https://beta-galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/index/community/general/>`_
         """
-        context = await self._ensure_context()
+        context = self.context
 
         collection = collection.replace(".", "/")
         galaxy_url = urljoin(context.base_url, f"collections/{collection}/")
@@ -305,7 +252,7 @@ class GalaxyClient:
             and the `Galaxy v3 REST API
             <https://beta-galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/index/community/general/versions/0.1.1/>`_
         """
-        context = await self._ensure_context()
+        context = self.context
 
         collection = collection.replace(".", "/")
         galaxy_url = urljoin(
@@ -382,9 +329,9 @@ class CollectionDownloader(GalaxyClient):
         self,
         aio_session: aiohttp.client.ClientSession,
         download_dir: StrPath,
-        galaxy_server: t.Optional[str] = None,
+        *,
         collection_cache: str | None = None,
-        context: t.Optional[GalaxyContext] = None,
+        context: GalaxyContext,
         trust_collection_cache: t.Optional[bool] = None,
     ) -> None:
         """
@@ -393,9 +340,7 @@ class CollectionDownloader(GalaxyClient):
         :arg aio_session: :obj:`aiohttp.ClientSession` with which to perform all
             requests to galaxy.
         :arg download_dir: Directory to download into.
-        :kwarg galaxy_server: URL to the galaxy server. ``context`` must be provided instead
-            in the future.
-        :kwarg context: A ``GalaxyContext`` instance. Must be provided in the future.
+        :kwarg context: A ``GalaxyContext`` instance. Must be provided.
         :kwarg collection_cache: If given, a path to a directory containing collection tarballs.
             These tarballs will be used instead of downloading new tarballs provided that the
             versions match the criteria (latest compatible version known to galaxy).
@@ -405,7 +350,7 @@ class CollectionDownloader(GalaxyClient):
             This avoids making a request to the Galaxy server to figure out the artifact's
             checksum and comparing it before trusting the cached artifact.
         """
-        super().__init__(aio_session, galaxy_server=galaxy_server, context=context)
+        super().__init__(aio_session, context=context)
         self.download_dir = download_dir
         lib_ctx = app_context.lib_ctx.get()
         if collection_cache is None:
