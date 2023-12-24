@@ -9,7 +9,7 @@ from semantic_version import Version as SemVer
 from antsibull_core.dependency_files import BuildFile
 
 SIMPLE_TEST_FILE = """_ansible_version: 4
-_ansible_base_version: 2.11.0rc1
+_ansible_core_version: 2.11.0rc1
 community.general: >=1.0.0,<2.0.0
 community.routeros: >=2.0.0-a2,<3.0.0
 """
