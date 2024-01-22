@@ -1,0 +1,2 @@
+breaking_changes:
+  - "Remove ``GalaxyClient``'s and ``CollectionDownloader``'s ``galaxy_server`` arguments. You need to explicitly pass in a ``GalaxyContext`` object instead (https://github.com/ansible-community/antsibull-core/pull/131)."
