@@ -58,20 +58,18 @@ def _parse_name_version_spec_file(filename: StrPath) -> DependencyFileData:
     for line in parse_pieces_file(filename):
         record = [entry.strip() for entry in line.split(":", 1)]
 
-        if record[0] in ("_ansible_version", "_acd_version"):
+        if record[0] == "_ansible_version":
             if ansible_version is not None:
                 raise InvalidFileFormat(
-                    f"{filename!r} specified _ansible_version/_acd_version"
-                    " more than once"
+                    f"{filename!r} specified _ansible_version more than once"
                 )
             ansible_version = record[1]
             continue
 
-        if record[0] in ("_ansible_base_version", "_ansible_core_version"):
+        if record[0] == "_ansible_core_version":
             if ansible_core_version is not None:
                 raise InvalidFileFormat(
-                    f"{filename!r} specified _ansible_base_version/_ansible_core_version more than"
-                    " once"
+                    f"{filename!r} specified _ansible_core_version more than once"
                 )
             ansible_core_version = record[1]
             continue
@@ -104,8 +102,6 @@ class DepsFile:
 
         _ansible_version: X1.Y1.Z1
         _ansible_core_version: X2.Y2.Z2
-
-    (Instead of _ansible_core_version, _ansible_base_version can also be used.)
 
     These are, respectively, the ansible version that was built and the ansible-core version which
     it was built against.  Note that the ansible release will depend on a compatible version of that
@@ -154,10 +150,7 @@ class DepsFile:
 
         with open(self.filename, "w", encoding="utf-8") as f:
             f.write(f"_ansible_version: {ansible_version}\n")
-            if ansible_version.major > 5:
-                f.write(f"_ansible_core_version: {ansible_core_version}\n")
-            else:
-                f.write(f"_ansible_base_version: {ansible_core_version}\n")
+            f.write(f"_ansible_core_version: {ansible_core_version}\n")
             if python_requires is not None:
                 f.write(f"_python: {python_requires}\n")
             f.write("\n".join(records))
@@ -207,17 +200,8 @@ class BuildFile:
         records.sort()
 
         with open(self.filename, "w", encoding="utf-8") as f:
-            if ansible_version.major > 2:
-                # Ansible 3.0.0 and newer use semver, so we only need the major version
-                f.write(f"_ansible_version: {ansible_version.major}\n")
-            else:
-                f.write(
-                    f"_ansible_version: {ansible_version.major}.{ansible_version.minor}\n"
-                )
-            if ansible_version.major > 5:
-                f.write(f"_ansible_core_version: {ansible_core_version}\n")
-            else:
-                f.write(f"_ansible_base_version: {ansible_core_version}\n")
+            f.write(f"_ansible_version: {ansible_version.major}\n")
+            f.write(f"_ansible_core_version: {ansible_core_version}\n")
             if python_requires is not None:
                 f.write(f"_python: {python_requires}\n")
             f.write("\n".join(records))

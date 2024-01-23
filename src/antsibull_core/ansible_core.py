@@ -9,7 +9,6 @@
 from __future__ import annotations
 
 import ast
-import asyncio
 import os
 import re
 import tempfile
@@ -74,37 +73,19 @@ class AnsibleCorePyPiClient:
         self, package_name: t.Optional[str] = None
     ) -> dict[str, t.Any]:
         """
-        Retrieve information about releases of the ansible-core/ansible-base package from pypi.
+        Retrieve information about releases of the ansible-core package from pypi.
 
-        :arg package_name: Either 'ansible-core', 'ansible-base', or None.
+        :arg package_name: Either 'ansible-core' or None.
         :returns: The dict which represents the release info keyed by version number.
             To examine the data structure, use::
 
                 curl https://pypi.org/pypi/ansible-core/json| python3 -m json.tool
-
-        .. note:: Returns an aggregate of ansible-base and ansible-core releases.
         """
-        # Retrieve the ansible-base and ansible-core package info from pypi
-        tasks = []
-        for a_package_name in (
-            ("ansible-core", "ansible-base")
-            if package_name is None
-            else (package_name,)
-        ):
-            query_url = urljoin(self.pypi_server_url, f"pypi/{a_package_name}/json")
-            tasks.append(asyncio.create_task(self._get_json(query_url)))
-
-        # Note: gather maintains the order of results
-        results = await asyncio.gather(*tasks)
-        if len(results) > 1:
-            release_info = results[1]["releases"]  # ansible-base information
-            release_info.update(results[0]["releases"])  # ansible-core information
-        elif len(results) == 1:
-            release_info = results[0]["releases"]
-        else:
-            release_info = {}
-
-        return release_info
+        # Retrieve the ansible-core package info from pypi
+        package_name = package_name or "ansible-core"
+        query_url = urljoin(self.pypi_server_url, f"pypi/{package_name}/json")
+        resp = await self._get_json(query_url)
+        return resp["releases"]
 
     async def get_versions(self) -> list[PypiVer]:
         """
@@ -142,7 +123,7 @@ class AnsibleCorePyPiClient:
         :arg download_dir: Directory to download the tarball to.
         :returns: The name of the downloaded tarball.
         """
-        package_name = get_ansible_core_package_name(ansible_core_version)
+        package_name = "ansible-core"
         release_info = await self.get_release_info(package_name)
 
         tar_filename = f"{package_name}-{ansible_core_version}.tar.gz"
@@ -187,23 +168,6 @@ class AnsibleCorePyPiClient:
             await copy_file(tar_path, cached_path, check_content=False)
 
         return tar_path
-
-
-def get_ansible_core_package_name(ansible_core_version: str | PypiVer) -> str:
-    """
-    Returns the name of the minimal ansible package.
-
-    :arg ansible_core_version: The version of the minimal ansible package to retrieve the
-        name for.
-    :returns: 'ansible-core' when the version is 2.11 or higher. Otherwise 'ansible-base'.
-    """
-    if not isinstance(ansible_core_version, PypiVer):
-        ansible_core_version = PypiVer(ansible_core_version)
-
-    if ansible_core_version.major <= 2 and ansible_core_version.minor <= 10:
-        return "ansible-base"
-
-    return "ansible-core"
 
 
 def _get_source_version(ansible_core_source: StrPath) -> PypiVer:
