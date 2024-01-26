@@ -230,8 +230,7 @@ def create_contexts(
     args: argparse.Namespace | None = None,
     cfg: Mapping = ImmutableDict(),
     use_extra: bool = True,
-) -> ContextReturn[AppContext]:
-    ...
+) -> ContextReturn[AppContext]: ...
 
 
 @t.overload
@@ -241,8 +240,7 @@ def create_contexts(
     use_extra: bool = True,
     *,
     app_context_model: type[AppContextT],
-) -> ContextReturn[AppContextT]:
-    ...
+) -> ContextReturn[AppContextT]: ...
 
 
 def create_contexts(
@@ -362,13 +360,11 @@ def lib_context(
 
 
 @t.overload
-def app_context() -> AbstractContextManager[AppContext]:
-    ...
+def app_context() -> AbstractContextManager[AppContext]: ...
 
 
 @t.overload
-def app_context(new_context: AppContextT) -> AbstractContextManager[AppContextT]:
-    ...
+def app_context(new_context: AppContextT) -> AbstractContextManager[AppContextT]: ...
 
 
 @contextmanager

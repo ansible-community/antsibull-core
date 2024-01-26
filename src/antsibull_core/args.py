@@ -46,9 +46,11 @@ def get_toplevel_parser(
         "--version",
         action="version",
         version=package_version,
-        help=f"Print the {program_name} version"
-        if program_name
-        else "Print the program's version",
+        help=(
+            f"Print the {program_name} version"
+            if program_name
+            else "Print the program's version"
+        ),
     )
     toplevel_parser.add_argument(
         "--config-file",
