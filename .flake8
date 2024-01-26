@@ -9,4 +9,4 @@ max-complexity = 10
 max-line-length = 100
 statistics = True
 # These rules conflict with black
-ignore = E203, W503
+ignore = E203, E704, W503
