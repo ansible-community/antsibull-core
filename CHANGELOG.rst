@@ -4,7 +4,6 @@ antsibull-core Release Notes
 
 .. contents:: Topics
 
-
 v2.2.0
 ======
 
