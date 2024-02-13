@@ -187,12 +187,12 @@ def bump(session: nox.Session):
         fragment = session.run(
             "python",
             "-c",
-            "import yaml ; "
-            f"print(yaml.dump(dict(release_summary={repr(session.posargs[1])})))",
+            "import sys, yaml ; "
+            f"yaml.dump(dict(release_summary={repr(session.posargs[1])}), sys.stdout)",
             silent=True,
         )
         with open(fragment_file, "w") as fp:
-            print(fragment, file=fp)
+            fp.write(fragment)
         session.run(
             "git",
             "add",
