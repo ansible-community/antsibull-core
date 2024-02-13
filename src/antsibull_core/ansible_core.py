@@ -124,7 +124,6 @@ class AnsibleCorePyPiClient:
         :returns: The name of the downloaded tarball.
         """
         package_name = "ansible-core"
-        release_info = await self.get_release_info(package_name)
 
         tar_filename = f"{package_name}-{ansible_core_version}.tar.gz"
         tar_path = os.path.join(download_dir, tar_filename)
@@ -135,6 +134,8 @@ class AnsibleCorePyPiClient:
             if os.path.isfile(cached_path):
                 await copy_file(cached_path, tar_path, check_content=False)
                 return tar_path
+
+        release_info = await self.get_release_info(package_name)
 
         pypi_url = ""
         digests = {}
