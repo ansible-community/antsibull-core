@@ -30,12 +30,12 @@ jobs:
         with:
           path: antsibull-core
 
-      # antsibull 0.52.0 depends on antsibull-changelog >= 0.14.0 as well, so install 0.14.0 of that
-      - name: Check out antsibull-changelog 0.14.0
+      # antsibull 0.60.0 depends on antsibull-changelog >= 0.24.0 as well, so install 0.24.0 of that
+      - name: Check out antsibull-changelog 0.24.0
         uses: actions/checkout@v4
         with:
           repository: ansible-community/antsibull-changelog
-          ref: 0.14.0
+          ref: 0.24.0
           path: antsibull-changelog
 
       # nb: this is the first version of antsibull that declares support
@@ -68,7 +68,6 @@ jobs:
 
       - name: Run type checkers
         run: |
-          touch ../antsibull-changelog/src/antsibull_changelog/py.typed
           nox -e typing
         working-directory: antsibull
 
