@@ -4,6 +4,39 @@ antsibull-core Release Notes
 
 .. contents:: Topics
 
+v3.0.0a1
+========
+
+Release Summary
+---------------
+
+First antsibull-core v3 pre-release
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- Drop support for building Ansible versions less than 6.0.0 (https://github.com/ansible-community/antsibull-core/pull/132).
+- Remove ``GalaxyClient``'s and ``CollectionDownloader``'s ``galaxy_server`` arguments. You need to explicitly pass in a ``GalaxyContext`` object instead (https://github.com/ansible-community/antsibull-core/pull/131).
+- antsibull-core now requires major version 2 of the ``pydantic`` library. Version 1 is no longer supported (https://github.com/ansible-community/antsibull-core/pull/122).
+
+Removed Features (previously deprecated)
+----------------------------------------
+
+- If ``ansible_base_url`` is provided in a config file, but ``ansible_core_repo_url`` is not, its value is no longer used for ``ansible_core_repo_url`` (https://github.com/ansible-community/antsibull-core/pull/128).
+- Remove dependency on ``sh`` (https://github.com/ansible-community/antsibull-core/pull/119).
+- Removed the deprecated field ``doc_parsing_backend`` from ``LibContext`` (https://github.com/ansible-community/antsibull-core/pull/128).
+- Removed the deprecated fields ``ansible_base_url``, ``galaxy_url``, ``pypi_url``, and ``collection_cache`` from ``AppContext`` (https://github.com/ansible-community/antsibull-core/pull/128).
+- ``ansible_core`` - remove ``get_ansible_core_package_name()`` function. This is no longer necessary now that support for ansible-base has been dropped (https://github.com/ansible-community/antsibull-core/pull/132).
+- ``ansible_core`` - remove ansible-core/ansible-base normalization in ``AnsibleCorePyPiClient``. Data retrieval is only supported for ``ansible-core`` (https://github.com/ansible-community/antsibull-core/pull/132).
+- ``antsibull_core.compat`` - remove deprecated ``asyncio_run``, ``best_get_loop``, ``create_task`` and ``metadata`` (https://github.com/ansible-community/antsibull-core/issues/124, https://github.com/ansible-community/antsibull-core/pull/129).
+- ``dependency_files`` - drop support for ``_ansible_base_version`` and ``_acd_version`` in pieces files. ``_ansible_core_version`` and ``_ansible_version``, respectively, should be used instead (https://github.com/ansible-community/antsibull-core/pull/132).
+- ``venv`` - remove ``get_command()`` method from ``VenvRunner`` and ``FakeVenvRunner`` (https://github.com/ansible-community/antsibull-core/pull/119).
+
+Bugfixes
+--------
+
+- Avoid superfluous network request when trusting the ansible-core download cache (https://github.com/ansible-community/antsibull-core/pull/135).
+
 v2.2.0
 ======
 

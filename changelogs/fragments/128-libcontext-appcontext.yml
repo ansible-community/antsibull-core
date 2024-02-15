@@ -1,4 +1,0 @@
-removed_features:
-  - "If ``ansible_base_url`` is provided in a config file, but ``ansible_core_repo_url`` is not, its value is no longer used for ``ansible_core_repo_url`` (https://github.com/ansible-community/antsibull-core/pull/128)."
-  - "Removed the deprecated fields ``ansible_base_url``, ``galaxy_url``, ``pypi_url``, and ``collection_cache`` from ``AppContext`` (https://github.com/ansible-community/antsibull-core/pull/128)."
-  - "Removed the deprecated field ``doc_parsing_backend`` from ``LibContext`` (https://github.com/ansible-community/antsibull-core/pull/128)."

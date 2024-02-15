@@ -1,5 +1,0 @@
----
-breaking_changes:
-  - "antsibull-core now requires major version 2 of the ``pydantic`` library.
-    Version 1 is no longer supported
-    (https://github.com/ansible-community/antsibull-core/pull/122)."
