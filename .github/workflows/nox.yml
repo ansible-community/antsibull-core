@@ -23,45 +23,53 @@ env:
   FORCE_COLOR: "1"
 
 jobs:
-  nox-lint:
+  nox:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: antsibull-core
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - session: test
+            python-versions: "3.9, 3.10, 3.11, 3.12"
+            codecov: true
+            packages: ""
+
+          - session: lint
+            python-versions: "3.12"
+            codecov: false
+            packages: ""
+    name: "Run nox ${{ matrix.session }} session"
     steps:
       - name: Check out antsibull-core
         uses: actions/checkout@v4
         with:
           path: antsibull-core
-      - name: Setup nox
-        uses: wntrblm/nox@2024.03.02
-        with:
-          python-versions: "3.11"
-      - run: |
-          nox -v -e lint
-  nox-test:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: antsibull-core
-    steps:
-      - name: Check out antsibull-core
-        uses: actions/checkout@v4
-        with:
-          path: antsibull-core
-      - name: Setup nox
-        uses: wntrblm/nox@2024.03.02
-        with:
-          python-versions: "3.9, 3.10, 3.11, 3.12"
-      - name: Run unit tests
+      - name: Install extra packages
+        if: "matrix.packages != ''"
         run: |
-          nox -v -e test
+          sudo apt-get install -y ${{ matrix.packages }}
+      - name: Setup nox
+        uses: wntrblm/nox@2024.03.02
+        with:
+          python-versions: "${{ matrix.python-versions }}"
+      - name: Set up nox environments
+        run: |
+          nox -v -e "${{ matrix.session }}" ${{ matrix.codecov && 'coverage' || '' }} --install-only
+      - name: "Run nox -e ${{ matrix.session }}"
+        run: |
+          nox -v -e "${{ matrix.session }}" --reuse-existing-virtualenvs --no-install
       - name: Report coverage
+        if: ${{ matrix.codecov }}
         run: |
-          nox -v -e coverage
+          nox -v -e coverage --reuse-existing-virtualenvs --no-install
       - name: Upload coverage
+        if: ${{ matrix.codecov }}
         uses: codecov/codecov-action@v3
         with:
           directory: antsibull-core
+          name: "${{ matrix.session }}"
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
