@@ -2,7 +2,7 @@
 
 **Topics**
 
-- <a href="#v3-0-0a1">v3\.0\.0a1</a>
+- <a href="#v3-0-0">v3\.0\.0</a>
     - <a href="#release-summary">Release Summary</a>
     - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
@@ -52,13 +52,13 @@
 - <a href="#v0-1-0">v0\.1\.0</a>
     - <a href="#release-summary-12">Release Summary</a>
 
-<a id="v3-0-0a1"></a>
-## v3\.0\.0a1
+<a id="v3-0-0"></a>
+## v3\.0\.0
 
 <a id="release-summary"></a>
 ### Release Summary
 
-First antsibull\-core v3 pre\-release
+New major release\.
 
 <a id="breaking-changes--porting-guide"></a>
 ### Breaking Changes / Porting Guide

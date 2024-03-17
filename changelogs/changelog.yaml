@@ -231,6 +231,12 @@ releases:
     - 116-subprocess_util_escape.yaml
     - 2.2.0.yml
     release_date: '2023-12-01'
+  3.0.0:
+    changes:
+      release_summary: New major release.
+    fragments:
+    - 3.0.0.yml
+    release_date: '2024-03-17'
   3.0.0a1:
     changes:
       breaking_changes:
