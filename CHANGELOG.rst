@@ -4,13 +4,13 @@ antsibull-core Release Notes
 
 .. contents:: Topics
 
-v3.0.0a1
-========
+v3.0.0
+======
 
 Release Summary
 ---------------
 
-First antsibull-core v3 pre-release
+New major release.
 
 Breaking Changes / Porting Guide
 --------------------------------

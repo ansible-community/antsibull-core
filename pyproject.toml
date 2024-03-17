@@ -16,7 +16,7 @@ license = "GPL-3.0-or-later AND BSD-2-Clause AND MIT AND PSF-2.0"
 license-files = {globs=["LICENSES/*.txt"]}
 readme = "README.md"
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Framework :: Ansible",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
