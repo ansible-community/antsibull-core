@@ -69,7 +69,7 @@ jobs:
         if: ${{ matrix.codecov }}
         uses: codecov/codecov-action@v4
         with:
-          directory: antsibull-core
           name: "${{ matrix.session }}"
+          working-directory: antsibull-core
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
