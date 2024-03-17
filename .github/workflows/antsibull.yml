@@ -69,10 +69,10 @@ jobs:
           nox -e typing
         working-directory: antsibull
 
-      - name: "Test building a release: Ansible 7 with ansible-core 2.14"
+      - name: "Test building a release: Ansible 9 with ansible-core 2.16"
         run: |
           . ./venv/bin/activate
-          ansible-playbook -vv playbooks/build-single-release.yaml -e antsibull_ansible_version=7.99.0 -e antsibull_build_file=ansible-7.build -e antsibull_data_dir="{{ antsibull_data_git_dir }}/7" -e antsibull_ansible_git_version=stable-2.14
+          ansible-playbook -vv playbooks/build-single-release.yaml -e antsibull_ansible_version=9.99.0 -e antsibull_build_file=ansible-9.build -e antsibull_data_dir="{{ antsibull_data_git_dir }}/9" -e antsibull_ansible_git_version=stable-2.16
         working-directory: antsibull
         env:
           # Make result better readable
