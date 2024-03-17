@@ -39,13 +39,11 @@ jobs:
 
       # nb: this is the first version of antsibull-docs that declares support
       # for antsibull-core v3.
-      # TODO: Change ref to a released version once antsibull-docs officially
-      # supports antsibull-core.
       - name: Check out antsibull-docs main
         uses: actions/checkout@v4
         with:
           repository: ansible-community/antsibull-docs
-          ref: main
+          ref: 2.9.0
           path: antsibull-docs
 
       - name: Set up Python 3.12

@@ -30,7 +30,7 @@ jobs:
         with:
           path: antsibull-core
 
-      # antsibull 0.60.0 depends on antsibull-changelog >= 0.24.0 as well, so install 0.24.0 of that
+      # antsibull 0.61.0 depends on antsibull-changelog >= 0.24.0 as well, so install 0.24.0 of that
       - name: Check out antsibull-changelog 0.24.0
         uses: actions/checkout@v4
         with:
@@ -40,13 +40,11 @@ jobs:
 
       # nb: this is the first version of antsibull that declares support
       # for antsibull-core v3.
-      # TODO: Change ref to a released version once antsibull officially
-      # supports antsibull-core.
       - name: Check out antsibull main
         uses: actions/checkout@v4
         with:
           repository: ansible-community/antsibull
-          ref: main
+          ref: 0.61.0
           path: antsibull
 
       - name: Set up Python 3.12
