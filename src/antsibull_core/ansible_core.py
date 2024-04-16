@@ -115,7 +115,10 @@ class AnsibleCorePyPiClient:
         versions = await self.get_versions()
         return versions[0]
 
-    async def retrieve(self, ansible_core_version: str, download_dir: StrPath) -> str:
+    # TODO(anyone): Make function less complex
+    async def retrieve(  # noqa C901
+        self, ansible_core_version: str, download_dir: StrPath
+    ) -> str:
         """
         Get the release from pypi.
 
@@ -125,31 +128,41 @@ class AnsibleCorePyPiClient:
         """
         package_name = "ansible-core"
 
-        tar_filename = f"{package_name}-{ansible_core_version}.tar.gz"
+        # https://github.com/pypa/setuptools/pull/4286
+        # Newer setuptools versions perform dist filename normalization
+        tar_filenames = (
+            f"{package_name.replace('-', '_')}-{ansible_core_version}.tar.gz",
+            f"{package_name}-{ansible_core_version}.tar.gz",
+        )
+        tar_filename = tar_filenames[0]
         tar_path = os.path.join(download_dir, tar_filename)
 
         lib_ctx = app_context.lib_ctx.get()
         if lib_ctx.ansible_core_cache and lib_ctx.trust_ansible_core_cache:
-            cached_path = os.path.join(lib_ctx.ansible_core_cache, tar_filename)
-            if os.path.isfile(cached_path):
-                await copy_file(cached_path, tar_path, check_content=False)
-                return tar_path
+            for tar_filename in tar_filenames:
+                cached_path = os.path.join(
+                    t.cast(str, lib_ctx.ansible_core_cache), tar_filename
+                )
+                if os.path.isfile(cached_path):
+                    tar_path = os.path.join(download_dir, tar_filename)
+                    await copy_file(cached_path, tar_path, check_content=False)
+                    return tar_path
 
         release_info = await self.get_release_info(package_name)
 
         pypi_url = ""
         digests = {}
         for release in release_info[ansible_core_version]:
-            if release["filename"].startswith(
-                f"{package_name}-{ansible_core_version}.tar."
-            ):
+            if release["filename"] in tar_filenames:
+                tar_filename = release["filename"]
+                tar_path = os.path.join(download_dir, tar_filename)
                 pypi_url = release["url"]
                 digests = release["digests"]
                 break
         else:  # for-else: http://bit.ly/1ElPkyg
             raise UnknownVersion(
                 f"{package_name} {ansible_core_version} does not"
-                " exist on {self.pypi_server_url}"
+                f" exist on {self.pypi_server_url}"
             )
 
         if lib_ctx.ansible_core_cache and "sha256" in digests:
