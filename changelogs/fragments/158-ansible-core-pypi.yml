@@ -1,0 +1,2 @@
+bugfixes:
+  - "Adjusting ansible-core PyPI code to also accept a filename starting with ``ansible_core``, which seems to be in use since ansible-core 2.16.6 (https://github.com/ansible-community/antsibull-core/pull/158)."

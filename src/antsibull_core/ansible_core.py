@@ -141,7 +141,10 @@ class AnsibleCorePyPiClient:
         digests = {}
         for release in release_info[ansible_core_version]:
             if release["filename"].startswith(
-                f"{package_name}-{ansible_core_version}.tar."
+                (
+                    f"{package_name}-{ansible_core_version}.tar.",
+                    f"{package_name.replace('-', '_')}-{ansible_core_version}.tar.",
+                )
             ):
                 pypi_url = release["url"]
                 digests = release["digests"]
