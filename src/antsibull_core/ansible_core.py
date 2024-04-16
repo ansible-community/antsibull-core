@@ -149,7 +149,7 @@ class AnsibleCorePyPiClient:
         else:  # for-else: http://bit.ly/1ElPkyg
             raise UnknownVersion(
                 f"{package_name} {ansible_core_version} does not"
-                " exist on {self.pypi_server_url}"
+                f" exist on {self.pypi_server_url}"
             )
 
         if lib_ctx.ansible_core_cache and "sha256" in digests:
