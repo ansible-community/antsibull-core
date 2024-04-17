@@ -4,6 +4,20 @@ antsibull-core Release Notes
 
 .. contents:: Topics
 
+v2.2.1
+======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- Adjusting ansible-core PyPI code to also accept a filename starting with ``ansible_core``, which seems to be in use since ansible-core 2.16.6 due to `PEP-625 <https://peps.python.org/pep-0625/>`__ support in setuptools 69.3.0 (https://github.com/ansible-community/antsibull-core/pull/158).
+- Avoid superfluous network request when trusting the ansible-core download cache (https://github.com/ansible-community/antsibull-core/pull/135).
+
 v2.2.0
 ======
 

@@ -1,2 +1,0 @@
-bugfixes:
-  - "Avoid superfluous network request when trusting the ansible-core download cache (https://github.com/ansible-community/antsibull-core/pull/135)."
