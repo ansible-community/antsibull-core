@@ -40,12 +40,17 @@ jobs:
 
       # nb: this is the first version of antsibull that declares support
       # for antsibull-core v3.
-      - name: Check out antsibull main
+      - name: Check out antsibull 0.61.0
         uses: actions/checkout@v4
         with:
           repository: ansible-community/antsibull
           ref: 0.61.0
           path: antsibull
+
+      - name: Patch antsibull pyproject.toml
+        run: |
+          sed -e 's/pyre-check/pyre-check <= 0.9.20,/' -i pyproject.toml
+        working-directory: antsibull
 
       - name: Set up Python 3.12
         id: python
