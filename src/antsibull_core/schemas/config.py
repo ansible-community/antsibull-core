@@ -31,21 +31,18 @@ class BaseModel(p.BaseModel):
     model_config = p.ConfigDict(frozen=True, extra="forbid", validate_default=True)
 
 
-# pyre-ignore[13]: BaseModel initializes attributes when data is loaded
 class LogFiltersModel(BaseModel):
     filter: t.Union[str, Callable]
     args: Sequence[t.Any] = []
     kwargs: Mapping[str, t.Any] = {}
 
 
-# pyre-ignore[13]: BaseModel initializes attributes when data is loaded
 class LogEmitterModel(BaseModel):
     output_name: str
     level: str = LEVEL_CHOICES_F
     filters: list[LogFiltersModel] = []
 
 
-# pyre-ignore[13]: BaseModel initializes attributes when data is loaded
 class LogOutputModel(BaseModel):
     output: t.Union[str, Callable]
     args: Sequence[t.Any] = []
