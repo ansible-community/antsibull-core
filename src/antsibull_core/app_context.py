@@ -354,7 +354,10 @@ def lib_context(
         new_context = _copy_lib_context()
 
     reset_token = lib_ctx.set(new_context)
-    yield new_context
+    try:
+        yield new_context
+    except GeneratorExit:
+        pass
 
     lib_ctx.reset(reset_token)
 
@@ -378,7 +381,10 @@ def app_context(new_context=None):
         new_context = _copy_app_context()
 
     reset_token = app_ctx.set(new_context)
-    yield new_context
+    try:
+        yield new_context
+    except GeneratorExit:
+        pass
 
     app_ctx.reset(reset_token)
 
