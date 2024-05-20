@@ -22,6 +22,10 @@ from ..logging import log
 mlog = log.fields(mod=__name__)
 
 
+# Since Python 3.11 asyncio.TimeoutError is a deprecated alias of TimeoutError
+_AsyncIoTimeoutError = getattr(asyncio, "TimeoutError", TimeoutError)  # pyre-ignore[16]
+
+
 def _format_call(
     command: str, args: tuple[t.Any, ...], kwargs: Mapping[str, t.Any]
 ) -> str:
@@ -68,7 +72,7 @@ class RetryGetManager:
                     return response
                 status = str(status_code)
                 response.close()
-            except asyncio.TimeoutError:
+            except _AsyncIoTimeoutError:
                 flog.trace()
                 status = "timeout"
                 wait_factor = 0.5

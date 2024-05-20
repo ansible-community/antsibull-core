@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncio
 import os
 import sys
-import venv  # pyre-ignore[21]
+import venv
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, NoReturn
 
