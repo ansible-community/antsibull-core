@@ -356,10 +356,8 @@ def lib_context(
     reset_token = lib_ctx.set(new_context)
     try:
         yield new_context
-    except GeneratorExit:
-        pass
-
-    lib_ctx.reset(reset_token)
+    finally:
+        lib_ctx.reset(reset_token)
 
 
 @t.overload
@@ -383,10 +381,8 @@ def app_context(new_context=None):
     reset_token = app_ctx.set(new_context)
     try:
         yield new_context
-    except GeneratorExit:
-        pass
-
-    app_ctx.reset(reset_token)
+    finally:
+        app_ctx.reset(reset_token)
 
 
 @contextmanager
