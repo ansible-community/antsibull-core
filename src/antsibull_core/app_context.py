@@ -360,9 +360,10 @@ def lib_context(
         new_context = _copy_lib_context()
 
     reset_token = lib_ctx.set(new_context)
-    yield new_context
-
-    lib_ctx.reset(reset_token)
+    try:
+        yield new_context
+    finally:
+        lib_ctx.reset(reset_token)
 
 
 @t.overload
@@ -384,9 +385,10 @@ def app_context(new_context=None):
         new_context = _copy_app_context()
 
     reset_token = app_ctx.set(new_context)
-    yield new_context
-
-    app_ctx.reset(reset_token)
+    try:
+        yield new_context
+    finally:
+        app_ctx.reset(reset_token)
 
 
 @contextmanager
