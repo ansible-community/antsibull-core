@@ -45,7 +45,6 @@ class AppContext(BaseModel):
 
     @cached_property
     def extra(self) -> ContextDict:
-        # pylint: disable-next=no-member
         d = (self.__pydantic_extra__ or {}).get("extra", {})
         return ContextDict.validate_and_convert(d)
 

@@ -324,7 +324,7 @@ def _copy_lib_context() -> LibContext:
     try:
         old_context = lib_ctx.get()
     except LookupError:
-        old_context = LibContext()
+        old_context = LibContext()  # pyre-ignore[20]
 
     # Copy just in case contexts are allowed to be writable in the the future
     return old_context.model_copy()
@@ -334,7 +334,7 @@ def _copy_app_context() -> AppContext:
     try:
         old_context = app_ctx.get()
     except LookupError:
-        old_context = AppContext()
+        old_context = AppContext()  # pyre-ignore[20]
 
     # Copy just in case contexts are allowed to be writable in the the future
     return old_context.model_copy()
@@ -423,5 +423,5 @@ class AppContextWrapper(t.Generic[AppContextT]):
 #
 # Set initial contexts with default values
 #
-lib_ctx.set(LibContext())
-app_ctx.set(AppContext())
+lib_ctx.set(LibContext())  # pyre-ignore[20]
+app_ctx.set(AppContext())  # pyre-ignore[20]
