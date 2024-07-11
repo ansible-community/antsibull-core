@@ -1,75 +1,79 @@
+---
 ancestor: null
 releases:
   0.1.0:
     changes:
       release_summary: Initial release.
     fragments:
-    - initial_release.yml
+      - initial_release.yml
     release_date: '2022-04-06'
   1.0.0:
     changes:
       major_changes:
-      - From version 1.0.0 on, antsibull-core is sticking to semantic versioning and
-        aims at providing no backwards compatibility breaking changes during a major
-        release cycle (https://github.com/ansible-community/antsibull-core/pull/2).
+        - From version 1.0.0 on, antsibull-core is sticking to semantic versioning
+          and aims at providing no backwards compatibility breaking changes during
+          a major release cycle (https://github.com/ansible-community/antsibull-core/pull/2).
       minor_changes:
-      - Remove unused code (https://github.com/ansible-community/antsibull-core/pull/1).
+        - Remove unused code (https://github.com/ansible-community/antsibull-core/pull/1).
       release_summary: First stable release.
       removed_features:
-      - Remove package ``antsibull_core.utils.transformations`` (https://github.com/ansible-community/antsibull-core/pull/1).
+        - Remove package ``antsibull_core.utils.transformations`` (https://github.com/ansible-community/antsibull-core/pull/1).
     fragments:
-    - 1-cleanup.yml
-    - 1.0.0.yml
+      - 1-cleanup.yml
+      - 1.0.0.yml
     release_date: '2022-04-10'
   1.0.1:
     changes:
       bugfixes:
-      - Fix detection of ansible-core devel checkouts (https://github.com/ansible-community/antsibull-core/pull/4).
+        - Fix detection of ansible-core devel checkouts (https://github.com/ansible-community/antsibull-core/pull/4).
       release_summary: Bugfix release.
     fragments:
-    - 1.0.1.yml
-    - 4-devel-detection.yml
+      - 1.0.1.yml
+      - 4-devel-detection.yml
     release_date: '2022-06-10'
   1.1.0:
     changes:
       minor_changes:
-      - The files in the source repository now follow the `REUSE Specification <https://reuse.software/spec/>`_.
-        The only exceptions are changelog fragments in ``changelogs/fragments/`` (https://github.com/ansible-community/antsibull-core/pull/5).
+        - The files in the source repository now follow the `REUSE Specification <https://reuse.software/spec/>`_.
+          The only exceptions are changelog fragments in ``changelogs/fragments/``
+          (https://github.com/ansible-community/antsibull-core/pull/5).
       release_summary: Maintenance release.
     fragments:
-    - 1.1.0.yml
-    - 5-licenses.yml
+      - 1.1.0.yml
+      - 5-licenses.yml
     release_date: '2022-07-31'
   1.2.0:
     changes:
       bugfixes:
-      - Adjust signature of ``DepsFile.write()`` to work around bug in antsibull (https://github.com/ansible-community/antsibull-core/pull/6).
+        - Adjust signature of ``DepsFile.write()`` to work around bug in antsibull
+          (https://github.com/ansible-community/antsibull-core/pull/6).
       deprecated_features:
-      - The ``DepsFile.write()`` method will require the first parameter to be a ``packaging.version.Version``
-        object, the second parameter to be a string, and the third parameter a mapping
-        of strings to strings, from antsibull-core 2.0.0 on (https://github.com/ansible-community/antsibull-core/pull/6).
+        - The ``DepsFile.write()`` method will require the first parameter to be a
+          ``packaging.version.Version`` object, the second parameter to be a string,
+          and the third parameter a mapping of strings to strings, from antsibull-core
+          2.0.0 on (https://github.com/ansible-community/antsibull-core/pull/6).
       minor_changes:
-      - Improve typing (https://github.com/ansible-community/antsibull-core/pull/6).
-      - Make config file management more flexible to allow project-specific config
-        file format extensions for the explicitly passed configuration files (https://github.com/ansible-community/antsibull-core/pull/7).
+        - Improve typing (https://github.com/ansible-community/antsibull-core/pull/6).
+        - Make config file management more flexible to allow project-specific config
+          file format extensions for the explicitly passed configuration files (https://github.com/ansible-community/antsibull-core/pull/7).
       release_summary: Feature release.
     fragments:
-    - 1.2.0.yml
-    - 6-typing.yml
-    - 7-config.yml
+      - 1.2.0.yml
+      - 6-typing.yml
+      - 7-config.yml
     release_date: '2022-08-20'
   1.3.0:
     changes:
       bugfixes:
-      - Fix async file copying helper (https://github.com/ansible-community/antsibull-core/pull/11).
+        - Fix async file copying helper (https://github.com/ansible-community/antsibull-core/pull/11).
       minor_changes:
-      - Allow to write Python dependencies as ``_python`` key into build and dependency
-        files (https://github.com/ansible-community/antsibull-core/pull/10).
+        - Allow to write Python dependencies as ``_python`` key into build and dependency
+          files (https://github.com/ansible-community/antsibull-core/pull/10).
       release_summary: Feature and bugfix release.
     fragments:
-    - 1.3.0.yml
-    - 10-python_requires.yml
-    - 11-copy-fix.yml
+      - 1.3.0.yml
+      - 10-python_requires.yml
+      - 11-copy-fix.yml
     release_date: '2022-10-05'
   1.3.0.post0:
     changes:
@@ -79,215 +83,221 @@ releases:
     changes:
       release_summary: Maintenance release to fix unwanted ``1.3.0.post0`` release.
     fragments:
-    - 1.3.1.yml
+      - 1.3.1.yml
     release_date: '2022-10-05'
   1.4.0:
     changes:
       bugfixes:
-      - Remove use of blocking IO in an async function (https://github.com/ansible-community/antsibull-core/pull/13/).
+        - Remove use of blocking IO in an async function (https://github.com/ansible-community/antsibull-core/pull/13/).
       minor_changes:
-      - Fix overly restrictive file name type annotations. Use ``StrOrBytesPath``
-        type annotation instead of ``str`` for functions that accept a file name (https://github.com/ansible-community/antsibull-core/pull/14).
+        - Fix overly restrictive file name type annotations. Use ``StrOrBytesPath``
+          type annotation instead of ``str`` for functions that accept a file name
+          (https://github.com/ansible-community/antsibull-core/pull/14).
       release_summary: Bugfix and feature release.
     fragments:
-    - 1.4.0.yml
-    - 13-no-blocking-io-async.yaml
-    - 14-StrOrBytesPath.yaml
+      - 1.4.0.yml
+      - 13-no-blocking-io-async.yaml
+      - 14-StrOrBytesPath.yaml
     release_date: '2022-11-27'
-  2.0.0:
-    changes:
-      bugfixes:
-      - Fix a bug in Galaxy download code when the filename is found in the cache,
-        but the checksum does not match. In that case, the collection was not copied
-        to the destination, and the code did not try to download the correct file
-        (https://github.com/ansible-community/antsibull-core/pull/76).
-      deprecated_features:
-      - The fields ``ansible_base_url``, ``galaxy_url``, and ``pypi_url`` of the app
-        context have been deprecated. Use the fields ``ansible_core_repo_url``, ``galaxy_url``,
-        and ``pypi_url``, respectively, of the library context instead (https://github.com/ansible-community/antsibull-core/pull/81).
-      minor_changes:
-      - Allow the Galaxy downloader to trust its collection cache to avoid having
-        to query the Galaxy server if an artifact exists in the cache. This can be
-        set with the new configuration file option ``trust_collection_cache`` (https://github.com/ansible-community/antsibull-core/pull/78).
-      - Allow to cache ansible-core download artifacts with a new config file option
-        ``ansible_core_cache`` (https://github.com/ansible-community/antsibull-core/pull/80).
-      - Allow to fully trust the ansible-core artifacts cache to avoid querying PyPI
-        with a new config file option ``trust_ansible_core_cache`` (https://github.com/ansible-community/antsibull-core/pull/80).
-      - Allow to skip content check when doing async file copying using ``antsibull_core.utils.io.copy_file()``
-        (https://github.com/ansible-community/antsibull-core/pull/78).
-      - Avoid using the collection artifact filename returned by the Galaxy server.
-        Instead compose it in a uniform way (https://github.com/ansible-community/antsibull-core/pull/78).
-      - The fields ``ansible_core_repo_url``, ``galaxy_url``, and ``pypi_url`` have
-        been added to the library context. If ``ansible_core_repo_url`` is not provided,
-        it will be populated from the field ``ansible_base_url`` if that has been
-        provided (https://github.com/ansible-community/antsibull-core/pull/81).
-      release_summary: New major release
-      removed_features:
-      - The unused ``antsibull_core.schemas.config.ConfigModel`` model and the unused
-        ``antsibull_core.config.read_config`` function have been removed (https://github.com/ansible-community/antsibull-core/pull/82).
-    fragments:
-    - 2.0.0.yml
-    - 76-galaxy-download-cache.yml
-    - 78-collection-cache.yml
-    - 80-ansible-core-cache.yml
-    - 81-contexts.yml
-    - 82-config-model.yml
-    release_date: '2023-05-03'
   2.0.0a1:
     changes:
       breaking_changes:
-      - Support for Python 3.6, 3.7, and 3.8 has been dropped. antsibull-core 2.x.y
-        needs Python 3.9 or newer. If you need to use Python 3.6 to 3.8, please use
-        antsibull-core 1.x.y (https://github.com/ansible-community/antsibull-core/pull/16).
+        - Support for Python 3.6, 3.7, and 3.8 has been dropped. antsibull-core 2.x.y
+          needs Python 3.9 or newer. If you need to use Python 3.6 to 3.8, please
+          use antsibull-core 1.x.y (https://github.com/ansible-community/antsibull-core/pull/16).
       deprecated_features:
-      - The ``antsibull_core.compat`` module deprecates the ``metadata`` module. Use
-        ``importlib.metadata`` instead, which is available from Python 3.8 on (https://github.com/ansible-community/antsibull-core/pull/16).
-      - The ``antsibull_core.compat`` module deprecates the functions ``asyncio_run``,
-        ``best_get_loop``, and ``create_task``. Replace ``asyncio_run`` with ``asyncio.run``,
-        ``create_task`` with ``asyncio.create_task``, and ``best_get_loop`` with ``asyncio.get_running_loop``
-        (https://github.com/ansible-community/antsibull-core/pull/16).
+        - The ``antsibull_core.compat`` module deprecates the ``metadata`` module.
+          Use ``importlib.metadata`` instead, which is available from Python 3.8 on
+          (https://github.com/ansible-community/antsibull-core/pull/16).
+        - The ``antsibull_core.compat`` module deprecates the functions ``asyncio_run``,
+          ``best_get_loop``, and ``create_task``. Replace ``asyncio_run`` with ``asyncio.run``,
+          ``create_task`` with ``asyncio.create_task``, and ``best_get_loop`` with
+          ``asyncio.get_running_loop`` (https://github.com/ansible-community/antsibull-core/pull/16).
       minor_changes:
-      - Add a ``store_yaml_stream`` function to ``antsibull_core.yaml`` to dump YAML
-        to an IO stream (https://github.com/ansible-community/antsibull-core/pull/24).
+        - Add a ``store_yaml_stream`` function to ``antsibull_core.yaml`` to dump
+          YAML to an IO stream (https://github.com/ansible-community/antsibull-core/pull/24).
       release_summary: Alpha release of 2.0.0.
     fragments:
-    - 16-compat-deprecation.yml
-    - 2.0.0a1.yml
-    - 24.yaml
+      - 16-compat-deprecation.yml
+      - 2.0.0a1.yml
+      - 24.yaml
     release_date: '2022-12-09'
   2.0.0a2:
     changes:
       breaking_changes:
-      - Remove ``breadcrumbs``, ``indexes``, and ``use_html_blobs`` from global antsibull
-        config handling. These options are only used by antsibull-docs, which already
-        validates them itself (https://github.com/ansible-community/antsibull-core/pull/54).
-      - The ``install_package()`` method of ``antsibull_core.venv.VenvRunner`` now
-        returns a ``subprocess.CompletedProcess`` object instead of an ``sh.RunningCommand``.
-        The rest of the function signature remains the same. Most callers should not
-        need to access the output to begin with (https://github.com/ansible-community/antsibull-core/pull/50).
+        - Remove ``breadcrumbs``, ``indexes``, and ``use_html_blobs`` from global
+          antsibull config handling. These options are only used by antsibull-docs,
+          which already validates them itself (https://github.com/ansible-community/antsibull-core/pull/54).
+        - The ``install_package()`` method of ``antsibull_core.venv.VenvRunner`` now
+          returns a ``subprocess.CompletedProcess`` object instead of an ``sh.RunningCommand``.
+          The rest of the function signature remains the same. Most callers should
+          not need to access the output to begin with (https://github.com/ansible-community/antsibull-core/pull/50).
       bugfixes:
-      - Remove improper usage of ``@functools.cache`` on async functions in the ``antsibull_core.ansible_core``
-        module (https://github.com/ansible-community/antsibull-core/pull/67).
-      - Restrict the ``pydantic`` dependency to major version 1 (https://github.com/ansible-community/antsibull-core/pull/35).
-      - Restrict the ``sh`` dependency to versions before 2.0.0 (https://github.com/ansible-community/antsibull-core/pull/31).
+        - Remove improper usage of ``@functools.cache`` on async functions in the
+          ``antsibull_core.ansible_core`` module (https://github.com/ansible-community/antsibull-core/pull/67).
+        - Restrict the ``pydantic`` dependency to major version 1 (https://github.com/ansible-community/antsibull-core/pull/35).
+        - Restrict the ``sh`` dependency to versions before 2.0.0 (https://github.com/ansible-community/antsibull-core/pull/31).
       deprecated_features:
-      - Deprecate the ``get_command()`` methods of ``antsibull_core.venv.VenvRunner``
-        and ``antsibull_core.venv.FakeVenvRunner``. These methods will be removed
-        in antsibull-core 3.0.0. Use the new ``log_run()`` and ``async_run()`` methods
-        instead (https://github.com/ansible-community/antsibull-core/pull/50).
-      - The ``doc_parsing_backend`` option from the library context is deprecated
-        and will be removed in antsibull-core 3.0.0. Applications that need it, such
-        as antsibull-docs, must ensure they allow and validate this option themselves
-        (https://github.com/ansible-community/antsibull-core/pull/59).
+        - Deprecate the ``get_command()`` methods of ``antsibull_core.venv.VenvRunner``
+          and ``antsibull_core.venv.FakeVenvRunner``. These methods will be removed
+          in antsibull-core 3.0.0. Use the new ``log_run()`` and ``async_run()`` methods
+          instead (https://github.com/ansible-community/antsibull-core/pull/50).
+        - The ``doc_parsing_backend`` option from the library context is deprecated
+          and will be removed in antsibull-core 3.0.0. Applications that need it,
+          such as antsibull-docs, must ensure they allow and validate this option
+          themselves (https://github.com/ansible-community/antsibull-core/pull/59).
       minor_changes:
-      - Add ``async_log_run()`` and ``log_run()`` methods to ``antsibull_core.venv.VenvRunner``
-        and ``antsibull_core.venv.FakeVenvRunner``. These should be used instead of
-        ``get_command()`` (https://github.com/ansible-community/antsibull-core/pull/50).
-      - Add a new ``antsibull_core.subprocess_util`` module to help run subprocesses
-        output and log their output (https://github.com/ansible-community/antsibull-core/pull/40).
-      - Allow Galaxy client to communicate with the Galaxy v3 API (https://github.com/ansible-community/antsibull-core/pull/45).
-      - Replace internal usage of ``sh`` with the ``antsibull.subprocess_util`` module
-        (https://github.com/ansible-community/antsibull-core/pull/51).
-      - Use the pypa ``build`` tool instead of directly calling ``setup.py`` which
-        is deprecated (https://github.com/ansible-community/antsibull-core/pull/51).
+        - Add ``async_log_run()`` and ``log_run()`` methods to ``antsibull_core.venv.VenvRunner``
+          and ``antsibull_core.venv.FakeVenvRunner``. These should be used instead
+          of ``get_command()`` (https://github.com/ansible-community/antsibull-core/pull/50).
+        - Add a new ``antsibull_core.subprocess_util`` module to help run subprocesses
+          output and log their output (https://github.com/ansible-community/antsibull-core/pull/40).
+        - Allow Galaxy client to communicate with the Galaxy v3 API (https://github.com/ansible-community/antsibull-core/pull/45).
+        - Replace internal usage of ``sh`` with the ``antsibull.subprocess_util``
+          module (https://github.com/ansible-community/antsibull-core/pull/51).
+        - Use the pypa ``build`` tool instead of directly calling ``setup.py`` which
+          is deprecated (https://github.com/ansible-community/antsibull-core/pull/51).
       release_summary: Second alpha release of 2.0.0.
     fragments:
-    - 2.0.0a2.yml
-    - 31-sh.yml
-    - 35-pydantic.yml
-    - 40-subprocess.yaml
-    - 45-galaxy-v3.yml
-    - 50-new-venv.yaml
-    - 51-bye-bye-sh.yaml
-    - 54-config.yml
-    - 67-cache.yaml
+      - 2.0.0a2.yml
+      - 31-sh.yml
+      - 35-pydantic.yml
+      - 40-subprocess.yaml
+      - 45-galaxy-v3.yml
+      - 50-new-venv.yaml
+      - 51-bye-bye-sh.yaml
+      - 54-config.yml
+      - 67-cache.yaml
     release_date: '2023-04-19'
+  2.0.0:
+    changes:
+      bugfixes:
+        - Fix a bug in Galaxy download code when the filename is found in the cache,
+          but the checksum does not match. In that case, the collection was not copied
+          to the destination, and the code did not try to download the correct file
+          (https://github.com/ansible-community/antsibull-core/pull/76).
+      deprecated_features:
+        - The fields ``ansible_base_url``, ``galaxy_url``, and ``pypi_url`` of the
+          app context have been deprecated. Use the fields ``ansible_core_repo_url``,
+          ``galaxy_url``, and ``pypi_url``, respectively, of the library context instead
+          (https://github.com/ansible-community/antsibull-core/pull/81).
+      minor_changes:
+        - Allow the Galaxy downloader to trust its collection cache to avoid having
+          to query the Galaxy server if an artifact exists in the cache. This can
+          be set with the new configuration file option ``trust_collection_cache``
+          (https://github.com/ansible-community/antsibull-core/pull/78).
+        - Allow to cache ansible-core download artifacts with a new config file option
+          ``ansible_core_cache`` (https://github.com/ansible-community/antsibull-core/pull/80).
+        - Allow to fully trust the ansible-core artifacts cache to avoid querying
+          PyPI with a new config file option ``trust_ansible_core_cache`` (https://github.com/ansible-community/antsibull-core/pull/80).
+        - Allow to skip content check when doing async file copying using ``antsibull_core.utils.io.copy_file()``
+          (https://github.com/ansible-community/antsibull-core/pull/78).
+        - Avoid using the collection artifact filename returned by the Galaxy server.
+          Instead compose it in a uniform way (https://github.com/ansible-community/antsibull-core/pull/78).
+        - The fields ``ansible_core_repo_url``, ``galaxy_url``, and ``pypi_url`` have
+          been added to the library context. If ``ansible_core_repo_url`` is not provided,
+          it will be populated from the field ``ansible_base_url`` if that has been
+          provided (https://github.com/ansible-community/antsibull-core/pull/81).
+      release_summary: New major release
+      removed_features:
+        - The unused ``antsibull_core.schemas.config.ConfigModel`` model and the unused
+          ``antsibull_core.config.read_config`` function have been removed (https://github.com/ansible-community/antsibull-core/pull/82).
+    fragments:
+      - 2.0.0.yml
+      - 76-galaxy-download-cache.yml
+      - 78-collection-cache.yml
+      - 80-ansible-core-cache.yml
+      - 81-contexts.yml
+      - 82-config-model.yml
+    release_date: '2023-05-03'
   2.1.0:
     changes:
       minor_changes:
-      - Allow to overwrite the version and the program name when using ``antsibull_core.args.get_toplevel_parser()``
-        (https://github.com/ansible-community/antsibull-core/pull/96).
+        - Allow to overwrite the version and the program name when using ``antsibull_core.args.get_toplevel_parser()``
+          (https://github.com/ansible-community/antsibull-core/pull/96).
       release_summary: Feature release.
     fragments:
-    - 2.1.0.yml
-    - 96-version.yml
+      - 2.1.0.yml
+      - 96-version.yml
     release_date: '2023-09-02'
   2.2.0:
     changes:
       bugfixes:
-      - Fix typing for ``antsibull_core.app_context.app_context()`` functions (https://github.com/ansible-community/antsibull-core/pull/109).
-      - '``subprocess_util.log_run`` - use proper string formatting when passing command
-        output to the logger (https://github.com/ansible-community/antsibull-core/pull/116).'
+        - Fix typing for ``antsibull_core.app_context.app_context()`` functions (https://github.com/ansible-community/antsibull-core/pull/109).
+        - '``subprocess_util.log_run`` - use proper string formatting when passing
+          command output to the logger (https://github.com/ansible-community/antsibull-core/pull/116).'
       minor_changes:
-      - Declare support for Python 3.12 (https://github.com/ansible-community/antsibull-core/pull/103).
-      - '``subprocess_util.async_log_run()``, ``subprocess_util.log_run()``, and the
-        corresponding functions  in ``venv`` now support passing generic callback
-        functions for ``stdout_loglevel`` and ``stderr_loglevel`` (https://github.com/ansible-community/antsibull-core/pull/113).'
+        - Declare support for Python 3.12 (https://github.com/ansible-community/antsibull-core/pull/103).
+        - '``subprocess_util.async_log_run()``, ``subprocess_util.log_run()``, and
+          the corresponding functions  in ``venv`` now support passing generic callback
+          functions for ``stdout_loglevel`` and ``stderr_loglevel`` (https://github.com/ansible-community/antsibull-core/pull/113).'
       release_summary: Add support for Python 3.12 and improve ``subprocess_util``
     fragments:
-    - 103-312.yaml
-    - 109-typing.yml
-    - 113-subprocess_util_loopback.yaml
-    - 116-subprocess_util_escape.yaml
-    - 2.2.0.yml
+      - 103-312.yaml
+      - 109-typing.yml
+      - 113-subprocess_util_loopback.yaml
+      - 116-subprocess_util_escape.yaml
+      - 2.2.0.yml
     release_date: '2023-12-01'
+  3.0.0a1:
+    changes:
+      breaking_changes:
+        - Drop support for building Ansible versions less than 6.0.0 (https://github.com/ansible-community/antsibull-core/pull/132).
+        - Remove ``GalaxyClient``'s and ``CollectionDownloader``'s ``galaxy_server``
+          arguments. You need to explicitly pass in a ``GalaxyContext`` object instead
+          (https://github.com/ansible-community/antsibull-core/pull/131).
+        - antsibull-core now requires major version 2 of the ``pydantic`` library.
+          Version 1 is no longer supported (https://github.com/ansible-community/antsibull-core/pull/122).
+      bugfixes:
+        - Avoid superfluous network request when trusting the ansible-core download
+          cache (https://github.com/ansible-community/antsibull-core/pull/135).
+      release_summary: First antsibull-core v3 pre-release
+      removed_features:
+        - If ``ansible_base_url`` is provided in a config file, but ``ansible_core_repo_url``
+          is not, its value is no longer used for ``ansible_core_repo_url`` (https://github.com/ansible-community/antsibull-core/pull/128).
+        - Remove dependency on ``sh`` (https://github.com/ansible-community/antsibull-core/pull/119).
+        - Removed the deprecated field ``doc_parsing_backend`` from ``LibContext``
+          (https://github.com/ansible-community/antsibull-core/pull/128).
+        - Removed the deprecated fields ``ansible_base_url``, ``galaxy_url``, ``pypi_url``,
+          and ``collection_cache`` from ``AppContext`` (https://github.com/ansible-community/antsibull-core/pull/128).
+        - '``ansible_core`` - remove ``get_ansible_core_package_name()`` function.
+          This is no longer necessary now that support for ansible-base has been dropped
+          (https://github.com/ansible-community/antsibull-core/pull/132).'
+        - '``ansible_core`` - remove ansible-core/ansible-base normalization in ``AnsibleCorePyPiClient``.
+          Data retrieval is only supported for ``ansible-core`` (https://github.com/ansible-community/antsibull-core/pull/132).'
+        - '``antsibull_core.compat`` - remove deprecated ``asyncio_run``, ``best_get_loop``,
+          ``create_task`` and ``metadata`` (https://github.com/ansible-community/antsibull-core/issues/124,
+          https://github.com/ansible-community/antsibull-core/pull/129).'
+        - '``dependency_files`` - drop support for ``_ansible_base_version`` and ``_acd_version``
+          in pieces files. ``_ansible_core_version`` and ``_ansible_version``, respectively,
+          should be used instead (https://github.com/ansible-community/antsibull-core/pull/132).'
+        - '``venv`` - remove ``get_command()`` method from ``VenvRunner`` and ``FakeVenvRunner``
+          (https://github.com/ansible-community/antsibull-core/pull/119).'
+    fragments:
+      - 119-nosh.yaml
+      - 122-pydanticv2.yaml
+      - 128-libcontext-appcontext.yml
+      - 129-deprecated-compat.yaml
+      - 130-old-ansible-rm.yaml
+      - 131-galaxy-client-context.yml
+      - 135-trust-core-cache.yml
+      - 3.0.0a1.yml
+    release_date: '2024-02-14'
   3.0.0:
     changes:
       release_summary: New major release.
     fragments:
-    - 3.0.0.yml
+      - 3.0.0.yml
     release_date: '2024-03-17'
-  3.0.0a1:
-    changes:
-      breaking_changes:
-      - Drop support for building Ansible versions less than 6.0.0 (https://github.com/ansible-community/antsibull-core/pull/132).
-      - Remove ``GalaxyClient``'s and ``CollectionDownloader``'s ``galaxy_server``
-        arguments. You need to explicitly pass in a ``GalaxyContext`` object instead
-        (https://github.com/ansible-community/antsibull-core/pull/131).
-      - antsibull-core now requires major version 2 of the ``pydantic`` library. Version
-        1 is no longer supported (https://github.com/ansible-community/antsibull-core/pull/122).
-      bugfixes:
-      - Avoid superfluous network request when trusting the ansible-core download
-        cache (https://github.com/ansible-community/antsibull-core/pull/135).
-      release_summary: First antsibull-core v3 pre-release
-      removed_features:
-      - If ``ansible_base_url`` is provided in a config file, but ``ansible_core_repo_url``
-        is not, its value is no longer used for ``ansible_core_repo_url`` (https://github.com/ansible-community/antsibull-core/pull/128).
-      - Remove dependency on ``sh`` (https://github.com/ansible-community/antsibull-core/pull/119).
-      - Removed the deprecated field ``doc_parsing_backend`` from ``LibContext`` (https://github.com/ansible-community/antsibull-core/pull/128).
-      - Removed the deprecated fields ``ansible_base_url``, ``galaxy_url``, ``pypi_url``,
-        and ``collection_cache`` from ``AppContext`` (https://github.com/ansible-community/antsibull-core/pull/128).
-      - '``ansible_core`` - remove ``get_ansible_core_package_name()`` function. This
-        is no longer necessary now that support for ansible-base has been dropped
-        (https://github.com/ansible-community/antsibull-core/pull/132).'
-      - '``ansible_core`` - remove ansible-core/ansible-base normalization in ``AnsibleCorePyPiClient``.
-        Data retrieval is only supported for ``ansible-core`` (https://github.com/ansible-community/antsibull-core/pull/132).'
-      - '``antsibull_core.compat`` - remove deprecated ``asyncio_run``, ``best_get_loop``,
-        ``create_task`` and ``metadata`` (https://github.com/ansible-community/antsibull-core/issues/124,
-        https://github.com/ansible-community/antsibull-core/pull/129).'
-      - '``dependency_files`` - drop support for ``_ansible_base_version`` and ``_acd_version``
-        in pieces files. ``_ansible_core_version`` and ``_ansible_version``, respectively,
-        should be used instead (https://github.com/ansible-community/antsibull-core/pull/132).'
-      - '``venv`` - remove ``get_command()`` method from ``VenvRunner`` and ``FakeVenvRunner``
-        (https://github.com/ansible-community/antsibull-core/pull/119).'
-    fragments:
-    - 119-nosh.yaml
-    - 122-pydanticv2.yaml
-    - 128-libcontext-appcontext.yml
-    - 129-deprecated-compat.yaml
-    - 130-old-ansible-rm.yaml
-    - 131-galaxy-client-context.yml
-    - 135-trust-core-cache.yml
-    - 3.0.0a1.yml
-    release_date: '2024-02-14'
   3.0.1:
     changes:
       bugfixes:
-      - Adjusting ansible-core PyPI code to also accept a filename starting with ``ansible_core``,
-        which seems to be in use since ansible-core 2.16.6 due to `PEP-625 <https://peps.python.org/pep-0625/>`__
-        support in setuptools 69.3.0 (https://github.com/ansible-community/antsibull-core/pull/158).
+        - Adjusting ansible-core PyPI code to also accept a filename starting with
+          ``ansible_core``, which seems to be in use since ansible-core 2.16.6 due
+          to `PEP-625 <https://peps.python.org/pep-0625/>`__ support in setuptools
+          69.3.0 (https://github.com/ansible-community/antsibull-core/pull/158).
       release_summary: Bugfix release.
     fragments:
-    - 158-ansible-core-pypi.yml
-    - 3.0.1.yml
+      - 158-ansible-core-pypi.yml
+      - 3.0.1.yml
     release_date: '2024-04-17'
