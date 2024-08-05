@@ -52,6 +52,12 @@ jobs:
           sed -e 's/pyre-check/pyre-check <= 0.9.20,/' -i pyproject.toml
         working-directory: antsibull
 
+      - name: Patch our pyproject.toml
+        # Necessary for pyre...
+        run: |
+          sed -e 's/aiohttp/aiohttp < 3.10.0,/' -i pyproject.toml
+        working-directory: antsibull-core
+
       - name: Set up Python 3.12
         id: python
         uses: actions/setup-python@v5
