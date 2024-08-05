@@ -1,3 +1,5 @@
 bugfixes:
   - "Adjust the aiohttp retry GET mananger to use ``ClientTimeout`` instead of a ``float``, since that will be removed in aiohttp 4.0.0
      (https://github.com/ansible-community/antsibull-core/pull/163)."
+  - "Bump asyncio requirement to >= 3.3.0 instead of 3.0.0. Version 3.0.0 likely never worked with the retry code that
+     has been in here basically since he beginning (https://github.com/ansible-community/antsibull-core/pull/163)."
