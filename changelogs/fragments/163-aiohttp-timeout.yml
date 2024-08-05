@@ -1,0 +1,3 @@
+bugfixes:
+  - "Adjust the aiohttp retry GET mananger to use ``ClientTimeout`` instead of a ``float``, since that will be removed in aiohttp 4.0.0
+     (https://github.com/ansible-community/antsibull-core/pull/163)."

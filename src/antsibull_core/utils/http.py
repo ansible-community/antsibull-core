@@ -62,7 +62,7 @@ class RetryGetManager:
             wait_factor: float = 5
             try:
                 response = await self.aio_session.get(  # pyre-ignore[16]
-                    *self.args, **self.kwargs, timeout=20
+                    *self.args, **self.kwargs, timeout=aiohttp.ClientTimeout(total=20)
                 )
                 status_code = response.status
                 flog.debug(f"Status code {status_code}")
