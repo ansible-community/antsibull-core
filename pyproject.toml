@@ -29,7 +29,7 @@ classifiers = [
 requires-python = ">=3.9"
 dependencies = [
     "aiofiles",
-    "aiohttp >= 3.0.0",
+    "aiohttp >= 3.3.0",
     "build",
     # major/minor was introduced here
     "packaging >= 20.0",
