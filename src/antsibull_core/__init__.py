@@ -9,6 +9,6 @@ Shared code used by tools for building the Ansible distribution
 
 from __future__ import annotations
 
-__version__ = "3.0.1.post0"
+__version__ = "3.0.2"
 
 __all__ = ("__version__",)
