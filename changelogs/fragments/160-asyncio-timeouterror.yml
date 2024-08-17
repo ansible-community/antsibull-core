@@ -1,4 +1,0 @@
-bugfixes:
-  - "Make sure that the right ``TimeoutError`` is used in the HTTP retry util.
-     ``asyncio.TimeoutError`` is a deprecated alias of ``TimeoutError`` since Python 3.11
-     (https://github.com/ansible-community/antsibull-core/pull/160)."
