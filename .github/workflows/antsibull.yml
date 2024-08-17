@@ -46,6 +46,12 @@ jobs:
           ref: 0.52.0
           path: antsibull
 
+      - name: Patch our pyproject.toml
+        # Necessary for pyre...
+        run: |
+          sed -e 's/aiohttp/aiohttp < 3.10.0,/' -i pyproject.toml
+        working-directory: antsibull-core
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
