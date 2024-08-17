@@ -245,3 +245,23 @@ releases:
     - 158-ansible-core-pypi.yml
     - 2.2.1.yml
     release_date: '2024-04-17'
+  2.2.2:
+    changes:
+      bugfixes:
+      - Adjust the aiohttp retry GET mananger to use ``ClientTimeout`` instead of
+        a ``float``, since that will be removed in aiohttp 4.0.0 (https://github.com/ansible-community/antsibull-core/pull/163).
+      - Bump asyncio requirement to >= 3.3.0 instead of 3.0.0. Version 3.0.0 likely
+        never worked with the retry code that has been in here basically since he
+        beginning (https://github.com/ansible-community/antsibull-core/pull/163).
+      - Make sure that app and lib contexts are cleaned up correctly in case of generator
+        exit (https://github.com/ansible-community/antsibull-core/pull/161).
+      - Make sure that the right ``TimeoutError`` is used in the HTTP retry util.
+        ``asyncio.TimeoutError`` is a deprecated alias of ``TimeoutError`` since Python
+        3.11 (https://github.com/ansible-community/antsibull-core/pull/160).
+      release_summary: Bugfix release.
+    fragments:
+    - 160-asyncio-timeouterror.yml
+    - 161-context.yml
+    - 163-aiohttp-timeout.yml
+    - 2.2.2.yml
+    release_date: '2024-08-17'

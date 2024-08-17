@@ -1,2 +1,0 @@
-bugfixes:
-  - "Make sure that app and lib contexts are cleaned up correctly in case of generator exit (https://github.com/ansible-community/antsibull-core/pull/161)."
