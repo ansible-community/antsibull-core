@@ -28,6 +28,7 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
+    "antsibull-fileutils >= 1.0.0, < 2.0.0",
     "aiofiles",
     "aiohttp >= 3.3.0",
     "build",
@@ -36,7 +37,6 @@ dependencies = [
     "perky",
     # pydantic v2 is a major rewrite
     "pydantic ~= 2.0",
-    "PyYAML",
     "semantic_version",
     # 0.5.0 introduces dict_config
     "twiggy >= 0.5.0",

@@ -37,6 +37,12 @@ jobs:
           ref: main
           path: antsibull-docs-parser
 
+      - name: Check out dependent project antsibull-fileutils
+        uses: actions/checkout@v4
+        with:
+          repository: ansible-community/antsibull-fileutils
+          path: antsibull-fileutils
+
       # nb: this is the first version of antsibull-docs that declares support
       # for antsibull-core v3.
       - name: Check out antsibull-docs main
