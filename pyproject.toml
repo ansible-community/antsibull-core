@@ -91,7 +91,6 @@ typing = [
     # https://github.com/facebook/pyre-check/issues/398
     "pyre-check >= 0.9.17",
     "types-aiofiles",
-    "types-PyYAML",
     "typing-extensions",
 ]
 dev = [
