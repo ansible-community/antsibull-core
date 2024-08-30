@@ -132,8 +132,14 @@ def codeqa(session: nox.Session):
 @nox.session
 def typing(session: nox.Session):
     # pyre does not work when we don't install ourself in editable mode 🙄.
-    install(session, "-e", ".[typing]", *other_antsibull())
+    others = other_antsibull()
+    install(session, "-e", ".[typing]", *others)
     session.run("mypy", "src/antsibull_core")
+
+    additional_libraries = []
+    for path in others:
+        if isinstance(path, Path):
+            additional_libraries.extend(("--search-path", str(path / "src")))
 
     purelib = (
         session.run(
@@ -163,6 +169,7 @@ def typing(session: nox.Session):
         platlib,
         "--search-path",
         "stubs/",
+        *additional_libraries,
     )
 
 
