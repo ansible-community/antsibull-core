@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import os.path
+import re
 import typing as t
 
 import aiofiles
@@ -71,9 +72,16 @@ async def copy_file(
     flog.debug("Leave")
 
 
-async def write_file(filename: StrOrBytesPath, content: str) -> None:
+async def write_file(
+    filename: StrOrBytesPath, content: str, /, sanitize: bool = False
+) -> None:
+    """Dumps a generated text file to disk, allows sanitization on trimming spaces."""
     flog = mlog.fields(func="write_file")
     flog.debug("Enter")
+
+    if sanitize:
+        content = re.sub(r"[ \t]+$", "", content, flags=re.MULTILINE)
+        content = content.rstrip("\n\r") + "\n"
 
     content_bytes = content.encode("utf-8")
 

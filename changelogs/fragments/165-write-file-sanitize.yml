@@ -1,0 +1,2 @@
+minor_changes:
+  - Allow write_file to sanitize spaces and newlines. (https://github.com/ansible-community/antsibull-docs/issues/305)
