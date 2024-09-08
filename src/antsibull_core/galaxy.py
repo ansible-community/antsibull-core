@@ -15,9 +15,9 @@ from urllib.parse import urljoin
 
 import aiofiles
 import semantic_version as semver
+from antsibull_fileutils.hashing import verify_hash
 
 from . import app_context
-from .utils.hashing import verify_hash
 from .utils.http import retry_get
 from .utils.io import copy_file
 
@@ -392,7 +392,10 @@ class CollectionDownloader(GalaxyClient):
         if self.collection_cache:
             cached_copy = os.path.join(self.collection_cache, filename)
             if os.path.isfile(cached_copy):
-                if await verify_hash(cached_copy, sha256sum):
+                lib_ctx = app_context.lib_ctx.get()
+                if await verify_hash(
+                    cached_copy, sha256sum, chunksize=lib_ctx.chunksize
+                ):
                     await copy_file(cached_copy, download_filename, check_content=False)
                     return download_filename
 
@@ -408,7 +411,9 @@ class CollectionDownloader(GalaxyClient):
                     await f.write(chunk)
 
         # Verify the download
-        if not await verify_hash(download_filename, sha256sum):
+        if not await verify_hash(
+            download_filename, sha256sum, chunksize=lib_ctx.chunksize
+        ):
             raise DownloadFailure(
                 f"{release_url} failed to download correctly."
                 f" Expected checksum: {sha256sum}"

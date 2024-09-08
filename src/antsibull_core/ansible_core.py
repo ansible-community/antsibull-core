@@ -16,12 +16,12 @@ import typing as t
 from urllib.parse import urljoin
 
 import aiofiles
+from antsibull_fileutils.hashing import verify_a_hash
 from packaging.version import Version as PypiVer
 
 from . import app_context
 from .logging import log
 from .subprocess_util import async_log_run
-from .utils.hashing import verify_a_hash
 from .utils.http import retry_get
 from .utils.io import copy_file
 
@@ -168,7 +168,9 @@ class AnsibleCorePyPiClient:
         if lib_ctx.ansible_core_cache and "sha256" in digests:
             cached_path = os.path.join(lib_ctx.ansible_core_cache, tar_filename)
             if os.path.isfile(cached_path):
-                if await verify_a_hash(cached_path, digests):
+                if await verify_a_hash(
+                    cached_path, digests, chunksize=lib_ctx.chunksize
+                ):
                     await copy_file(cached_path, tar_path, check_content=False)
                     return tar_path
 
