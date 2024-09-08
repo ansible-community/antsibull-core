@@ -16,10 +16,10 @@ from urllib.parse import urljoin
 import aiofiles
 import semantic_version as semver
 from antsibull_fileutils.hashing import verify_hash
+from antsibull_fileutils.io import copy_file
 
 from . import app_context
 from .utils.http import retry_get
-from .utils.io import copy_file
 
 # The type checker can handle finding aiohttp.client but flake8 cannot :-(
 if t.TYPE_CHECKING:
@@ -377,11 +377,18 @@ class CollectionDownloader(GalaxyClient):
         namespace, name = collection.split(".", 1)
         filename = f"{namespace}-{name}-{version}.tar.gz"
         download_filename = os.path.join(self.download_dir, filename)
+        lib_ctx = app_context.lib_ctx.get()
 
         if self.collection_cache and self.trust_collection_cache:
             cached_copy = os.path.join(self.collection_cache, filename)
             if os.path.isfile(cached_copy):
-                await copy_file(cached_copy, download_filename, check_content=False)
+                await copy_file(
+                    cached_copy,
+                    download_filename,
+                    check_content=False,
+                    file_check_content=lib_ctx.file_check_content,
+                    chunksize=lib_ctx.chunksize,
+                )
                 return download_filename
 
         release_info = await self.get_release_info(f"{namespace}/{name}", version)
@@ -396,7 +403,13 @@ class CollectionDownloader(GalaxyClient):
                 if await verify_hash(
                     cached_copy, sha256sum, chunksize=lib_ctx.chunksize
                 ):
-                    await copy_file(cached_copy, download_filename, check_content=False)
+                    await copy_file(
+                        cached_copy,
+                        download_filename,
+                        check_content=False,
+                        file_check_content=lib_ctx.file_check_content,
+                        chunksize=lib_ctx.chunksize,
+                    )
                     return download_filename
 
         async with retry_get(
@@ -422,7 +435,13 @@ class CollectionDownloader(GalaxyClient):
         # Copy downloaded collection into cache
         if self.collection_cache:
             cached_copy = os.path.join(self.collection_cache, filename)
-            await copy_file(download_filename, cached_copy, check_content=False)
+            await copy_file(
+                download_filename,
+                cached_copy,
+                check_content=False,
+                file_check_content=lib_ctx.file_check_content,
+                chunksize=lib_ctx.chunksize,
+            )
 
         return download_filename
 

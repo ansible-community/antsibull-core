@@ -17,13 +17,13 @@ from urllib.parse import urljoin
 
 import aiofiles
 from antsibull_fileutils.hashing import verify_a_hash
+from antsibull_fileutils.io import copy_file
 from packaging.version import Version as PypiVer
 
 from . import app_context
 from .logging import log
 from .subprocess_util import async_log_run
 from .utils.http import retry_get
-from .utils.io import copy_file
 
 if t.TYPE_CHECKING:
     import aiohttp.client
@@ -145,7 +145,13 @@ class AnsibleCorePyPiClient:
                 )
                 if os.path.isfile(cached_path):
                     tar_path = os.path.join(download_dir, tar_filename)
-                    await copy_file(cached_path, tar_path, check_content=False)
+                    await copy_file(
+                        cached_path,
+                        tar_path,
+                        check_content=False,
+                        file_check_content=lib_ctx.file_check_content,
+                        chunksize=lib_ctx.chunksize,
+                    )
                     return tar_path
 
         release_info = await self.get_release_info(package_name)
@@ -171,7 +177,13 @@ class AnsibleCorePyPiClient:
                 if await verify_a_hash(
                     cached_path, digests, chunksize=lib_ctx.chunksize
                 ):
-                    await copy_file(cached_path, tar_path, check_content=False)
+                    await copy_file(
+                        cached_path,
+                        tar_path,
+                        check_content=False,
+                        file_check_content=lib_ctx.file_check_content,
+                        chunksize=lib_ctx.chunksize,
+                    )
                     return tar_path
 
         async with retry_get(self.aio_session, pypi_url) as response:
@@ -181,7 +193,13 @@ class AnsibleCorePyPiClient:
 
         if lib_ctx.ansible_core_cache:
             cached_path = os.path.join(lib_ctx.ansible_core_cache, tar_filename)
-            await copy_file(tar_path, cached_path, check_content=False)
+            await copy_file(
+                tar_path,
+                cached_path,
+                check_content=False,
+                file_check_content=lib_ctx.file_check_content,
+                chunksize=lib_ctx.chunksize,
+            )
 
         return tar_path
 
