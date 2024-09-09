@@ -37,6 +37,12 @@ jobs:
           ref: main
           path: antsibull-docs-parser
 
+      - name: Check out dependent project antsibull-fileutils
+        uses: actions/checkout@v4
+        with:
+          repository: ansible-community/antsibull-fileutils
+          path: antsibull-fileutils
+
       # nb: this is the first version of antsibull-docs that declares support
       # for antsibull-core v3.
       - name: Check out antsibull-docs main
@@ -45,6 +51,11 @@ jobs:
           repository: ansible-community/antsibull-docs
           ref: 2.9.0
           path: antsibull-docs
+
+      - name: Patch antsibull-docs noxfile.py
+        run: |
+          sed -i noxfile.py -e 's/args = ("antsibull-core", "antsibull-docs-parser")/args = ("antsibull-core", "antsibull-docs-parser", "antsibull-fileutils")/g'
+        working-directory: antsibull-docs
 
       - name: Set up Python 3.12
         id: python
@@ -59,7 +70,7 @@ jobs:
           pipx install --python "${PYTHON}" nox
           python -m venv venv
           . ./venv/bin/activate
-          python -m pip install . ../antsibull-core
+          python -m pip install . ../antsibull-core ../antsibull-docs-parser ../antsibull-fileutils
         working-directory: antsibull-docs
 
       - name: Run type checkers

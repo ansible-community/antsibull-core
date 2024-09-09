@@ -30,6 +30,12 @@ jobs:
         with:
           path: antsibull-core
 
+      - name: Check out dependent project antsibull-fileutils
+        uses: actions/checkout@v4
+        with:
+          repository: ansible-community/antsibull-fileutils
+          path: antsibull-fileutils
+
       # antsibull 0.61.0 depends on antsibull-changelog >= 0.24.0 as well, so install 0.24.0 of that
       - name: Check out antsibull-changelog 0.24.0
         uses: actions/checkout@v4
@@ -46,6 +52,11 @@ jobs:
           repository: ansible-community/antsibull
           ref: 0.61.0
           path: antsibull
+
+      - name: Patch antsibull noxfile.py
+        run: |
+          sed -i noxfile.py -e 's/args = ("antsibull-core", "antsibull-changelog")/args = ("antsibull-core", "antsibull-changelog", "antsibull-fileutils")/g'
+        working-directory: antsibull
 
       - name: Patch antsibull pyproject.toml
         run: |
@@ -71,7 +82,7 @@ jobs:
           pipx install --python "${PYTHON}" nox
           python -m venv venv
           . ./venv/bin/activate
-          python -m pip install . ../antsibull-core ../antsibull-changelog
+          python -m pip install . ../antsibull-core ../antsibull-changelog ../antsibull-fileutils
           ansible-galaxy collection install community.general
         working-directory: antsibull
 

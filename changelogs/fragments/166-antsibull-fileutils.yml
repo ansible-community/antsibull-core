@@ -1,0 +1,4 @@
+minor_changes:
+  - Antsibull-core now depends on the new project antsibull-fileutils. Some code has been moved to that library;
+    that code is re-imported to avoid breaking changes for users of antsibull-core
+    (https://github.com/ansible-community/antsibull-core/pull/166).
