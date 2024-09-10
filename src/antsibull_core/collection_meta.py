@@ -158,4 +158,4 @@ def lint_collection_meta(
             location = " -> ".join(str(loc) for loc in error["loc"])
             validator.errors.append(f'{location}: {error["msg"]}')
 
-    return validator.errors
+    return sorted(validator.errors)
