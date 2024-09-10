@@ -146,7 +146,7 @@ class CollectionsMetadata(p.BaseModel):
         if not os.path.exists(collection_meta_path):
             return CollectionsMetadata(collections={})
         data = load_yaml_file(collection_meta_path)
-        return CollectionsMetadata.parse_obj(data)
+        return CollectionsMetadata.model_validate(data)
 
     def get_meta(self, collection_name: str) -> CollectionMetadata:
         result = self.collections.get(collection_name)

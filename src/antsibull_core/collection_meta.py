@@ -151,7 +151,7 @@ def lint_collection_meta(
         return [f"Error while parsing YAML file: {exc}"]
 
     try:
-        parsed_data = CollectionsMetadata.parse_obj(data)
+        parsed_data = CollectionsMetadata.model_validate(data)
         validator.validate(parsed_data)
     except p.ValidationError as exc:
         for error in exc.errors():
