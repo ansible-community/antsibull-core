@@ -320,8 +320,7 @@ def test_collections_metadata_methods(tmp_path):
     assert CollectionsMetadata.load_from(None).collections == {}
 
     filename = tmp_path / "collection-meta.yaml"
-    if filename.exists():
-        filename.unlink()
+    filename.unlink(missing_ok=True)
 
     assert CollectionsMetadata.load_from(tmp_path).collections == {}
 
