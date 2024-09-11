@@ -127,6 +127,14 @@ def lint_collection_meta(
     *, collection_meta_path: StrPath, major_release: int, all_collections: list[str]
 ) -> list[str]:
     """Lint collection-meta.yaml."""
+    if not os.path.exists(collection_meta_path):
+        return [f"Cannot find {collection_meta_path}"]
+
+    try:
+        data = load_yaml_file(collection_meta_path)
+    except Exception as exc:  # pylint: disable=broad-exception-caught
+        return [f"Error while parsing YAML file: {exc}"]
+
     validator = _Validator(
         all_collections=all_collections,
         major_release=major_release,
@@ -141,14 +149,6 @@ def lint_collection_meta(
     ):
         cls.model_config["extra"] = "forbid"
         cls.model_rebuild(force=True)
-
-    if not os.path.exists(collection_meta_path):
-        return [f"Cannot find {collection_meta_path}"]
-
-    try:
-        data = load_yaml_file(collection_meta_path)
-    except Exception as exc:  # pylint: disable=broad-exception-caught
-        return [f"Error while parsing YAML file: {exc}"]
 
     try:
         parsed_data = CollectionsMetadata.model_validate(data)

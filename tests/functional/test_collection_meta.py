@@ -3,6 +3,7 @@
 # SPDX-FileCopyrightText: Ansible Project
 
 import os
+from pathlib import Path
 
 import pytest
 
@@ -286,7 +287,7 @@ def test_lint_collection_meta(
     collection_metadata: str,
     all_collections: list[str],
     expected_errors: list[str],
-    tmp_path,
+    tmp_path: Path,
 ):
     filename = tmp_path / "collection-meta.yaml"
     filename.write_text(collection_metadata)
@@ -316,7 +317,7 @@ def test_lint_collection_meta_not_existing(tmp_path):
     ]
 
 
-def test_collections_metadata_methods(tmp_path):
+def test_collections_metadata_methods(tmp_path: Path):
     assert CollectionsMetadata.load_from(None).collections == {}
 
     filename = tmp_path / "collection-meta.yaml"
