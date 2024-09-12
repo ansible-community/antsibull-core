@@ -301,7 +301,7 @@ def test_lint_collection_meta(
     ]
 
 
-def test_lint_collection_meta_not_existing(tmp_path):
+def test_lint_collection_meta_not_existing(tmp_path: Path):
     filename = tmp_path / "collection-meta.yaml"
     errors = lint_collection_meta(
         collection_meta_path=filename, major_release=5, all_collections=["foo.bar"]
