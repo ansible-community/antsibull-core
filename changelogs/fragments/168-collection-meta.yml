@@ -1,0 +1,2 @@
+minor_changes:
+  - "Add schema and validation helper for ansible-build-data's collection meta (https://github.com/ansible-community/ansible-build-data/pull/450, https://github.com/ansible-community/antsibull-core/pull/168)."
