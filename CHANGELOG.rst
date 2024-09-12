@@ -4,6 +4,20 @@ antsibull-core Release Notes
 
 .. contents:: Topics
 
+v3.1.0
+======
+
+Release Summary
+---------------
+
+Feature release adding a new dependency.
+
+Minor Changes
+-------------
+
+- Add schema and validation helper for ansible-build-data's collection meta (https://github.com/ansible-community/ansible-build-data/pull/450, https://github.com/ansible-community/antsibull-core/pull/168).
+- Antsibull-core now depends on the new project antsibull-fileutils. Some code has been moved to that library; that code is re-imported to avoid breaking changes for users of antsibull-core (https://github.com/ansible-community/antsibull-core/pull/166).
+
 v3.0.2
 ======
 
