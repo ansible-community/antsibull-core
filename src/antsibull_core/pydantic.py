@@ -18,7 +18,12 @@ import pydantic as p
 
 
 def _is_basemodel(a_type: t.Any) -> bool:
-    return inspect.isclass(a_type) and issubclass(a_type, p.BaseModel)
+    try:
+        return inspect.isclass(a_type) and issubclass(a_type, p.BaseModel)
+    except TypeError:
+        # On Python 3.9 and 3.10, issubclass(dict[int, int], p.BaseModel) raises
+        # "TypeError: issubclass() arg 1 must be a class".
+        return False
 
 
 def _modify_config(
