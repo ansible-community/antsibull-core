@@ -258,12 +258,17 @@ collections:
       major_version: 11
       reason: considered-unmaintained
       discussion: https://forum.ansible.com/...
+  bad.foo12:
+    repository: https://github.com/ansible-collections/collection_template
+    extra_stuff: bam
+extra_stuff: baz
 """,
         [],
         [
             "collections -> bad.foo0 -> removal: Value error, new_name must be provided if reason is 'renamed'",
             "collections -> bad.foo1 -> removal -> announce_version: Value error, must be a string or PypiVer object, got 42",
             "collections -> bad.foo10 -> removal -> reason_other: Extra inputs are not permitted",
+            "collections -> bad.foo12 -> extra_stuff: Extra inputs are not permitted",
             "collections -> bad.foo2 -> removal -> announce_version: Value error, must be a version with three release numbers (e.g. 1.2.3, 2.3.4a1), got '9.3'",
             "collections -> bad.foo3 -> removal -> announce_version: Value error, must be a non-trivial string, got ''",
             "collections -> bad.foo4 -> removal: Value error, major_version must not be TBD if reason is not 'renamed'",
@@ -273,6 +278,7 @@ collections:
             "collections -> bad.foo7 -> removal: Value error, reason_text must be provided if reason is 'other', 'guidelines-violation'",
             "collections -> bad.foo8 -> removal: Value error, new_name must not be provided if reason is not 'renamed'",
             "collections -> bad.foo9 -> removal: Value error, redirect_replacement_major_version must not be provided if reason is not 'renamed'",
+            "extra_stuff: Extra inputs are not permitted",
         ],
     ),
 ]
