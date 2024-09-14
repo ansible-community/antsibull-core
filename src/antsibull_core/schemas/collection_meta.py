@@ -49,7 +49,7 @@ class RemovalInformation(p.BaseModel):
     Stores metadata on when and why a collection will get removed.
     """
 
-    model_config = p.ConfigDict(extra="ignore", arbitrary_types_allowed=True)
+    model_config = p.ConfigDict(arbitrary_types_allowed=True)
 
     major_version: t.Union[int, t.Literal["TBD"]]
     reason: t.Literal[
@@ -117,8 +117,6 @@ class CollectionMetadata(p.BaseModel):
     Stores metadata about one collection.
     """
 
-    model_config = p.ConfigDict(extra="ignore")
-
     changelog_url: t.Optional[str] = p.Field(alias="changelog-url", default=None)
     collection_directory: t.Optional[str] = p.Field(
         alias="collection-directory", default=None
@@ -133,8 +131,6 @@ class CollectionsMetadata(p.BaseModel):
     """
     Stores metadata about a set of collections.
     """
-
-    model_config = p.ConfigDict(extra="ignore")
 
     collections: dict[str, CollectionMetadata]
 

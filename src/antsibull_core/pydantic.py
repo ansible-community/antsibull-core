@@ -1,0 +1,78 @@
+# Author: Felix Fontein <felix@fontein.de>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or
+# https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: Ansible Project, 2024
+
+"""
+Helpers for pydantic.
+"""
+
+from __future__ import annotations
+
+import inspect
+import typing as t
+from collections.abc import Collection
+
+import pydantic as p
+
+
+def _is_basemodel(a_type: t.Any) -> bool:
+    return inspect.isclass(a_type) and issubclass(a_type, p.BaseModel)
+
+
+def _modify_config(
+    cls: type[p.BaseModel],
+    processed_classes: set[type[p.BaseModel]],
+    change_config: t.Callable[[dict[str, t.Any]], bool],
+) -> bool:
+    if cls in processed_classes:
+        return False
+    change = False
+    for field_info in cls.model_fields.values():
+        if _is_basemodel(field_info.annotation):
+            change |= _modify_config(
+                t.cast(type[p.BaseModel], field_info.annotation),
+                processed_classes,
+                change_config,
+            )
+        for subcls in t.get_args(field_info.annotation):
+            if _is_basemodel(subcls):
+                change |= _modify_config(subcls, processed_classes, change_config)
+    if not cls.model_config.get("extra") == "forbid":
+        cls.model_config["extra"] = "forbid"
+        change = True
+    if change:
+        cls.model_rebuild(force=True)
+    processed_classes.add(cls)
+    return change
+
+
+def set_extras(
+    models: type[p.BaseModel] | Collection[type[p.BaseModel]],
+    value: t.Literal["forbid", "ignore"],
+) -> None:
+    def change_config(model_config):
+        if model_config.get("extra") != value:
+            return False
+        model_config["extra"] = value
+        return True
+
+    processed_classes: set[type[p.BaseModel]] = set()
+    if isinstance(models, Collection):
+        for cls in models:
+            _modify_config(cls, processed_classes, change_config)
+    else:
+        _modify_config(models, processed_classes, change_config)
+
+
+def forbid_extras(models: type[p.BaseModel] | Collection[type[p.BaseModel]]) -> None:
+    set_extras(models, "forbid")
+
+
+def get_formatted_error_messages(error: p.ValidationError) -> list[str]:
+    def format_error(err) -> str:
+        location = " -> ".join(str(loc) for loc in err["loc"])
+        return f'{location}: {err["msg"]}'
+
+    return [format_error(err) for err in error.errors()]

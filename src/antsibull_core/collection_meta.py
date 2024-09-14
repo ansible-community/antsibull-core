@@ -17,6 +17,7 @@ import typing as t
 import pydantic as p
 from antsibull_fileutils.yaml import load_yaml_file
 
+from .pydantic import forbid_extras, get_formatted_error_messages
 from .schemas.collection_meta import (
     CollectionMetadata,
     CollectionsMetadata,
@@ -140,22 +141,12 @@ def lint_collection_meta(
         major_release=major_release,
     )
 
-    for cls in (
-        # NOTE: The order is important here! The most deeply nested classes must come first,
-        #       otherwise extra=forbid might not be used for something deeper in the hierarchy.
-        RemovalInformation,
-        CollectionMetadata,
-        CollectionsMetadata,
-    ):
-        cls.model_config["extra"] = "forbid"
-        cls.model_rebuild(force=True)
+    forbid_extras(CollectionsMetadata)
 
     try:
         parsed_data = CollectionsMetadata.model_validate(data)
         validator.validate(parsed_data)
     except p.ValidationError as exc:
-        for error in exc.errors():
-            location = " -> ".join(str(loc) for loc in error["loc"])
-            validator.errors.append(f'{location}: {error["msg"]}')
+        validator.errors.extend(get_formatted_error_messages(exc))
 
     return sorted(validator.errors)
