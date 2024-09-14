@@ -23,6 +23,7 @@ def _is_basemodel(a_type: t.Any) -> bool:
     except TypeError:
         # On Python 3.9 and 3.10, issubclass(dict[int, int], p.BaseModel) raises
         # "TypeError: issubclass() arg 1 must be a class".
+        # (https://github.com/pydantic/pydantic/discussions/5970)
         return False
 
 
