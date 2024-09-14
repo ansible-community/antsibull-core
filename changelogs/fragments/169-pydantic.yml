@@ -1,0 +1,2 @@
+minor_changes:
+  - "Add pydantic helper for strict linting (https://github.com/ansible-community/antsibull-core/pull/169)."
