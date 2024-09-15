@@ -12,15 +12,21 @@ from __future__ import annotations
 
 import inspect
 import typing as t
-from collections.abc import Collection
+from collections.abc import Callable, Collection
 
 import pydantic as p
 
+if t.TYPE_CHECKING:
+    from typing_extensions import TypeGuard
 
-def _is_basemodel(a_type: t.Any) -> bool:
+
+def _is_basemodel(a_type: t.Any) -> TypeGuard[type[p.BaseModel]]:
     try:
         return inspect.isclass(a_type) and issubclass(a_type, p.BaseModel)
     except TypeError:
+        # If inspect.isclass(a_type) is checked first, no TypeError happens for
+        # Python 3.11+.
+
         # On Python 3.9 and 3.10, issubclass(dict[int, int], p.BaseModel) raises
         # "TypeError: issubclass() arg 1 must be a class".
         # (https://github.com/pydantic/pydantic/discussions/5970)
@@ -30,7 +36,7 @@ def _is_basemodel(a_type: t.Any) -> bool:
 def _modify_config(
     cls: type[p.BaseModel],
     processed_classes: set[type[p.BaseModel]],
-    change_config: t.Callable[[dict[str, t.Any]], bool],
+    change_config: Callable[[p.ConfigDict], bool],
 ) -> bool:
     if cls in processed_classes:
         return False
@@ -38,16 +44,14 @@ def _modify_config(
     for field_info in cls.model_fields.values():
         if _is_basemodel(field_info.annotation):
             change |= _modify_config(
-                t.cast(type[p.BaseModel], field_info.annotation),
+                field_info.annotation,
                 processed_classes,
                 change_config,
             )
         for subcls in t.get_args(field_info.annotation):
             if _is_basemodel(subcls):
                 change |= _modify_config(subcls, processed_classes, change_config)
-    if not cls.model_config.get("extra") == "forbid":
-        cls.model_config["extra"] = "forbid"
-        change = True
+    change |= change_config(cls.model_config)
     if change:
         cls.model_rebuild(force=True)
     processed_classes.add(cls)
@@ -58,7 +62,7 @@ def set_extras(
     models: type[p.BaseModel] | Collection[type[p.BaseModel]],
     value: t.Literal["forbid", "ignore"],
 ) -> None:
-    def change_config(model_config):
+    def change_config(model_config: p.ConfigDict) -> bool:
         if model_config.get("extra") != value:
             return False
         model_config["extra"] = value
