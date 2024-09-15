@@ -10,7 +10,6 @@ Helpers for pydantic.
 
 from __future__ import annotations
 
-import inspect
 import typing as t
 from collections.abc import Callable, Collection
 
@@ -22,7 +21,7 @@ if t.TYPE_CHECKING:
 
 def _is_basemodel(a_type: t.Any) -> TypeGuard[type[p.BaseModel]]:
     try:
-        return inspect.isclass(a_type) and issubclass(a_type, p.BaseModel)
+        return issubclass(a_type, p.BaseModel)
     except TypeError:
         # If inspect.isclass(a_type) is checked first, no TypeError happens for
         # Python 3.11+.
