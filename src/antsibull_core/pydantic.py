@@ -59,10 +59,10 @@ def _modify_config(
 
 def set_extras(
     models: type[p.BaseModel] | Collection[type[p.BaseModel]],
-    value: t.Literal["forbid", "ignore"],
+    value: t.Literal["allow", "ignore", "forbid"],
 ) -> None:
     def change_config(model_config: p.ConfigDict) -> bool:
-        if model_config.get("extra") != value:
+        if model_config.get("extra") == value:
             return False
         model_config["extra"] = value
         return True
