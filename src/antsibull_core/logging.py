@@ -194,7 +194,7 @@ Here's a sample of the relevant portions of an antsibull command to show how thi
             # the log is output as.  See the twiggy documentation for information on the format of
             # the logging config.  See the antsibull.app_context documentation if you want more
             # information on the context object.
-            twiggy.dict_config(app_ctx.logging_cfg.dict())
+            twiggy.dict_config(app_ctx.logging_cfg.model_dump())
 
 
 Once those steps are taken, any further logging calls will obey the user's configuration.
