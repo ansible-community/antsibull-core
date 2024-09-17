@@ -261,6 +261,17 @@ collections:
   bad.foo12:
     repository: https://github.com/ansible-collections/collection_template
     extra_stuff: bam
+  bad.foo13:
+    repository: https://github.com/ansible-collections/collection_template
+    removal:
+      major_version: foo
+      reason: considered-unmaintained
+      discussion: https://forum.ansible.com/...
+  bad.foo14:
+    repository: https://github.com/ansible-collections/collection_template
+    removal:
+      major_version: 11
+      reason: foo
 extra_stuff: baz
 """,
         [],
@@ -269,6 +280,9 @@ extra_stuff: baz
             "collections -> bad.foo1 -> removal -> announce_version: Value error, must be a string or PypiVer object, got 42",
             "collections -> bad.foo10 -> removal -> reason_other: Extra inputs are not permitted",
             "collections -> bad.foo12 -> extra_stuff: Extra inputs are not permitted",
+            "collections -> bad.foo13 -> removal -> major_version -> int: Input should be a valid integer, unable to parse string as an integer",
+            "collections -> bad.foo13 -> removal -> major_version -> literal['TBD']: Input should be 'TBD'",
+            "collections -> bad.foo14 -> removal -> reason: Input should be 'deprecated', 'considered-unmaintained', 'renamed', 'guidelines-violation' or 'other'",
             "collections -> bad.foo2 -> removal -> announce_version: Value error, must be a version with three release numbers (e.g. 1.2.3, 2.3.4a1), got '9.3'",
             "collections -> bad.foo3 -> removal -> announce_version: Value error, must be a non-trivial string, got ''",
             "collections -> bad.foo4 -> removal: Value error, major_version must not be TBD if reason is not 'renamed'",
