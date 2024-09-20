@@ -157,7 +157,6 @@ collections:
             "collections -> bad.bar1 -> removal -> major_version: Removal major version 7 must be larger than current major version 9",
             "collections -> bad.bar1: Collection not in ansible.in",
             "collections -> bad.bar2 -> removal -> new_name: Must not be the collection's name",
-            "collections -> bad.bar2 -> removal -> redirect_replacement_major_version: Redirect removal version 9 must be larger than current major version 9",
             "collections -> bad.bar2: Collection not in ansible.in",
             "collections -> baz.bam -> repository: Required field not provided",
             "collections -> baz.bam: Collection not in ansible.in",

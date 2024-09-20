@@ -63,24 +63,6 @@ class _Validator:
                 f" must not be larger than the current major version {self.major_release}"
             )
 
-        if removal.redirect_replacement_major_version is not None:
-            if removal.redirect_replacement_major_version <= self.major_release:
-                self.errors.append(
-                    f"{prefix} redirect_replacement_major_version: Redirect removal version"
-                    f" {removal.redirect_replacement_major_version} must be larger than"
-                    f" current major version {self.major_release}"
-                )
-            if (
-                removal.major_version != "TBD"
-                and removal.redirect_replacement_major_version  # pyre-ignore[58]
-                >= removal.major_version
-            ):
-                self.errors.append(
-                    f"{prefix} redirect_replacement_major_version: Redirect removal major version"
-                    f" {removal.redirect_replacement_major_version} must be smaller than"
-                    f" the removal major version {removal.major_version}"
-                )
-
         if removal.reason == "renamed" and removal.new_name == collection:
             self.errors.append(f"{prefix} new_name: Must not be the collection's name")
 
