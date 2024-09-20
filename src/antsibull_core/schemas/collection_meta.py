@@ -112,7 +112,15 @@ class RemovalInformation(p.BaseModel):
         return self
 
 
-class CollectionMetadata(p.BaseModel):
+class RemovedRemovalInformation(RemovalInformation):
+    """
+    Stores metadata on when and why a collection was removed.
+    """
+
+    major_version: int
+
+
+class BaseCollectionMetadata(p.BaseModel):
     """
     Stores metadata about one collection.
     """
@@ -124,7 +132,25 @@ class CollectionMetadata(p.BaseModel):
     repository: t.Optional[str] = None
     tag_version_regex: t.Optional[str] = None
     maintainers: list[str] = []
+
+
+class CollectionMetadata(BaseCollectionMetadata):
+    """
+    Stores metadata about one collection.
+    """
+
     removal: t.Optional[RemovalInformation] = None
+
+
+class RemovedCollectionMetadata(BaseCollectionMetadata):
+    """
+    Stores metadata about a removed collection.
+    """
+
+    model_config = p.ConfigDict(arbitrary_types_allowed=True)
+
+    removal: RemovedRemovalInformation
+    removed_version: PydanticPypiVersion
 
 
 class CollectionsMetadata(p.BaseModel):
@@ -133,6 +159,7 @@ class CollectionsMetadata(p.BaseModel):
     """
 
     collections: dict[str, CollectionMetadata]
+    removed_collections: dict[str, RemovedCollectionMetadata] = {}
 
     @staticmethod
     def load_from(deps_dir: StrPath | None) -> CollectionsMetadata:
