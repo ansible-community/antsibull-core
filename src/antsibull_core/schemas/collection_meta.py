@@ -51,7 +51,10 @@ class RemovalInformation(p.BaseModel):
 
     model_config = p.ConfigDict(arbitrary_types_allowed=True)
 
+    # The Ansible major version from which the collection will be removed.
     major_version: t.Union[int, t.Literal["TBD"]]
+
+    # The reason because of which the collection will be removed.
     reason: t.Literal[
         "deprecated",
         "considered-unmaintained",
@@ -60,9 +63,19 @@ class RemovalInformation(p.BaseModel):
         "other",
     ]
     reason_text: t.Optional[str] = None
+
+    # The Ansible version in which the announcement was made. This is needed
+    # for changelog generation.
     announce_version: t.Optional[PydanticPypiVersion] = None
+
+    # In case reason=renamed, the new name of the collection.
     new_name: t.Optional[str] = None
+
+    # The link to the discussion of the removal.
     discussion: t.Optional[p.HttpUrl] = None
+
+    # In case reason=renamed, the major Ansible release in which the collection's
+    # contents have been replaced by deprecated redirects.
     redirect_replacement_major_version: t.Optional[int] = None
 
     @p.model_validator(mode="after")  # pyre-ignore[56]
@@ -125,12 +138,24 @@ class BaseCollectionMetadata(p.BaseModel):
     Stores metadata about one collection.
     """
 
+    # If the collection does not use changelogs/changelog.yaml, it can provide
+    # an URL where the collection's changelog can be found.
     changelog_url: t.Optional[str] = p.Field(alias="changelog-url", default=None)
+
+    # In case the collection is not located in the root of its repository, the
+    # subdirectory in which the collection appears.
     collection_directory: t.Optional[str] = p.Field(
         alias="collection-directory", default=None
     )
+
+    # The collection's repository.
     repository: t.Optional[str] = None
+
+    # A regular expression to match the collection's version from a tag in the repository.
     tag_version_regex: t.Optional[str] = None
+
+    # A list of maintainers. These should be usernames for the repository's
+    # hosting environment.
     maintainers: list[str] = []
 
 
@@ -139,6 +164,8 @@ class CollectionMetadata(BaseCollectionMetadata):
     Stores metadata about one collection.
     """
 
+    # Optional information that the collection will be removed from
+    # a future Ansible release.
     removal: t.Optional[RemovalInformation] = None
 
 
@@ -149,7 +176,11 @@ class RemovedCollectionMetadata(BaseCollectionMetadata):
 
     model_config = p.ConfigDict(arbitrary_types_allowed=True)
 
+    # Information why the collection has been removed
     removal: RemovedRemovalInformation
+
+    # The exact version from which the collection has been removed.
+    # This is needed for changelog generation.
     removed_version: PydanticPypiVersion
 
 
@@ -158,7 +189,10 @@ class CollectionsMetadata(p.BaseModel):
     Stores metadata about a set of collections.
     """
 
+    # Metadata on the collections included in Ansible.
     collections: dict[str, CollectionMetadata]
+
+    # Metadata on the collections removed from this major version of Ansible.
     removed_collections: dict[str, RemovedCollectionMetadata] = {}
 
     @staticmethod
