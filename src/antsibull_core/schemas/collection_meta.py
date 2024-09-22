@@ -139,7 +139,7 @@ class BaseCollectionMetadata(p.BaseModel):
     """
 
     # If the collection does not use changelogs/changelog.yaml, it can provide
-    # an URL where the collection's changelog can be found.
+    # a URL where the collection's changelog can be found.
     changelog_url: t.Optional[str] = p.Field(alias="changelog-url", default=None)
 
     # In case the collection is not located in the root of its repository, the
