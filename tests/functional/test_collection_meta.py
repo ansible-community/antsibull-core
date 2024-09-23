@@ -306,6 +306,13 @@ removed_collections:
     repository: https://github.com/ansible-collections/collection_template
     removal:
       reason: deprecated
+  bad.foo3:
+    repository: https://github.com/ansible-collections/collection_template
+    removal:
+      version: 9.0.0
+      reason: renamed
+      new_name: bad.foo3_new
+      redirect_replacement_major_version: 12
 extra_stuff: baz
 """,
         [],
@@ -329,6 +336,7 @@ extra_stuff: baz
             "extra_stuff: Extra inputs are not permitted",
             "removed_collections -> bad.foo1 -> removal -> version: Value error, Invalid version: 'TBD'",
             "removed_collections -> bad.foo2 -> removal -> version: Field required",
+            "removed_collections -> bad.foo3 -> removal: Value error, redirect_replacement_major_version must be smaller than version's major version",
         ],
     ),
 ]

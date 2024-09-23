@@ -154,7 +154,8 @@ class RemovedRemovalInformation(BaseRemovalInformation):
             and self.redirect_replacement_major_version >= self.version.major
         ):
             raise ValueError(
-                "redirect_replacement_major_version must be smaller than major_version"
+                "redirect_replacement_major_version must be smaller than"
+                " version's major version"
             )
         return self
 
