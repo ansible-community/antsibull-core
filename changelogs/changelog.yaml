@@ -335,3 +335,18 @@ releases:
       - 168-collection-meta.yml
       - 3.1.0.yml
     release_date: '2024-09-12'
+  3.2.0:
+    changes:
+      bugfixes:
+        - 'Collection metadata removal schema valiation: remove bad check that deprecated
+          redirect replacement major version must be in the future (https://github.com/ansible-community/antsibull-core/pull/172).'
+      minor_changes:
+        - Add pydantic helper for strict linting (https://github.com/ansible-community/antsibull-core/pull/169).
+        - Allow information on removed collections in collection metadata schema (https://github.com/ansible-community/antsibull-core/pull/173).
+      release_summary: Feature and bugfix release.
+    fragments:
+      - 169-pydantic.yml
+      - 172-removal-schema.yml
+      - 173-schema-removal.yml
+      - 3.2.0.yml
+    release_date: '2024-09-23'

@@ -2,74 +2,97 @@
 
 **Topics**
 
-- <a href="#v3-1-0">v3\.1\.0</a>
+- <a href="#v3-2-0">v3\.2\.0</a>
     - <a href="#release-summary">Release Summary</a>
     - <a href="#minor-changes">Minor Changes</a>
-- <a href="#v3-0-2">v3\.0\.2</a>
-    - <a href="#release-summary-1">Release Summary</a>
     - <a href="#bugfixes">Bugfixes</a>
-- <a href="#v3-0-1">v3\.0\.1</a>
+- <a href="#v3-1-0">v3\.1\.0</a>
+    - <a href="#release-summary-1">Release Summary</a>
+    - <a href="#minor-changes-1">Minor Changes</a>
+- <a href="#v3-0-2">v3\.0\.2</a>
     - <a href="#release-summary-2">Release Summary</a>
     - <a href="#bugfixes-1">Bugfixes</a>
-- <a href="#v3-0-0">v3\.0\.0</a>
+- <a href="#v3-0-1">v3\.0\.1</a>
     - <a href="#release-summary-3">Release Summary</a>
+    - <a href="#bugfixes-2">Bugfixes</a>
+- <a href="#v3-0-0">v3\.0\.0</a>
+    - <a href="#release-summary-4">Release Summary</a>
     - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
-    - <a href="#bugfixes-2">Bugfixes</a>
-- <a href="#v2-2-0">v2\.2\.0</a>
-    - <a href="#release-summary-4">Release Summary</a>
-    - <a href="#minor-changes-1">Minor Changes</a>
     - <a href="#bugfixes-3">Bugfixes</a>
-- <a href="#v2-1-0">v2\.1\.0</a>
+- <a href="#v2-2-0">v2\.2\.0</a>
     - <a href="#release-summary-5">Release Summary</a>
     - <a href="#minor-changes-2">Minor Changes</a>
-- <a href="#v2-0-0">v2\.0\.0</a>
+    - <a href="#bugfixes-4">Bugfixes</a>
+- <a href="#v2-1-0">v2\.1\.0</a>
     - <a href="#release-summary-6">Release Summary</a>
     - <a href="#minor-changes-3">Minor Changes</a>
+- <a href="#v2-0-0">v2\.0\.0</a>
+    - <a href="#release-summary-7">Release Summary</a>
+    - <a href="#minor-changes-4">Minor Changes</a>
     - <a href="#breaking-changes--porting-guide-1">Breaking Changes / Porting Guide</a>
     - <a href="#deprecated-features">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated-1">Removed Features \(previously deprecated\)</a>
-    - <a href="#bugfixes-4">Bugfixes</a>
-- <a href="#v1-4-0">v1\.4\.0</a>
-    - <a href="#release-summary-7">Release Summary</a>
-    - <a href="#minor-changes-4">Minor Changes</a>
     - <a href="#bugfixes-5">Bugfixes</a>
-- <a href="#v1-3-1">v1\.3\.1</a>
+- <a href="#v1-4-0">v1\.4\.0</a>
     - <a href="#release-summary-8">Release Summary</a>
-- <a href="#v1-3-0-post0">v1\.3\.0\.post0</a>
-    - <a href="#release-summary-9">Release Summary</a>
-- <a href="#v1-3-0">v1\.3\.0</a>
-    - <a href="#release-summary-10">Release Summary</a>
     - <a href="#minor-changes-5">Minor Changes</a>
     - <a href="#bugfixes-6">Bugfixes</a>
-- <a href="#v1-2-0">v1\.2\.0</a>
+- <a href="#v1-3-1">v1\.3\.1</a>
+    - <a href="#release-summary-9">Release Summary</a>
+- <a href="#v1-3-0-post0">v1\.3\.0\.post0</a>
+    - <a href="#release-summary-10">Release Summary</a>
+- <a href="#v1-3-0">v1\.3\.0</a>
     - <a href="#release-summary-11">Release Summary</a>
     - <a href="#minor-changes-6">Minor Changes</a>
-    - <a href="#deprecated-features-1">Deprecated Features</a>
     - <a href="#bugfixes-7">Bugfixes</a>
-- <a href="#v1-1-0">v1\.1\.0</a>
+- <a href="#v1-2-0">v1\.2\.0</a>
     - <a href="#release-summary-12">Release Summary</a>
     - <a href="#minor-changes-7">Minor Changes</a>
-- <a href="#v1-0-1">v1\.0\.1</a>
-    - <a href="#release-summary-13">Release Summary</a>
+    - <a href="#deprecated-features-1">Deprecated Features</a>
     - <a href="#bugfixes-8">Bugfixes</a>
-- <a href="#v1-0-0">v1\.0\.0</a>
-    - <a href="#release-summary-14">Release Summary</a>
-    - <a href="#major-changes">Major Changes</a>
+- <a href="#v1-1-0">v1\.1\.0</a>
+    - <a href="#release-summary-13">Release Summary</a>
     - <a href="#minor-changes-8">Minor Changes</a>
+- <a href="#v1-0-1">v1\.0\.1</a>
+    - <a href="#release-summary-14">Release Summary</a>
+    - <a href="#bugfixes-9">Bugfixes</a>
+- <a href="#v1-0-0">v1\.0\.0</a>
+    - <a href="#release-summary-15">Release Summary</a>
+    - <a href="#major-changes">Major Changes</a>
+    - <a href="#minor-changes-9">Minor Changes</a>
     - <a href="#removed-features-previously-deprecated-2">Removed Features \(previously deprecated\)</a>
 - <a href="#v0-1-0">v0\.1\.0</a>
-    - <a href="#release-summary-15">Release Summary</a>
+    - <a href="#release-summary-16">Release Summary</a>
 
-<a id="v3-1-0"></a>
-## v3\.1\.0
+<a id="v3-2-0"></a>
+## v3\.2\.0
 
 <a id="release-summary"></a>
 ### Release Summary
 
-Feature release adding a new dependency\.
+Feature and bugfix release\.
 
 <a id="minor-changes"></a>
+### Minor Changes
+
+* Add pydantic helper for strict linting \([https\://github\.com/ansible\-community/antsibull\-core/pull/169](https\://github\.com/ansible\-community/antsibull\-core/pull/169)\)\.
+* Allow information on removed collections in collection metadata schema \([https\://github\.com/ansible\-community/antsibull\-core/pull/173](https\://github\.com/ansible\-community/antsibull\-core/pull/173)\)\.
+
+<a id="bugfixes"></a>
+### Bugfixes
+
+* Collection metadata removal schema valiation\: remove bad check that deprecated redirect replacement major version must be in the future \([https\://github\.com/ansible\-community/antsibull\-core/pull/172](https\://github\.com/ansible\-community/antsibull\-core/pull/172)\)\.
+
+<a id="v3-1-0"></a>
+## v3\.1\.0
+
+<a id="release-summary-1"></a>
+### Release Summary
+
+Feature release adding a new dependency\.
+
+<a id="minor-changes-1"></a>
 ### Minor Changes
 
 * Add schema and validation helper for ansible\-build\-data\'s collection meta \([https\://github\.com/ansible\-community/ansible\-build\-data/pull/450](https\://github\.com/ansible\-community/ansible\-build\-data/pull/450)\, [https\://github\.com/ansible\-community/antsibull\-core/pull/168](https\://github\.com/ansible\-community/antsibull\-core/pull/168)\)\.
@@ -78,12 +101,12 @@ Feature release adding a new dependency\.
 <a id="v3-0-2"></a>
 ## v3\.0\.2
 
-<a id="release-summary-1"></a>
+<a id="release-summary-2"></a>
 ### Release Summary
 
 Bugfix release\.
 
-<a id="bugfixes"></a>
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * Adjust the aiohttp retry GET mananger to use <code>ClientTimeout</code> instead of a <code>float</code>\, since that will be removed in aiohttp 4\.0\.0 \([https\://github\.com/ansible\-community/antsibull\-core/pull/163](https\://github\.com/ansible\-community/antsibull\-core/pull/163)\)\.
@@ -94,12 +117,12 @@ Bugfix release\.
 <a id="v3-0-1"></a>
 ## v3\.0\.1
 
-<a id="release-summary-2"></a>
+<a id="release-summary-3"></a>
 ### Release Summary
 
 Bugfix release\.
 
-<a id="bugfixes-1"></a>
+<a id="bugfixes-2"></a>
 ### Bugfixes
 
 * Adjusting ansible\-core PyPI code to also accept a filename starting with <code>ansible\_core</code>\, which seems to be in use since ansible\-core 2\.16\.6 due to [PEP\-625](https\://peps\.python\.org/pep\-0625/) support in setuptools 69\.3\.0 \([https\://github\.com/ansible\-community/antsibull\-core/pull/158](https\://github\.com/ansible\-community/antsibull\-core/pull/158)\)\.
@@ -107,7 +130,7 @@ Bugfix release\.
 <a id="v3-0-0"></a>
 ## v3\.0\.0
 
-<a id="release-summary-3"></a>
+<a id="release-summary-4"></a>
 ### Release Summary
 
 New major release\.
@@ -132,7 +155,7 @@ New major release\.
 * <code>dependency\_files</code> \- drop support for <code>\_ansible\_base\_version</code> and <code>\_acd\_version</code> in pieces files\. <code>\_ansible\_core\_version</code> and <code>\_ansible\_version</code>\, respectively\, should be used instead \([https\://github\.com/ansible\-community/antsibull\-core/pull/132](https\://github\.com/ansible\-community/antsibull\-core/pull/132)\)\.
 * <code>venv</code> \- remove <code>get\_command\(\)</code> method from <code>VenvRunner</code> and <code>FakeVenvRunner</code> \([https\://github\.com/ansible\-community/antsibull\-core/pull/119](https\://github\.com/ansible\-community/antsibull\-core/pull/119)\)\.
 
-<a id="bugfixes-2"></a>
+<a id="bugfixes-3"></a>
 ### Bugfixes
 
 * Avoid superfluous network request when trusting the ansible\-core download cache \([https\://github\.com/ansible\-community/antsibull\-core/pull/135](https\://github\.com/ansible\-community/antsibull\-core/pull/135)\)\.
@@ -140,18 +163,18 @@ New major release\.
 <a id="v2-2-0"></a>
 ## v2\.2\.0
 
-<a id="release-summary-4"></a>
+<a id="release-summary-5"></a>
 ### Release Summary
 
 Add support for Python 3\.12 and improve <code>subprocess\_util</code>
 
-<a id="minor-changes-1"></a>
+<a id="minor-changes-2"></a>
 ### Minor Changes
 
 * Declare support for Python 3\.12 \([https\://github\.com/ansible\-community/antsibull\-core/pull/103](https\://github\.com/ansible\-community/antsibull\-core/pull/103)\)\.
 * <code>subprocess\_util\.async\_log\_run\(\)</code>\, <code>subprocess\_util\.log\_run\(\)</code>\, and the corresponding functions  in <code>venv</code> now support passing generic callback functions for <code>stdout\_loglevel</code> and <code>stderr\_loglevel</code> \([https\://github\.com/ansible\-community/antsibull\-core/pull/113](https\://github\.com/ansible\-community/antsibull\-core/pull/113)\)\.
 
-<a id="bugfixes-3"></a>
+<a id="bugfixes-4"></a>
 ### Bugfixes
 
 * Fix typing for <code>antsibull\_core\.app\_context\.app\_context\(\)</code> functions \([https\://github\.com/ansible\-community/antsibull\-core/pull/109](https\://github\.com/ansible\-community/antsibull\-core/pull/109)\)\.
@@ -160,12 +183,12 @@ Add support for Python 3\.12 and improve <code>subprocess\_util</code>
 <a id="v2-1-0"></a>
 ## v2\.1\.0
 
-<a id="release-summary-5"></a>
+<a id="release-summary-6"></a>
 ### Release Summary
 
 Feature release\.
 
-<a id="minor-changes-2"></a>
+<a id="minor-changes-3"></a>
 ### Minor Changes
 
 * Allow to overwrite the version and the program name when using <code>antsibull\_core\.args\.get\_toplevel\_parser\(\)</code> \([https\://github\.com/ansible\-community/antsibull\-core/pull/96](https\://github\.com/ansible\-community/antsibull\-core/pull/96)\)\.
@@ -173,12 +196,12 @@ Feature release\.
 <a id="v2-0-0"></a>
 ## v2\.0\.0
 
-<a id="release-summary-6"></a>
+<a id="release-summary-7"></a>
 ### Release Summary
 
 New major release
 
-<a id="minor-changes-3"></a>
+<a id="minor-changes-4"></a>
 ### Minor Changes
 
 * Add <code>async\_log\_run\(\)</code> and <code>log\_run\(\)</code> methods to <code>antsibull\_core\.venv\.VenvRunner</code> and <code>antsibull\_core\.venv\.FakeVenvRunner</code>\. These should be used instead of <code>get\_command\(\)</code> \([https\://github\.com/ansible\-community/antsibull\-core/pull/50](https\://github\.com/ansible\-community/antsibull\-core/pull/50)\)\.
@@ -215,7 +238,7 @@ New major release
 
 * The unused <code>antsibull\_core\.schemas\.config\.ConfigModel</code> model and the unused <code>antsibull\_core\.config\.read\_config</code> function have been removed \([https\://github\.com/ansible\-community/antsibull\-core/pull/82](https\://github\.com/ansible\-community/antsibull\-core/pull/82)\)\.
 
-<a id="bugfixes-4"></a>
+<a id="bugfixes-5"></a>
 ### Bugfixes
 
 * Fix a bug in Galaxy download code when the filename is found in the cache\, but the checksum does not match\. In that case\, the collection was not copied to the destination\, and the code did not try to download the correct file \([https\://github\.com/ansible\-community/antsibull\-core/pull/76](https\://github\.com/ansible\-community/antsibull\-core/pull/76)\)\.
@@ -226,17 +249,17 @@ New major release
 <a id="v1-4-0"></a>
 ## v1\.4\.0
 
-<a id="release-summary-7"></a>
+<a id="release-summary-8"></a>
 ### Release Summary
 
 Bugfix and feature release\.
 
-<a id="minor-changes-4"></a>
+<a id="minor-changes-5"></a>
 ### Minor Changes
 
 * Fix overly restrictive file name type annotations\. Use <code>StrOrBytesPath</code> type annotation instead of <code>str</code> for functions that accept a file name \([https\://github\.com/ansible\-community/antsibull\-core/pull/14](https\://github\.com/ansible\-community/antsibull\-core/pull/14)\)\.
 
-<a id="bugfixes-5"></a>
+<a id="bugfixes-6"></a>
 ### Bugfixes
 
 * Remove use of blocking IO in an async function \([https\://github\.com/ansible\-community/antsibull\-core/pull/13/](https\://github\.com/ansible\-community/antsibull\-core/pull/13/)\)\.
@@ -244,7 +267,7 @@ Bugfix and feature release\.
 <a id="v1-3-1"></a>
 ## v1\.3\.1
 
-<a id="release-summary-8"></a>
+<a id="release-summary-9"></a>
 ### Release Summary
 
 Maintenance release to fix unwanted <code>1\.3\.0\.post0</code> release\.
@@ -252,7 +275,7 @@ Maintenance release to fix unwanted <code>1\.3\.0\.post0</code> release\.
 <a id="v1-3-0-post0"></a>
 ## v1\.3\.0\.post0
 
-<a id="release-summary-9"></a>
+<a id="release-summary-10"></a>
 ### Release Summary
 
 Erroneously released version\.
@@ -260,17 +283,17 @@ Erroneously released version\.
 <a id="v1-3-0"></a>
 ## v1\.3\.0
 
-<a id="release-summary-10"></a>
+<a id="release-summary-11"></a>
 ### Release Summary
 
 Feature and bugfix release\.
 
-<a id="minor-changes-5"></a>
+<a id="minor-changes-6"></a>
 ### Minor Changes
 
 * Allow to write Python dependencies as <code>\_python</code> key into build and dependency files \([https\://github\.com/ansible\-community/antsibull\-core/pull/10](https\://github\.com/ansible\-community/antsibull\-core/pull/10)\)\.
 
-<a id="bugfixes-6"></a>
+<a id="bugfixes-7"></a>
 ### Bugfixes
 
 * Fix async file copying helper \([https\://github\.com/ansible\-community/antsibull\-core/pull/11](https\://github\.com/ansible\-community/antsibull\-core/pull/11)\)\.
@@ -278,12 +301,12 @@ Feature and bugfix release\.
 <a id="v1-2-0"></a>
 ## v1\.2\.0
 
-<a id="release-summary-11"></a>
+<a id="release-summary-12"></a>
 ### Release Summary
 
 Feature release\.
 
-<a id="minor-changes-6"></a>
+<a id="minor-changes-7"></a>
 ### Minor Changes
 
 * Improve typing \([https\://github\.com/ansible\-community/antsibull\-core/pull/6](https\://github\.com/ansible\-community/antsibull\-core/pull/6)\)\.
@@ -294,7 +317,7 @@ Feature release\.
 
 * The <code>DepsFile\.write\(\)</code> method will require the first parameter to be a <code>packaging\.version\.Version</code> object\, the second parameter to be a string\, and the third parameter a mapping of strings to strings\, from antsibull\-core 2\.0\.0 on \([https\://github\.com/ansible\-community/antsibull\-core/pull/6](https\://github\.com/ansible\-community/antsibull\-core/pull/6)\)\.
 
-<a id="bugfixes-7"></a>
+<a id="bugfixes-8"></a>
 ### Bugfixes
 
 * Adjust signature of <code>DepsFile\.write\(\)</code> to work around bug in antsibull \([https\://github\.com/ansible\-community/antsibull\-core/pull/6](https\://github\.com/ansible\-community/antsibull\-core/pull/6)\)\.
@@ -302,12 +325,12 @@ Feature release\.
 <a id="v1-1-0"></a>
 ## v1\.1\.0
 
-<a id="release-summary-12"></a>
+<a id="release-summary-13"></a>
 ### Release Summary
 
 Maintenance release\.
 
-<a id="minor-changes-7"></a>
+<a id="minor-changes-8"></a>
 ### Minor Changes
 
 * The files in the source repository now follow the [REUSE Specification](https\://reuse\.software/spec/)\. The only exceptions are changelog fragments in <code>changelogs/fragments/</code> \([https\://github\.com/ansible\-community/antsibull\-core/pull/5](https\://github\.com/ansible\-community/antsibull\-core/pull/5)\)\.
@@ -315,12 +338,12 @@ Maintenance release\.
 <a id="v1-0-1"></a>
 ## v1\.0\.1
 
-<a id="release-summary-13"></a>
+<a id="release-summary-14"></a>
 ### Release Summary
 
 Bugfix release\.
 
-<a id="bugfixes-8"></a>
+<a id="bugfixes-9"></a>
 ### Bugfixes
 
 * Fix detection of ansible\-core devel checkouts \([https\://github\.com/ansible\-community/antsibull\-core/pull/4](https\://github\.com/ansible\-community/antsibull\-core/pull/4)\)\.
@@ -328,7 +351,7 @@ Bugfix release\.
 <a id="v1-0-0"></a>
 ## v1\.0\.0
 
-<a id="release-summary-14"></a>
+<a id="release-summary-15"></a>
 ### Release Summary
 
 First stable release\.
@@ -338,7 +361,7 @@ First stable release\.
 
 * From version 1\.0\.0 on\, antsibull\-core is sticking to semantic versioning and aims at providing no backwards compatibility breaking changes during a major release cycle \([https\://github\.com/ansible\-community/antsibull\-core/pull/2](https\://github\.com/ansible\-community/antsibull\-core/pull/2)\)\.
 
-<a id="minor-changes-8"></a>
+<a id="minor-changes-9"></a>
 ### Minor Changes
 
 * Remove unused code \([https\://github\.com/ansible\-community/antsibull\-core/pull/1](https\://github\.com/ansible\-community/antsibull\-core/pull/1)\)\.
@@ -351,7 +374,7 @@ First stable release\.
 <a id="v0-1-0"></a>
 ## v0\.1\.0
 
-<a id="release-summary-15"></a>
+<a id="release-summary-16"></a>
 ### Release Summary
 
 Initial release\.

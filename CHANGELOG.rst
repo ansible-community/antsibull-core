@@ -4,6 +4,25 @@ antsibull-core Release Notes
 
 .. contents:: Topics
 
+v3.2.0
+======
+
+Release Summary
+---------------
+
+Feature and bugfix release.
+
+Minor Changes
+-------------
+
+- Add pydantic helper for strict linting (https://github.com/ansible-community/antsibull-core/pull/169).
+- Allow information on removed collections in collection metadata schema (https://github.com/ansible-community/antsibull-core/pull/173).
+
+Bugfixes
+--------
+
+- Collection metadata removal schema valiation: remove bad check that deprecated redirect replacement major version must be in the future (https://github.com/ansible-community/antsibull-core/pull/172).
+
 v3.1.0
 ======
 
