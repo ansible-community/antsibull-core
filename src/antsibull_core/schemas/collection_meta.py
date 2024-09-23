@@ -44,14 +44,14 @@ def _convert_pypi_version(v: t.Any) -> t.Any:
 PydanticPypiVersion = Annotated[PypiVer, BeforeValidator(_convert_pypi_version)]
 
 
-class RemovalInformation(p.BaseModel):
+class BaseRemovalInformation(p.BaseModel):
     """
-    Stores metadata on when and why a collection will get removed.
+    Stores metadata on why a collection was/will get removed.
     """
 
     model_config = p.ConfigDict(arbitrary_types_allowed=True)
 
-    major_version: t.Union[int, t.Literal["TBD"]]
+    # The reason because of which the collection will be removed.
     reason: t.Literal[
         "deprecated",
         "considered-unmaintained",
@@ -60,9 +60,19 @@ class RemovalInformation(p.BaseModel):
         "other",
     ]
     reason_text: t.Optional[str] = None
+
+    # The Ansible version in which the announcement was made. This is needed
+    # for changelog generation.
     announce_version: t.Optional[PydanticPypiVersion] = None
+
+    # In case reason=renamed, the new name of the collection.
     new_name: t.Optional[str] = None
+
+    # The link to the discussion of the removal.
     discussion: t.Optional[p.HttpUrl] = None
+
+    # In case reason=renamed, the major Ansible release in which the collection's
+    # contents have been replaced by deprecated redirects.
     redirect_replacement_major_version: t.Optional[int] = None
 
     @p.model_validator(mode="after")  # pyre-ignore[56]
@@ -81,50 +91,122 @@ class RemovalInformation(p.BaseModel):
         return self
 
     @p.model_validator(mode="after")  # pyre-ignore[56]
+    def _check_renamed_base(self) -> Self:
+        if self.reason == "renamed":
+            if self.new_name is None:
+                raise ValueError("new_name must be provided if reason is 'renamed'")
+        else:
+            if self.new_name is not None:
+                raise ValueError(
+                    "new_name must not be provided if reason is not 'renamed'"
+                )
+            if self.redirect_replacement_major_version is not None:
+                raise ValueError(
+                    "redirect_replacement_major_version must not be provided"
+                    " if reason is not 'renamed'"
+                )
+        return self
+
+
+class RemovalInformation(BaseRemovalInformation):
+    """
+    Stores metadata on when and why a collection will get removed.
+    """
+
+    # The Ansible major version from which the collection will be removed.
+    major_version: t.Union[int, t.Literal["TBD"]]
+
+    @p.model_validator(mode="after")  # pyre-ignore[56]
+    def _check_renamed(self) -> Self:
+        if self.reason == "renamed":
+            if (
+                self.redirect_replacement_major_version is not None
+                and self.major_version != "TBD"
+                and self.redirect_replacement_major_version
+                >= self.major_version  # pyre-ignore[58]
+            ):
+                raise ValueError(
+                    "redirect_replacement_major_version must be smaller than major_version"
+                )
+        else:
+            if self.major_version == "TBD":
+                raise ValueError(
+                    "major_version must not be TBD if reason is not 'renamed'"
+                )
+        return self
+
+
+class RemovedRemovalInformation(BaseRemovalInformation):
+    """
+    Stores metadata on when and why a collection was removed.
+    """
+
+    # The exact version from which the collection has been removed.
+    # This is needed for changelog generation.
+    version: PydanticPypiVersion
+
+    @p.model_validator(mode="after")  # pyre-ignore[56]
     def _check_reason_is_renamed(self) -> Self:
         if self.reason != "renamed":
             return self
-        if self.new_name is None:
-            raise ValueError("new_name must be provided if reason is 'renamed'")
         if (
             self.redirect_replacement_major_version is not None
-            and self.major_version != "TBD"
-            and self.redirect_replacement_major_version
-            >= self.major_version  # pyre-ignore[58]
+            and self.redirect_replacement_major_version >= self.version.major
         ):
             raise ValueError(
-                "redirect_replacement_major_version must be smaller than major_version"
+                "redirect_replacement_major_version must be smaller than"
+                " version's major version"
             )
         return self
 
-    @p.model_validator(mode="after")  # pyre-ignore[56]
-    def _check_reason_is_not_renamed(self) -> Self:
-        if self.reason == "renamed":
-            return self
-        if self.new_name is not None:
-            raise ValueError("new_name must not be provided if reason is not 'renamed'")
-        if self.redirect_replacement_major_version is not None:
-            raise ValueError(
-                "redirect_replacement_major_version must not be provided if reason is not 'renamed'"
-            )
-        if self.major_version == "TBD":
-            raise ValueError("major_version must not be TBD if reason is not 'renamed'")
-        return self
 
-
-class CollectionMetadata(p.BaseModel):
+class BaseCollectionMetadata(p.BaseModel):
     """
     Stores metadata about one collection.
     """
 
+    # If the collection does not use changelogs/changelog.yaml, it can provide
+    # a URL where the collection's changelog can be found.
     changelog_url: t.Optional[str] = p.Field(alias="changelog-url", default=None)
+
+    # In case the collection is not located in the root of its repository, the
+    # subdirectory in which the collection appears.
     collection_directory: t.Optional[str] = p.Field(
         alias="collection-directory", default=None
     )
+
+    # The collection's repository.
     repository: t.Optional[str] = None
+
+    # A regular expression to match the collection's version from a tag in the repository.
     tag_version_regex: t.Optional[str] = None
+
+    # A list of maintainers. These should be usernames for the repository's
+    # hosting environment.
     maintainers: list[str] = []
+
+
+class CollectionMetadata(BaseCollectionMetadata):
+    """
+    Stores metadata about one collection.
+    """
+
+    model_config = p.ConfigDict(arbitrary_types_allowed=True)
+
+    # Optional information that the collection will be removed from
+    # a future Ansible release.
     removal: t.Optional[RemovalInformation] = None
+
+
+class RemovedCollectionMetadata(BaseCollectionMetadata):
+    """
+    Stores metadata about a removed collection.
+    """
+
+    model_config = p.ConfigDict(arbitrary_types_allowed=True)
+
+    # Information why the collection has been removed
+    removal: RemovedRemovalInformation
 
 
 class CollectionsMetadata(p.BaseModel):
@@ -132,7 +214,11 @@ class CollectionsMetadata(p.BaseModel):
     Stores metadata about a set of collections.
     """
 
+    # Metadata on the collections included in Ansible.
     collections: dict[str, CollectionMetadata]
+
+    # Metadata on the collections removed from this major version of Ansible.
+    removed_collections: dict[str, RemovedCollectionMetadata] = {}
 
     @staticmethod
     def load_from(deps_dir: StrPath | None) -> CollectionsMetadata:

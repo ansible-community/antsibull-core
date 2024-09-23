@@ -137,6 +137,26 @@ collections:
       reason_text: The collection wasn't cow friendly, so the Steering Committee decided to kick it out.
       discussion: https://forum.ansible.com/...
       announce_version: 9.3.0
+removed_collections:
+  bad.baz2:
+    repository: https://github.com/ansible-collections/collection_template
+    removal:
+      version: 10.2.1
+      reason: renamed
+      new_name: bad.bar2
+      announce_version: 9.3.0
+      redirect_replacement_major_version: 7
+  bad.baz1:
+    removal:
+      version: 9.1.0
+      reason: deprecated
+      announce_version: 7.1.0
+  foo.bar:
+    repository: https://github.com/ansible-collections/collection_template
+    removal:
+      version: 9.0.0
+      reason: deprecated
+      announce_version: 7.1.0
 """,
         [
             "foo.bar",
@@ -153,6 +173,7 @@ collections:
         ],
         [
             "The collection list must be sorted; 'baz.bam' must come before foo.bar",
+            "The removed collection list must be sorted; 'bad.baz1' must come before bad.baz2",
             "collections -> bad.bar1 -> removal -> announce_version: Major version of 10.1.0 must not be larger than the current major version 9",
             "collections -> bad.bar1 -> removal -> major_version: Removal major version 7 must be larger than current major version 9",
             "collections -> bad.bar1: Collection not in ansible.in",
@@ -162,6 +183,10 @@ collections:
             "collections -> baz.bam: Collection not in ansible.in",
             "collections -> foo.bar -> repository: Required field not provided",
             "collections: No metadata present for not.there",
+            "removed_collections -> bad.baz1 -> repository: Required field not provided",
+            "removed_collections -> bad.baz2 -> removal -> announce_version: Major version of 9.3.0 must be less than the current major version 9",
+            "removed_collections -> bad.baz2 -> removal -> version: Major version of removal version 10.2.1 must be current major version 9",
+            "removed_collections -> foo.bar: Collection in ansible.in",
         ],
     ),
     (
@@ -271,6 +296,23 @@ collections:
     removal:
       major_version: 11
       reason: foo
+removed_collections:
+  bad.foo1:
+    repository: https://github.com/ansible-collections/collection_template
+    removal:
+      version: TBD
+      reason: deprecated
+  bad.foo2:
+    repository: https://github.com/ansible-collections/collection_template
+    removal:
+      reason: deprecated
+  bad.foo3:
+    repository: https://github.com/ansible-collections/collection_template
+    removal:
+      version: 9.0.0
+      reason: renamed
+      new_name: bad.foo3_new
+      redirect_replacement_major_version: 12
 extra_stuff: baz
 """,
         [],
@@ -292,6 +334,9 @@ extra_stuff: baz
             "collections -> bad.foo8 -> removal: Value error, new_name must not be provided if reason is not 'renamed'",
             "collections -> bad.foo9 -> removal: Value error, redirect_replacement_major_version must not be provided if reason is not 'renamed'",
             "extra_stuff: Extra inputs are not permitted",
+            "removed_collections -> bad.foo1 -> removal -> version: Value error, Invalid version: 'TBD'",
+            "removed_collections -> bad.foo2 -> removal -> version: Field required",
+            "removed_collections -> bad.foo3 -> removal: Value error, redirect_replacement_major_version must be smaller than version's major version",
         ],
     ),
 ]

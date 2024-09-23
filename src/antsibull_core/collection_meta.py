@@ -13,15 +13,19 @@ from __future__ import annotations
 
 import os
 import typing as t
+from collections.abc import Collection
 
 import pydantic as p
 from antsibull_fileutils.yaml import load_yaml_file
 
 from .pydantic import forbid_extras, get_formatted_error_messages
 from .schemas.collection_meta import (
+    BaseRemovalInformation,
     CollectionMetadata,
     CollectionsMetadata,
     RemovalInformation,
+    RemovedCollectionMetadata,
+    RemovedRemovalInformation,
 )
 
 if t.TYPE_CHECKING:
@@ -41,6 +45,12 @@ class _Validator:
         self.errors = []
         self.all_collections = all_collections
         self.major_release = major_release
+
+    def _validate_removal_base(
+        self, collection: str, removal: BaseRemovalInformation, prefix: str
+    ) -> None:
+        if removal.reason == "renamed" and removal.new_name == collection:
+            self.errors.append(f"{prefix} new_name: Must not be the collection's name")
 
     def _validate_removal(
         self, collection: str, removal: RemovalInformation, prefix: str
@@ -63,8 +73,7 @@ class _Validator:
                 f" must not be larger than the current major version {self.major_release}"
             )
 
-        if removal.reason == "renamed" and removal.new_name == collection:
-            self.errors.append(f"{prefix} new_name: Must not be the collection's name")
+        self._validate_removal_base(collection, removal, prefix)
 
     def _validate_collection(
         self, collection: str, meta: CollectionMetadata, prefix: str
@@ -75,18 +84,51 @@ class _Validator:
         if meta.removal:
             self._validate_removal(collection, meta.removal, f"{prefix} removal ->")
 
-    def validate(self, data: CollectionsMetadata) -> None:
+    def _validate_removal_for_removed(
+        self, collection: str, removal: RemovedRemovalInformation, prefix: str
+    ) -> None:
+        if removal.version.major != self.major_release:
+            self.errors.append(
+                f"{prefix} version: Major version of removal version {removal.version} must"
+                f" be current major version {self.major_release}"
+            )
+
+        if (
+            removal.announce_version is not None
+            and removal.announce_version.major >= self.major_release
+        ):
+            self.errors.append(
+                f"{prefix} announce_version: Major version of {removal.announce_version}"
+                f" must be less than the current major version {self.major_release}"
+            )
+
+        self._validate_removal_base(collection, removal, prefix)
+
+    def _validate_removed_collection(
+        self, collection: str, meta: RemovedCollectionMetadata, prefix: str
+    ) -> None:
+        if meta.repository is None:
+            self.errors.append(f"{prefix} repository: Required field not provided")
+
+        self._validate_removal_for_removed(
+            collection, meta.removal, f"{prefix} removal ->"
+        )
+
+    def _validate_order(self, collection: Collection, what: str) -> None:
         # Check order
-        sorted_list = sorted(data.collections)
-        raw_list = list(data.collections)
-        if raw_list != sorted_list:
-            for raw_entry, sorted_entry in zip(raw_list, sorted_list):
-                if raw_entry != sorted_entry:
-                    self.errors.append(
-                        "The collection list must be sorted; "
-                        f"{sorted_entry!r} must come before {raw_entry}"
-                    )
-                    break
+        sorted_list = sorted(collection)
+        raw_list = list(collection)
+        for raw_entry, sorted_entry in zip(raw_list, sorted_list):
+            if raw_entry != sorted_entry:
+                self.errors.append(
+                    f"{what} must be sorted; "
+                    f"{sorted_entry!r} must come before {raw_entry}"
+                )
+                break
+
+    def _validate_collections(self, data: CollectionsMetadata) -> None:
+        # Check order
+        self._validate_order(data.collections, "The collection list")
 
         # Validate collection data
         remaining_collections = set(self.all_collections)
@@ -104,6 +146,24 @@ class _Validator:
         # Complain about remaining collections
         for collection in sorted(remaining_collections):
             self.errors.append(f"collections: No metadata present for {collection}")
+
+    def _validate_removed_collections(self, data: CollectionsMetadata) -> None:
+        # Check order
+        self._validate_order(data.removed_collections, "The removed collection list")
+
+        # Validate removed collection data
+        for collection, removed_meta in data.removed_collections.items():
+            if collection in self.all_collections:
+                self.errors.append(
+                    f"removed_collections -> {collection}: Collection in ansible.in"
+                )
+            self._validate_removed_collection(
+                collection, removed_meta, f"removed_collections -> {collection} ->"
+            )
+
+    def validate(self, data: CollectionsMetadata) -> None:
+        self._validate_collections(data)
+        self._validate_removed_collections(data)
 
 
 def lint_collection_meta(
