@@ -118,14 +118,13 @@ class _Validator:
         # Check order
         sorted_list = sorted(collection)
         raw_list = list(collection)
-        if raw_list != sorted_list:
-            for raw_entry, sorted_entry in zip(raw_list, sorted_list):
-                if raw_entry != sorted_entry:
-                    self.errors.append(
-                        f"{what} must be sorted; "
-                        f"{sorted_entry!r} must come before {raw_entry}"
-                    )
-                    break
+        for raw_entry, sorted_entry in zip(raw_list, sorted_list):
+            if raw_entry != sorted_entry:
+                self.errors.append(
+                    f"{what} must be sorted; "
+                    f"{sorted_entry!r} must come before {raw_entry}"
+                )
+                break
 
     def _validate_collections(self, data: CollectionsMetadata) -> None:
         # Check order
