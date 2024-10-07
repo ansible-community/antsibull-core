@@ -87,10 +87,10 @@ class _Validator:
     def _validate_removal_for_removed(
         self, collection: str, removal: RemovedRemovalInformation, prefix: str
     ) -> None:
-        if removal.version.major != self.major_release:
+        if removal.version.major > self.major_release:
             self.errors.append(
                 f"{prefix} version: Major version of removal version {removal.version} must"
-                f" be current major version {self.major_release}"
+                f" not be larger than current major version {self.major_release}"
             )
 
         if (
