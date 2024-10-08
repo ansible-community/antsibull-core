@@ -185,7 +185,7 @@ removed_collections:
             "collections: No metadata present for not.there",
             "removed_collections -> bad.baz1 -> repository: Required field not provided",
             "removed_collections -> bad.baz2 -> removal -> announce_version: Major version of 9.3.0 must be less than the current major version 9",
-            "removed_collections -> bad.baz2 -> removal -> version: Major version of removal version 10.2.1 must be current major version 9",
+            "removed_collections -> bad.baz2 -> removal -> version: Major version of removal version 10.2.1 must not be larger than current major version 9",
             "removed_collections -> foo.bar: Collection in ansible.in",
         ],
     ),
