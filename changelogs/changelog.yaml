@@ -350,3 +350,13 @@ releases:
       - 173-schema-removal.yml
       - 3.2.0.yml
     release_date: '2024-09-23'
+  3.3.0:
+    changes:
+      minor_changes:
+        - Allow information on removed collections from previous major releases in
+          collection metadata schema (https://github.com/ansible-community/antsibull-core/pull/174).
+      release_summary: Feature release.
+    fragments:
+      - 174-removed-in-previous.yml
+      - 3.3.0.yml
+    release_date: '2024-10-09'

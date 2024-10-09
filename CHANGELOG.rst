@@ -4,6 +4,19 @@ antsibull-core Release Notes
 
 .. contents:: Topics
 
+v3.3.0
+======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- Allow information on removed collections from previous major releases in collection metadata schema (https://github.com/ansible-community/antsibull-core/pull/174).
+
 v3.2.0
 ======
 
