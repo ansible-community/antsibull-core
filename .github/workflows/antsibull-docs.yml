@@ -57,11 +57,11 @@ jobs:
           sed -i noxfile.py -e 's/args = ("antsibull-core", "antsibull-docs-parser")/args = ("antsibull-core", "antsibull-docs-parser", "antsibull-fileutils")/g'
         working-directory: antsibull-docs
 
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         id: python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
 
       - name: Install dependencies
         env:

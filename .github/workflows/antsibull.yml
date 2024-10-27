@@ -69,11 +69,11 @@ jobs:
           sed -e 's/aiohttp/aiohttp < 3.10.0,/' -i pyproject.toml
         working-directory: antsibull-core
 
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         id: python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
 
       - name: Install dependencies
         env:
