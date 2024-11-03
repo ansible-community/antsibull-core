@@ -44,6 +44,44 @@ def _convert_pypi_version(v: t.Any) -> t.Any:
 PydanticPypiVersion = Annotated[PypiVer, BeforeValidator(_convert_pypi_version)]
 
 
+class RemovalUpdate(p.BaseModel):
+    """
+    Stores metadata about removal updates, like when a deprecation has been cancelled,
+    the collection has been re-deprecated, when a removal has been undone, etc.
+    """
+
+    model_config = p.ConfigDict(arbitrary_types_allowed=True)
+
+    cancelled_version: t.Optional[PydanticPypiVersion] = None
+    deprecated_version: t.Optional[PydanticPypiVersion] = None
+    redeprecated_version: t.Optional[PydanticPypiVersion] = None
+    removed_version: t.Optional[PydanticPypiVersion] = None
+    readded_version: t.Optional[PydanticPypiVersion] = None
+
+    @p.model_validator(mode="after")  # pyre-ignore[56]
+    def _exactly_one_required(self) -> Self:
+        count = sum(
+            1 if x is not None else 0
+            for x in (
+                self.cancelled_version,
+                self.deprecated_version,
+                self.redeprecated_version,
+                self.removed_version,
+                self.readded_version,
+            )
+        )
+        if count != 1:
+            fields = (
+                "cancelled_version",
+                "deprecated_version",
+                "redeprecated_version",
+                "removed_version",
+                "readded_version",
+            )
+            raise ValueError(f"Exactly one of {', '.join(fields)} must be specified")
+        return self
+
+
 class BaseRemovalInformation(p.BaseModel):
     """
     Stores metadata on why a collection was/will get removed.
@@ -74,6 +112,9 @@ class BaseRemovalInformation(p.BaseModel):
     # In case reason=renamed, the major Ansible release in which the collection's
     # contents have been replaced by deprecated redirects.
     redirect_replacement_major_version: t.Optional[int] = None
+
+    # Updates to the removal
+    updates: list[RemovalUpdate] = []
 
     @p.model_validator(mode="after")  # pyre-ignore[56]
     def _check_reason_text(self) -> Self:
@@ -134,6 +175,22 @@ class RemovalInformation(BaseRemovalInformation):
                     "major_version must not be TBD if reason is not 'renamed'"
                 )
         return self
+
+    def get_updates_including_indirect(self) -> list[RemovalUpdate]:
+        prefix = []
+        if self.announce_version:
+            prefix.append(RemovalUpdate(deprecated_version=self.announce_version))
+        return prefix + self.updates
+
+    def is_deprecated(self) -> bool:
+        result = True
+        for update in self.get_updates_including_indirect():
+            result = bool(
+                update.deprecated_version
+                or update.redeprecated_version
+                or update.removed_version
+            )
+        return result
 
 
 class RemovedRemovalInformation(BaseRemovalInformation):

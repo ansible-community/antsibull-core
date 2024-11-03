@@ -17,6 +17,7 @@ from collections.abc import Collection
 
 import pydantic as p
 from antsibull_fileutils.yaml import load_yaml_file
+from packaging.version import Version as PypiVer
 
 from .pydantic import forbid_extras, get_formatted_error_messages
 from .schemas.collection_meta import (
@@ -24,6 +25,7 @@ from .schemas.collection_meta import (
     CollectionMetadata,
     CollectionsMetadata,
     RemovalInformation,
+    RemovalUpdate,
     RemovedCollectionMetadata,
     RemovedRemovalInformation,
 )
@@ -46,6 +48,93 @@ class _Validator:
         self.all_collections = all_collections
         self.major_release = major_release
 
+    def _update_state_value(
+        self,
+        state: str | None,
+        accepted_states: list[str | None],
+        prefix: str,
+        index: int,
+        field_name: str,
+    ) -> str:
+        if state not in accepted_states:
+            if state is not None:
+                self.errors.append(
+                    f"{prefix}[{index}] -> {field_name}: Unexpected update after {state}"
+                )
+            else:
+                self.errors.append(
+                    f"{prefix}[{index}] -> {field_name}: Unexpected first update"
+                )
+        return field_name
+
+    def _update_state(
+        self, state: str | None, index: int, update: RemovalUpdate, prefix: str
+    ) -> tuple[str | None, PypiVer | None, str]:
+        if update.cancelled_version:
+            state = self._update_state_value(
+                state,
+                [None, "deprecated_version", "redeprecated_version"],
+                prefix,
+                index,
+                "cancelled_version",
+            )
+            return state, update.cancelled_version, "cancelled_version"
+        if update.deprecated_version:
+            state = self._update_state_value(
+                state, [None], prefix, index, "deprecated_version"
+            )
+            return state, update.deprecated_version, "deprecated_version"
+        if update.redeprecated_version:
+            state = self._update_state_value(
+                state,
+                ["readded_version", "cancelled_version"],
+                prefix,
+                index,
+                "redeprecated_version",
+            )
+            return state, update.redeprecated_version, "redeprecated_version"
+        if update.removed_version:
+            state = self._update_state_value(
+                state, [None], prefix, index, "removed_version"
+            )
+            return state, update.removed_version, "removed_version"
+        if update.readded_version:
+            state = self._update_state_value(
+                state, ["removed_version"], prefix, index, "readded_version"
+            )
+            return state, update.readded_version, "readded_version"
+        self.errors.append(f"{prefix}[{index}]: Internal error")
+        return state, None, ""
+
+    def _validate_removal_updates(
+        self,
+        removal: BaseRemovalInformation,
+        indirect_updates: list[RemovalUpdate],
+        prefix: str,
+    ) -> None:
+        prefix += " -> updates"
+        state = None
+        for update in indirect_updates:
+            state, _, __ = self._update_state(state, -1, update, prefix)
+        last_version = None
+        for index, update in enumerate(removal.updates):
+            state, version, field_name = self._update_state(
+                state, index, update, prefix
+            )
+            if version is None:
+                pass
+            elif version.major != self.major_release:
+                self.errors.append(
+                    f"{prefix}[{index}] -> {field_name}: Version's major version {version.major}"
+                    f" must be the current major version {self.major_release}"
+                )
+            elif last_version is not None and version <= last_version:
+                self.errors.append(
+                    f"{prefix}[{index}] -> {field_name}: Version {version}"
+                    f" must be after the previous update's version {last_version}"
+                )
+            last_version = version
+
     def _validate_removal_base(
         self, collection: str, removal: BaseRemovalInformation, prefix: str
     ) -> None:
@@ -59,10 +148,16 @@ class _Validator:
             removal.major_version != "TBD"
             and removal.major_version <= self.major_release  # pyre-ignore[58]
         ):
-            self.errors.append(
-                f"{prefix} major_version: Removal major version {removal.major_version} must"
-                f" be larger than current major version {self.major_release}"
-            )
+            is_ok = False
+            if removal.major_version == self.major_release:
+                for update in removal.updates:
+                    if update.removed_version:
+                        is_ok = True
+            if not is_ok:
+                self.errors.append(
+                    f"{prefix} major_version: Removal major version {removal.major_version} must"
+                    f" be larger than current major version {self.major_release}"
+                )
 
         if (
             removal.announce_version is not None
@@ -74,6 +169,13 @@ class _Validator:
             )
 
         self._validate_removal_base(collection, removal, prefix)
+
+        indirect_updates = []
+        if removal.announce_version is not None:
+            indirect_updates.append(
+                RemovalUpdate(deprecated_version=removal.announce_version)
+            )
+        self._validate_removal_updates(removal, indirect_updates, prefix)
 
     def _validate_collection(
         self, collection: str, meta: CollectionMetadata, prefix: str
