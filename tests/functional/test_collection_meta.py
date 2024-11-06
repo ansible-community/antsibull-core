@@ -11,6 +11,8 @@ from antsibull_core.collection_meta import lint_collection_meta
 from antsibull_core.schemas.collection_meta import (
     CollectionMetadata,
     CollectionsMetadata,
+    RemovalInformation,
+    RemovalUpdate,
 )
 
 LINT_COLLECTION_META_DATA = [
@@ -59,6 +61,13 @@ collections:
       major_version: 7
       reason: deprecated
       announce_version: 10.1.0
+      updates:
+        - removed_version: 9.2.0
+        - cancelled_version: 9.3.0
+        - cancelled_version: 9.4.0
+        - redeprecated_version: 9.4.0
+        - removed_version: 9.3.0
+        - readded_version: 10.6.0
   bad.bar2:
     repository: https://github.com/ansible-collections/collection_template
     removal:
@@ -76,6 +85,16 @@ collections:
       reason: considered-unmaintained
       discussion: https://forum.ansible.com/...
       announce_version: 9.3.0
+  correct.foo10:
+    repository: https://github.com/ansible-collections/collection_template
+    removal:
+      major_version: 9
+      reason: considered-unmaintained
+      discussion: https://forum.ansible.com/...
+      announce_version: 9.3.0
+      updates:
+        - removed_version: 9.0.0a1
+        - readded_version: 9.1.0
   correct.foo2:
     repository: https://github.com/ansible-collections/collection_template
     removal:
@@ -89,7 +108,8 @@ collections:
       major_version: 10
       reason: renamed
       new_name: namespace.name
-      announce_version: 9.3.0
+      updates:
+        - readded_version: 10.1.0
   correct.foo4:
     repository: https://github.com/ansible-collections/collection_template
     removal:
@@ -161,6 +181,7 @@ removed_collections:
         [
             "foo.bar",
             "correct.foo1",
+            "correct.foo10",
             "correct.foo2",
             "correct.foo3",
             "correct.foo4",
@@ -174,6 +195,13 @@ removed_collections:
         [
             "The collection list must be sorted; 'baz.bam' must come before foo.bar",
             "The removed collection list must be sorted; 'bad.baz1' must come before bad.baz2",
+            "collections -> bad.bar1 -> removal -> -> updates[0] -> removed_version: Unexpected update after deprecated_version",
+            "collections -> bad.bar1 -> removal -> -> updates[1] -> cancelled_version: Unexpected update after removed_version",
+            "collections -> bad.bar1 -> removal -> -> updates[2] -> cancelled_version: Unexpected update after cancelled_version",
+            "collections -> bad.bar1 -> removal -> -> updates[3] -> redeprecated_version: Version 9.4.0 must be after the previous update's version 9.4.0",
+            "collections -> bad.bar1 -> removal -> -> updates[4] -> removed_version: Unexpected update after redeprecated_version",
+            "collections -> bad.bar1 -> removal -> -> updates[4] -> removed_version: Version 9.3.0 must be after the previous update's version 9.4.0",
+            "collections -> bad.bar1 -> removal -> -> updates[5] -> readded_version: Version's major version 10 must be the current major version 9",
             "collections -> bad.bar1 -> removal -> announce_version: Major version of 10.1.0 must not be larger than the current major version 9",
             "collections -> bad.bar1 -> removal -> major_version: Removal major version 7 must be larger than current major version 9",
             "collections -> bad.bar1: Collection not in ansible.in",
@@ -181,6 +209,9 @@ removed_collections:
             "collections -> bad.bar2: Collection not in ansible.in",
             "collections -> baz.bam -> repository: Required field not provided",
             "collections -> baz.bam: Collection not in ansible.in",
+            "collections -> correct.foo10 -> removal -> -> updates[0] -> removed_version: Unexpected update after deprecated_version",
+            "collections -> correct.foo3 -> removal -> -> updates[0] -> readded_version: Unexpected first update",
+            "collections -> correct.foo3 -> removal -> -> updates[0] -> readded_version: Version's major version 10 must be the current major version 9",
             "collections -> foo.bar -> repository: Required field not provided",
             "collections: No metadata present for not.there",
             "removed_collections -> bad.baz1 -> repository: Required field not provided",
@@ -296,6 +327,22 @@ collections:
     removal:
       major_version: 11
       reason: foo
+  bad.foo15:
+    repository: https://github.com/ansible-collections/collection_template
+    removal:
+      major_version: 11
+      reason: considered-unmaintained
+      updates:
+        - {}
+        - foo: bar
+        - cancelled_version: 1.2.3
+          extra: bad
+        - cancelled_version: []
+        - cancelled_version: 1.2.3
+          deprecated_version: 1.2.3
+          redeprecated_version: 1.2.3
+          removed_version: 1.2.3
+          readded_version: 1.2.3
 removed_collections:
   bad.foo1:
     repository: https://github.com/ansible-collections/collection_template
@@ -313,6 +360,13 @@ removed_collections:
       reason: renamed
       new_name: bad.foo3_new
       redirect_replacement_major_version: 12
+  bad.foo4:
+    repository: https://github.com/ansible-collections/collection_template
+    removal:
+      version: 9.0.0
+      reason: renamed
+      new_name: bad.foo3_new
+      updates: {}
 extra_stuff: baz
 """,
         [],
@@ -324,11 +378,15 @@ extra_stuff: baz
             "collections -> bad.foo13 -> removal -> major_version -> int: Input should be a valid integer, unable to parse string as an integer",
             "collections -> bad.foo13 -> removal -> major_version -> literal['TBD']: Input should be 'TBD'",
             "collections -> bad.foo14 -> removal -> reason: Input should be 'deprecated', 'considered-unmaintained', 'renamed', 'guidelines-violation' or 'other'",
+            "collections -> bad.foo15 -> removal -> updates -> 0: Value error, Exactly one of cancelled_version, deprecated_version, redeprecated_version, removed_version, readded_version must be specified",
+            "collections -> bad.foo15 -> removal -> updates -> 1 -> foo: Extra inputs are not permitted",
+            "collections -> bad.foo15 -> removal -> updates -> 2 -> extra: Extra inputs are not permitted",
+            "collections -> bad.foo15 -> removal -> updates -> 3 -> cancelled_version: Value error, must be a string or PypiVer object, got []",
+            "collections -> bad.foo15 -> removal -> updates -> 4: Value error, Exactly one of cancelled_version, deprecated_version, redeprecated_version, removed_version, readded_version must be specified",
             "collections -> bad.foo2 -> removal -> announce_version: Value error, must be a version with three release numbers (e.g. 1.2.3, 2.3.4a1), got '9.3'",
             "collections -> bad.foo3 -> removal -> announce_version: Value error, must be a non-trivial string, got ''",
             "collections -> bad.foo4 -> removal: Value error, major_version must not be TBD if reason is not 'renamed'",
-            "collections -> bad.foo5 -> removal: Value error, "
-            "redirect_replacement_major_version must be smaller than major_version",
+            "collections -> bad.foo5 -> removal: Value error, redirect_replacement_major_version must be smaller than major_version",
             "collections -> bad.foo6 -> removal: Value error, reason_text must not be provided if reason is not 'other', 'guidelines-violation'",
             "collections -> bad.foo7 -> removal: Value error, reason_text must be provided if reason is 'other', 'guidelines-violation'",
             "collections -> bad.foo8 -> removal: Value error, new_name must not be provided if reason is not 'renamed'",
@@ -337,6 +395,7 @@ extra_stuff: baz
             "removed_collections -> bad.foo1 -> removal -> version: Value error, Invalid version: 'TBD'",
             "removed_collections -> bad.foo2 -> removal -> version: Field required",
             "removed_collections -> bad.foo3 -> removal: Value error, redirect_replacement_major_version must be smaller than version's major version",
+            "removed_collections -> bad.foo4 -> removal -> updates: Input should be a valid list",
         ],
     ),
 ]
@@ -418,3 +477,51 @@ collections:
     assert "not.there" not in meta.collections
     assert meta.get_meta("not.there") == CollectionMetadata()
     assert "not.there" in meta.collections
+
+
+def test_removal_info_methods():
+    ri = RemovalInformation(reason="considered-unmaintained", major_version=10)
+    assert ri.get_updates_including_indirect() == []
+    assert ri.is_deprecated() is True
+
+    ri = RemovalInformation(
+        reason="considered-unmaintained",
+        major_version=10,
+        announce_version="1.2.0",
+        updates=[
+            RemovalUpdate(cancelled_version="1.3.0"),
+            RemovalUpdate(redeprecated_version="1.4.0"),
+            RemovalUpdate(removed_version="1.5.0"),
+        ],
+    )
+    assert ri.get_updates_including_indirect() == [
+        RemovalUpdate(deprecated_version="1.2.0"),
+        RemovalUpdate(cancelled_version="1.3.0"),
+        RemovalUpdate(redeprecated_version="1.4.0"),
+        RemovalUpdate(removed_version="1.5.0"),
+    ]
+    assert ri.is_deprecated() is True
+
+    ri = RemovalInformation(
+        reason="considered-unmaintained",
+        major_version=10,
+        announce_version="1.2.0",
+        updates=[
+            RemovalUpdate(cancelled_version="1.3.0"),
+            RemovalUpdate(redeprecated_version="1.4.0"),
+            RemovalUpdate(removed_version="1.5.0"),
+            RemovalUpdate(readded_version="1.6.0"),
+            RemovalUpdate(deprecated_version="1.7.0"),
+            RemovalUpdate(cancelled_version="1.8.0"),
+        ],
+    )
+    assert ri.get_updates_including_indirect() == [
+        RemovalUpdate(deprecated_version="1.2.0"),
+        RemovalUpdate(cancelled_version="1.3.0"),
+        RemovalUpdate(redeprecated_version="1.4.0"),
+        RemovalUpdate(removed_version="1.5.0"),
+        RemovalUpdate(readded_version="1.6.0"),
+        RemovalUpdate(deprecated_version="1.7.0"),
+        RemovalUpdate(cancelled_version="1.8.0"),
+    ]
+    assert ri.is_deprecated() is False

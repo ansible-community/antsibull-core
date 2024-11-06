@@ -103,8 +103,9 @@ class _Validator:
                 state, ["removed_version"], prefix, index, "readded_version"
             )
             return state, update.readded_version, "readded_version"
-        self.errors.append(f"{prefix}[{index}]: Internal error")
-        return state, None, ""
+        # The following lines should never be reached:
+        self.errors.append(f"{prefix}[{index}]: Internal error")  # pragma: no cover
+        return state, None, ""  # pragma: no cover
 
     def _validate_removal_updates(
         self,
@@ -122,7 +123,8 @@ class _Validator:
                 state, index, update, prefix
             )
             if version is None:
-                pass
+                # The following line should never be reached:
+                pass  # pragma: no cover
             elif version.major != self.major_release:
                 self.errors.append(
                     f"{prefix}[{index}] -> {field_name}: Version's major version {version.major}"
