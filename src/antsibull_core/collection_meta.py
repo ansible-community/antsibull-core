@@ -155,6 +155,7 @@ class _Validator:
                 for update in removal.updates:
                     if update.removed_version:
                         is_ok = True
+                        break
             if not is_ok:
                 self.errors.append(
                     f"{prefix} major_version: Removal major version {removal.major_version} must"
