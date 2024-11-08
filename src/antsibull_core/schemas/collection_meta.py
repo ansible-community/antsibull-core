@@ -58,6 +58,25 @@ class RemovalUpdate(p.BaseModel):
     removed_version: t.Optional[PydanticPypiVersion] = None
     readded_version: t.Optional[PydanticPypiVersion] = None
 
+    # Overwrites the discussion link from BaseRemovalInformation if present
+    discussion: t.Optional[str] = None
+
+    # If deprecated_version or redeprecated_version: the reason because of which the
+    # collection will be removed.
+    reason: t.Optional[
+        t.Literal[
+            "deprecated",
+            "considered-unmaintained",
+            "renamed",
+            "guidelines-violation",
+            "other",
+        ]
+    ] = None
+
+    # If reason is not provided, or if reason is other, an optional extra text appended
+    # to the message.
+    reason_text: t.Optional[str] = None
+
     @p.model_validator(mode="after")  # pyre-ignore[56]
     def _exactly_one_required(self) -> Self:
         count = sum(

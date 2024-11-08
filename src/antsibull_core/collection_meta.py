@@ -137,6 +137,23 @@ class _Validator:
                 )
             last_version = version
 
+            if update.reason:
+                if not (update.deprecated_version or update.redeprecated_version):
+                    self.errors.append(
+                        f"{prefix}[{index}] -> reason: Reason can only be provided"
+                        f" if 'deprecated_version' or 'redeprecated_version' is used"
+                    )
+                if update.reason != "other" and update.reason_text is not None:
+                    self.errors.append(
+                        f"{prefix}[{index}] -> reason_text: Reason text"
+                        f" must not be provided if reason is not 'other'"
+                    )
+                if update.reason == "other" and update.reason_text is None:
+                    self.errors.append(
+                        f"{prefix}[{index}] -> reason_text: Reason text"
+                        f" must be provided if reason is 'other'"
+                    )
+
     def _validate_removal_base(
         self, collection: str, removal: BaseRemovalInformation, prefix: str
     ) -> None:
@@ -176,7 +193,11 @@ class _Validator:
         indirect_updates = []
         if removal.announce_version is not None:
             indirect_updates.append(
-                RemovalUpdate(deprecated_version=removal.announce_version)
+                RemovalUpdate(
+                    deprecated_version=removal.announce_version,
+                    reason=removal.reason,
+                    reason_text=removal.reason_text,
+                )
             )
         self._validate_removal_updates(removal, indirect_updates, prefix)
 
