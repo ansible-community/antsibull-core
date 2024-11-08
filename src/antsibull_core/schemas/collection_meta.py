@@ -52,6 +52,7 @@ class RemovalUpdate(p.BaseModel):
 
     model_config = p.ConfigDict(arbitrary_types_allowed=True)
 
+    # Exactly one of the following must be provided
     cancelled_version: t.Optional[PydanticPypiVersion] = None
     deprecated_version: t.Optional[PydanticPypiVersion] = None
     redeprecated_version: t.Optional[PydanticPypiVersion] = None
@@ -73,7 +74,7 @@ class RemovalUpdate(p.BaseModel):
         ]
     ] = None
 
-    # If reason is not provided, or if reason is other, an optional extra text appended
+    # If reason is not provided, or if reason is 'other', an optional extra text appended
     # to the message.
     reason_text: t.Optional[str] = None
 
@@ -98,6 +99,30 @@ class RemovalUpdate(p.BaseModel):
                 "readded_version",
             )
             raise ValueError(f"Exactly one of {', '.join(fields)} must be specified")
+        return self
+
+    @p.model_validator(mode="after")  # pyre-ignore[56]
+    def _check_reason(self) -> Self:
+        if self.reason and not (self.deprecated_version or self.redeprecated_version):
+            raise ValueError(
+                "Reason can only be provided if 'deprecated_version'"
+                " or 'redeprecated_version' is used"
+            )
+        return self
+
+    @p.model_validator(mode="after")  # pyre-ignore[56]
+    def _check_reason_text(self) -> Self:
+        reasons_with_text = ("other", "guidelines-violation")
+        if self.reason in reasons_with_text:
+            if self.reason_text is None:
+                raise ValueError(
+                    f"Reason text must be provided if reason is '{self.reason}'"
+                )
+        elif self.reason:
+            if self.reason_text is not None:
+                raise ValueError(
+                    f"Reason text must not be provided if reason is '{self.reason}'"
+                )
         return self
 
 

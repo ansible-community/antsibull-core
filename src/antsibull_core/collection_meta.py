@@ -137,23 +137,6 @@ class _Validator:
                 )
             last_version = version
 
-            if update.reason:
-                if not (update.deprecated_version or update.redeprecated_version):
-                    self.errors.append(
-                        f"{prefix}[{index}] -> reason: Reason can only be provided"
-                        f" if 'deprecated_version' or 'redeprecated_version' is used"
-                    )
-                if update.reason != "other" and update.reason_text is not None:
-                    self.errors.append(
-                        f"{prefix}[{index}] -> reason_text: Reason text"
-                        f" must not be provided if reason is not 'other'"
-                    )
-                if update.reason == "other" and update.reason_text is None:
-                    self.errors.append(
-                        f"{prefix}[{index}] -> reason_text: Reason text"
-                        f" must be provided if reason is 'other'"
-                    )
-
     def _validate_removal_base(
         self, collection: str, removal: BaseRemovalInformation, prefix: str
     ) -> None:
@@ -167,12 +150,9 @@ class _Validator:
             removal.major_version != "TBD"
             and removal.major_version <= self.major_release  # pyre-ignore[58]
         ):
-            is_ok = False
-            if removal.major_version == self.major_release:
-                for update in removal.updates:
-                    if update.removed_version:
-                        is_ok = True
-                        break
+            is_ok = removal.major_version == self.major_release and any(
+                update.removed_version for update in removal.updates
+            )
             if not is_ok:
                 self.errors.append(
                     f"{prefix} major_version: Removal major version {removal.major_version} must"

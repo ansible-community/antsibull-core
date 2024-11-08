@@ -95,6 +95,13 @@ collections:
       updates:
         - removed_version: 9.0.0a1
         - readded_version: 9.1.0
+  correct.foo11:
+    repository: https://github.com/ansible-collections/collection_template
+    removal:
+      major_version: 9
+      reason: considered-unmaintained
+      discussion: https://forum.ansible.com/...
+      announce_version: 9.3.0
   correct.foo2:
     repository: https://github.com/ansible-collections/collection_template
     removal:
@@ -182,6 +189,7 @@ removed_collections:
             "foo.bar",
             "correct.foo1",
             "correct.foo10",
+            "correct.foo11",
             "correct.foo2",
             "correct.foo3",
             "correct.foo4",
@@ -210,6 +218,7 @@ removed_collections:
             "collections -> baz.bam -> repository: Required field not provided",
             "collections -> baz.bam: Collection not in ansible.in",
             "collections -> correct.foo10 -> removal -> -> updates[0] -> removed_version: Unexpected update after deprecated_version",
+            "collections -> correct.foo11 -> removal -> major_version: Removal major version 9 must be larger than current major version 9",
             "collections -> correct.foo3 -> removal -> -> updates[0] -> readded_version: Unexpected first update",
             "collections -> correct.foo3 -> removal -> -> updates[0] -> readded_version: Version's major version 10 must be the current major version 9",
             "collections -> foo.bar -> repository: Required field not provided",
@@ -343,6 +352,14 @@ collections:
           redeprecated_version: 1.2.3
           removed_version: 1.2.3
           readded_version: 1.2.3
+        - reason_text: foo
+        - readded_version: 1.2.3
+          reason: deprecated
+        - deprecated_version: 1.2.3
+          reason: deprecated
+          reason_text: bla
+        - deprecated_version: 1.2.3
+          reason: other
 removed_collections:
   bad.foo1:
     repository: https://github.com/ansible-collections/collection_template
@@ -383,6 +400,10 @@ extra_stuff: baz
             "collections -> bad.foo15 -> removal -> updates -> 2 -> extra: Extra inputs are not permitted",
             "collections -> bad.foo15 -> removal -> updates -> 3 -> cancelled_version: Value error, must be a string or PypiVer object, got []",
             "collections -> bad.foo15 -> removal -> updates -> 4: Value error, Exactly one of cancelled_version, deprecated_version, redeprecated_version, removed_version, readded_version must be specified",
+            "collections -> bad.foo15 -> removal -> updates -> 5: Value error, Exactly one of cancelled_version, deprecated_version, redeprecated_version, removed_version, readded_version must be specified",
+            "collections -> bad.foo15 -> removal -> updates -> 6: Value error, Reason can only be provided if 'deprecated_version' or 'redeprecated_version' is used",
+            "collections -> bad.foo15 -> removal -> updates -> 7: Value error, Reason text must not be provided if reason is 'deprecated'",
+            "collections -> bad.foo15 -> removal -> updates -> 8: Value error, Reason text must be provided if reason is 'other'",
             "collections -> bad.foo2 -> removal -> announce_version: Value error, must be a version with three release numbers (e.g. 1.2.3, 2.3.4a1), got '9.3'",
             "collections -> bad.foo3 -> removal -> announce_version: Value error, must be a non-trivial string, got ''",
             "collections -> bad.foo4 -> removal: Value error, major_version must not be TBD if reason is not 'renamed'",
