@@ -1,0 +1,4 @@
+minor_changes:
+  - "Allow information on removed or deprecated collections to be updated.
+     This is needed to generate a consistent changelog
+     (https://github.com/ansible-community/antsibull-core/pull/177)."
