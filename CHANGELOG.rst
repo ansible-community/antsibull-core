@@ -4,6 +4,20 @@ antsibull-core Release Notes
 
 .. contents:: Topics
 
+v3.4.0
+======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- Allow information on removed or deprecated collections to be updated. This is needed to generate a consistent changelog (https://github.com/ansible-community/antsibull-core/pull/177).
+- Declare support for Python 3.13 (https://github.com/ansible-community/antsibull-core/pull/176).
+
 v3.3.0
 ======
 
