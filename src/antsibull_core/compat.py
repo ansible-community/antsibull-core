@@ -3,12 +3,7 @@
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2020, Ansible Project
-"""Compat for older versions of Python.
-
-PARTS OF THIS MODULE ARE DEPRECATED AND WILL BE REMOVED IN ANTSIBULL-CORE 3.0.0:
-  - the `metadata` module;
-  - the functions `asyncio_run`, `best_get_loop`, and `create_task`.
-"""
+"""Compat for older versions of Python."""
 
 from __future__ import annotations
 
