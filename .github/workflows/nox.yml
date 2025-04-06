@@ -68,7 +68,7 @@ jobs:
         uses: ansible-community/github-action-run-nox@main
         with:
           sessions: ${{ matrix.session }}
-          pythons: ${{ matrix.force-python }}
+          force-pythons: ${{ matrix.force-python }}
           working-directory: antsibull-core
           codecov: ${{ matrix.codecov }}
           codecov-session: coverage
