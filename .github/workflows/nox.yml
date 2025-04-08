@@ -64,27 +64,12 @@ jobs:
         uses: wntrblm/nox@2025.02.09
         with:
           python-versions: "${{ matrix.python-versions }}"
-      - name: Set up nox environments
-        run: >-
-          nox -v -e "${{ matrix.session }}"
-          ${{ matrix.codecov && 'coverage' || '' }}
-          ${{ matrix.force-python && '--force-python ' || '' }}${{ matrix.force-python }}
-          --install-only
-      - name: "Run nox -e ${{ matrix.session }}"
-        run: >-
-          nox -v -e "${{ matrix.session }}"
-          ${{ matrix.force-python && '--force-python ' || '' }}${{ matrix.force-python }}
-          --reuse-existing-virtualenvs
-          --no-install
-      - name: Report coverage
-        if: ${{ matrix.codecov }}
-        run: |
-          nox -v -e coverage --reuse-existing-virtualenvs --no-install
-      - name: Upload coverage
-        if: ${{ matrix.codecov }}
-        uses: codecov/codecov-action@v5
+      - name: Run nox
+        uses: ansible-community/github-action-run-nox@main
         with:
-          name: "${{ matrix.session }}"
+          sessions: ${{ matrix.session }}
+          force-pythons: ${{ matrix.force-python }}
           working-directory: antsibull-core
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          codecov: ${{ matrix.codecov }}
+          codecov-session: coverage
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
