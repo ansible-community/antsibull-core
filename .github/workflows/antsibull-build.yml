@@ -64,7 +64,7 @@ jobs:
 
       - name: Patch antsibull pyproject.toml
         run: |
-          sed -e 's/pyre-check/pyre-check <= 0.9.20,/' -i pyproject.toml
+          sed -e 's/pyre-check/click < 8.2.0",\n    "pyre-check <= 0.9.20,/' -i pyproject.toml
         working-directory: antsibull-build
 
       - name: Patch our pyproject.toml
