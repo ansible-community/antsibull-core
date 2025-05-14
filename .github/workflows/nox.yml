@@ -25,9 +25,6 @@ env:
 jobs:
   nox:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: antsibull-core
     strategy:
       fail-fast: false
       matrix:
