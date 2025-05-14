@@ -6,7 +6,7 @@
 # Run some antsibull 0.52.0 tests against the current development version of antsibull-core
 # to make sure we don't accidentally break compatibility.
 
-name: antsibull compatibility
+name: antsibull-build compatibility
 
 on:
   push:
@@ -47,25 +47,25 @@ jobs:
           path: antsibull-changelog
           persist-credentials: false
 
-      # nb: this is the first version of antsibull that declares support
+      # nb: this is the first version of antsibull-build that declares support
       # for antsibull-core v3.
-      - name: Check out antsibull 0.61.0
+      - name: Check out antsibull-build 0.61.0
         uses: actions/checkout@v4
         with:
-          repository: ansible-community/antsibull
+          repository: ansible-community/antsibull-build
           ref: 0.61.0
-          path: antsibull
+          path: antsibull-build
           persist-credentials: false
 
       - name: Patch antsibull noxfile.py
         run: |
           sed -i noxfile.py -e 's/args = ("antsibull-core", "antsibull-changelog")/args = ("antsibull-core", "antsibull-changelog", "antsibull-fileutils")/g'
-        working-directory: antsibull
+        working-directory: antsibull-build
 
       - name: Patch antsibull pyproject.toml
         run: |
           sed -e 's/pyre-check/pyre-check <= 0.9.20,/' -i pyproject.toml
-        working-directory: antsibull
+        working-directory: antsibull-build
 
       - name: Patch our pyproject.toml
         # Necessary for pyre...
@@ -88,18 +88,18 @@ jobs:
           . ./venv/bin/activate
           python -m pip install . ../antsibull-core ../antsibull-changelog ../antsibull-fileutils
           ansible-galaxy collection install community.general
-        working-directory: antsibull
+        working-directory: antsibull-build
 
       - name: Run type checkers
         run: |
           nox -e typing
-        working-directory: antsibull
+        working-directory: antsibull-build
 
       - name: "Test building a release: Ansible 9 with ansible-core 2.16"
         run: |
           . ./venv/bin/activate
           ansible-playbook -vv playbooks/build-single-release.yaml -e antsibull_ansible_version=9.99.0 -e antsibull_build_file=ansible-9.build -e antsibull_data_dir="{{ antsibull_data_git_dir }}/9" -e antsibull_ansible_git_version=stable-2.16
-        working-directory: antsibull
+        working-directory: antsibull-build
         env:
           # Make result better readable
           ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
