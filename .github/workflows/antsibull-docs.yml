@@ -56,9 +56,10 @@ jobs:
           path: antsibull-docs
           persist-credentials: false
 
-      - name: Patch antsibull-docs noxfile.py
+      - name: Patch antsibull-docs noxfile.py and pyproject.toml
         run: |
           sed -i noxfile.py -e 's/args = ("antsibull-core", "antsibull-docs-parser")/args = ("antsibull-core", "antsibull-docs-parser", "antsibull-fileutils")/g'
+          sed -i pyproject.toml -e 's/    "mypy",/    "mypy<1.16.0",/g'
         working-directory: antsibull-docs
 
       - name: Set up Python 3.13
