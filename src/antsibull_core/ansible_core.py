@@ -21,7 +21,7 @@ from antsibull_fileutils.io import copy_file
 from packaging.version import Version as PypiVer
 
 from . import app_context
-from .logging import log
+from .logging import get_module_logger
 from .subprocess_util import async_log_run
 from .utils.http import retry_get
 
@@ -30,7 +30,7 @@ if t.TYPE_CHECKING:
     from _typeshed import StrPath
 
 
-mlog = log.fields(mod=__name__)
+mlog = get_module_logger(__name__)
 
 
 class UnknownVersion(Exception):

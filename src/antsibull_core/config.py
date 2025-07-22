@@ -14,13 +14,13 @@ from collections.abc import Iterable, Mapping, Sequence
 import perky  # type: ignore[import]
 import pydantic as p
 
-from .logging import log
+from .logging import get_module_logger
 from .schemas.context import AppContext, LibContext
 
 if t.TYPE_CHECKING:
     from _typeshed import StrPath
 
-mlog = log.fields(mod=__name__)
+mlog = get_module_logger(__name__)
 
 #: System config file location.
 SYSTEM_CONFIG_FILE = "/etc/antsibull.cfg"

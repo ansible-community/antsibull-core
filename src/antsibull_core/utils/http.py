@@ -17,9 +17,9 @@ from collections.abc import Iterable, Mapping
 import aiohttp
 
 from .. import app_context
-from ..logging import log
+from ..logging import get_module_logger
 
-mlog = log.fields(mod=__name__)
+mlog = get_module_logger(__name__)
 
 
 # Since Python 3.11 asyncio.TimeoutError is a deprecated alias of TimeoutError

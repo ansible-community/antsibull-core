@@ -1,0 +1,3 @@
+minor_changes:
+  - "Add logging wrapper classes to simplify switch from twiggy to the standard logging framework
+     (https://github.com/ansible-community/antsibull-core/issues/39, https://github.com/ansible-community/antsibull-core/pull/188)."
