@@ -14,12 +14,12 @@ from antsibull_fileutils.io import read_file as _read_file
 from antsibull_fileutils.io import write_file as _write_file
 
 from .. import app_context
-from ..logging import log
+from ..logging import get_module_logger
 
 if t.TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
 
-mlog = log.fields(mod=__name__)
+mlog = get_module_logger(__name__)
 
 
 async def copy_file(

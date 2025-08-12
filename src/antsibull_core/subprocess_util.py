@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from twiggy.logger import Logger as TwiggyLogger  # type: ignore[import]
 
-from antsibull_core.logging import log
+from antsibull_core.logging import Logger, get_module_logger
 
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     _T = TypeVar("_T")
     _P = ParamSpec("_P")
 
-mlog = log.fields(mod=__name__)
+mlog = get_module_logger(__name__)
 
 CalledProcessError = subprocess.CalledProcessError
 
@@ -99,7 +99,7 @@ def _get_log_func_and_prefix(
         else:
             # fmt: off
             func = getattr(logger, loglevel)
-            if isinstance(logger, TwiggyLogger):
+            if isinstance(logger, (TwiggyLogger, Logger)):
                 def logfunc(string: str, /):
                     func("{0}", string)
             elif isinstance(logger, StdLogger):
@@ -114,7 +114,7 @@ def _get_log_func_and_prefix(
 
 async def async_log_run(
     args: Sequence[StrOrBytesPath],
-    logger: TwiggyLogger | StdLogger | None = None,
+    logger: TwiggyLogger | StdLogger | Logger | None = None,
     stdout_loglevel: str | OutputCallbackType | None = None,
     stderr_loglevel: str | OutputCallbackType | None = "debug",
     check: bool = True,
@@ -187,7 +187,7 @@ async def async_log_run(
 
 def log_run(
     args: Sequence[StrOrBytesPath],
-    logger: TwiggyLogger | StdLogger | None = None,
+    logger: TwiggyLogger | StdLogger | Logger | None = None,
     stdout_loglevel: str | OutputCallbackType | None = None,
     stderr_loglevel: str | OutputCallbackType | None = "debug",
     check: bool = True,
