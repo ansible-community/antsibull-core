@@ -202,13 +202,20 @@ Once those steps are taken, any further logging calls will obey the user's confi
 from __future__ import annotations
 
 import abc
+import datetime
+import logging as python_logging
 import os
+import sys
+import traceback
 import typing as t
+from dataclasses import dataclass
 
 import twiggy  # type: ignore[import]
 import twiggy.levels  # type: ignore[import]
 
 if t.TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     from .schemas.context import AppContext
 
 #: The standard log to use everywhere.  The name of the logger for all of the antsibull libraries
@@ -300,6 +307,94 @@ class TwiggyLogger(Logger):
 
     def fields(self, **kwargs) -> Logger:
         return TwiggyLogger(self.logger.fields(**kwargs))
+
+
+@dataclass
+class LogMessage:
+    level: str
+    message: str
+    fields: dict[str, t.Any]
+    timestamp: datetime.datetime
+    trace: str | None
+
+    def as_string(self, *, with_trace: bool = True) -> str:
+        parts: list[str] = []
+        parts.append(self.timestamp.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+        parts.append(self.level)
+        parts.append("antsibull")
+        for key, value in sorted(self.fields.items()):
+            parts.append(f"{key}={value}")
+        if self.message:
+            parts.append(self.message)
+        result = ":".join(parts)
+        if self.trace is None or not with_trace:
+            return result
+        trace = "\n".join(f"TRACE {line}" for line in self.trace.splitlines())
+        return f"{result}\n{trace}\n"
+
+    def __str__(self) -> str:
+        return self.as_string()
+
+
+class PythonLogger(Logger):
+    def __init__(
+        self, logger: python_logging.Logger, *, fields: dict[str, t.Any] | None = None
+    ) -> None:
+        self._logger = logger
+        self._fields = {} if fields is None else fields
+
+    def _create_message(
+        self,
+        level: str,
+        format_spec: str,
+        args: Sequence[t.Any],
+        kwargs: Mapping[str, t.Any],
+    ) -> LogMessage:
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+        trace = None if sys.exc_info()[0] is None else traceback.format_exc()
+        f_args = tuple(v() if callable(v) else v for v in args)
+        f_kwargs = {k: v() if callable(v) else v for k, v in kwargs.items()}
+        message = format_spec.format(*f_args, **f_kwargs) if format_spec else ""
+        return LogMessage(
+            level=level,
+            message=message,
+            fields={k: v() if callable(v) else v for k, v in self._fields.items()},
+            timestamp=timestamp,
+            trace=trace,
+        )
+
+    def debug(self, format_spec: str, *args, **kwargs) -> None:
+        if self._logger.isEnabledFor(python_logging.DEBUG):
+            self._logger.debug(self._create_message("DEBUG", format_spec, args, kwargs))
+
+    def info(self, format_spec: str, *args, **kwargs) -> None:
+        if self._logger.isEnabledFor(python_logging.INFO):
+            self._logger.info(self._create_message("INFO", format_spec, args, kwargs))
+
+    def notice(self, format_spec: str, *args, **kwargs) -> None:
+        if self._logger.isEnabledFor(python_logging.INFO):
+            self._logger.info(self._create_message("NOTICE", format_spec, args, kwargs))
+
+    def warning(self, format_spec: str, *args, **kwargs) -> None:
+        if self._logger.isEnabledFor(python_logging.WARNING):
+            self._logger.warning(
+                self._create_message("WARNING", format_spec, args, kwargs)
+            )
+
+    def error(self, format_spec: str, *args, **kwargs) -> None:
+        if self._logger.isEnabledFor(python_logging.ERROR):
+            self._logger.error(self._create_message("ERROR", format_spec, args, kwargs))
+
+    def critical(self, format_spec: str, *args, **kwargs) -> None:
+        if self._logger.isEnabledFor(python_logging.CRITICAL):
+            self._logger.critical(
+                self._create_message("CRITICAL", format_spec, args, kwargs)
+            )
+
+    def fields(self, **kwargs) -> Logger:
+        new_fields = self._fields.copy()
+        new_fields.update(kwargs)
+        return PythonLogger(self._logger, fields=new_fields)
 
 
 def get_module_logger(module_name: str) -> Logger:
