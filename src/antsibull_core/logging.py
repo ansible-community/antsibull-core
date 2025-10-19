@@ -272,10 +272,6 @@ class Logger(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def trace(self) -> None:
-        pass
-
-    @abc.abstractmethod
     def fields(self, **kwargs) -> Logger:
         pass
 
@@ -301,9 +297,6 @@ class TwiggyLogger(Logger):
 
     def critical(self, format_spec: str, *args, **kwargs) -> None:
         self.logger.critical(format_spec, *args, **kwargs)
-
-    def trace(self) -> None:
-        self.logger.trace()
 
     def fields(self, **kwargs) -> Logger:
         return TwiggyLogger(self.logger.fields(**kwargs))

@@ -73,11 +73,9 @@ class RetryGetManager:
                 status = str(status_code)
                 response.close()
             except _AsyncIoTimeoutError:
-                flog.trace()
                 status = "timeout"
                 wait_factor = 0.5
             except Exception as error:  # pylint:disable=broad-except
-                flog.trace()
                 status = str(error)
 
             errors.append(status)
