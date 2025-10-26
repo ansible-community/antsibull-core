@@ -392,8 +392,7 @@ class PythonLogger(Logger):
             )
 
     def fields(self, **kwargs) -> Logger:
-        new_fields = self._fields.copy()
-        new_fields.update(kwargs)
+        new_fields = self._fields | kwargs
         return PythonLogger(self._logger, fields=new_fields)
 
 
