@@ -310,7 +310,7 @@ class TwiggyLogger(Logger):
 
 
 @dataclass
-class LogMessage:
+class _LogMessage:
     level: str
     message: str
     fields: dict[str, t.Any]
@@ -349,13 +349,13 @@ class PythonLogger(Logger):
         format_spec: str,
         args: Sequence[t.Any],
         kwargs: Mapping[str, t.Any],
-    ) -> LogMessage:
+    ) -> _LogMessage:
         timestamp = datetime.datetime.now(datetime.timezone.utc)
         trace = None if sys.exc_info()[0] is None else traceback.format_exc()
         f_args = tuple(v() if callable(v) else v for v in args)
         f_kwargs = {k: v() if callable(v) else v for k, v in kwargs.items()}
         message = format_spec.format(*f_args, **f_kwargs) if format_spec else ""
-        return LogMessage(
+        return _LogMessage(
             level=level,
             message=message,
             fields={k: v() if callable(v) else v for k, v in self._fields.items()},
