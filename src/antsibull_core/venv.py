@@ -23,6 +23,8 @@ if TYPE_CHECKING:
     from _typeshed import StrPath
     from twiggy.logger import Logger as TwiggyLogger  # type: ignore[import]
 
+    from antsibull_core.logging import Logger
+
 
 def get_clean_environment() -> dict[str, str]:
     env = os.environ.copy()
@@ -81,7 +83,7 @@ class VenvRunner:
     async def async_log_run(
         self,
         args: Sequence[StrPath],
-        logger: TwiggyLogger | StdLogger | None = None,
+        logger: TwiggyLogger | StdLogger | Logger | None = None,
         stdout_loglevel: str | subprocess_util.OutputCallbackType | None = None,
         stderr_loglevel: str | subprocess_util.OutputCallbackType | None = "debug",
         check: bool = True,
@@ -116,7 +118,7 @@ class VenvRunner:
     def log_run(
         self,
         args: Sequence[StrPath],
-        logger: TwiggyLogger | StdLogger | None = None,
+        logger: TwiggyLogger | StdLogger | Logger | None = None,
         stdout_loglevel: str | subprocess_util.OutputCallbackType | None = None,
         stderr_loglevel: str | subprocess_util.OutputCallbackType | None = "debug",
         check: bool = True,
@@ -151,7 +153,7 @@ class FakeVenvRunner:
     async def async_log_run(
         self,
         args: Sequence[StrPath],
-        logger: TwiggyLogger | StdLogger | None = None,
+        logger: TwiggyLogger | StdLogger | Logger | None = None,
         stdout_loglevel: str | None = None,
         stderr_loglevel: str | None = "debug",
         check: bool = True,
@@ -180,7 +182,7 @@ class FakeVenvRunner:
     def log_run(
         self,
         args: Sequence[StrPath],
-        logger: TwiggyLogger | StdLogger | None = None,
+        logger: TwiggyLogger | StdLogger | Logger | None = None,
         stdout_loglevel: str | None = None,
         stderr_loglevel: str | None = "debug",
         check: bool = True,

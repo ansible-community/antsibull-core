@@ -17,9 +17,9 @@ from collections.abc import Iterable, Mapping
 import aiohttp
 
 from .. import app_context
-from ..logging import log
+from ..logging import get_module_logger
 
-mlog = log.fields(mod=__name__)
+mlog = get_module_logger(__name__)
 
 
 # Since Python 3.11 asyncio.TimeoutError is a deprecated alias of TimeoutError
@@ -73,11 +73,9 @@ class RetryGetManager:
                 status = str(status_code)
                 response.close()
             except _AsyncIoTimeoutError:
-                flog.trace()
                 status = "timeout"
                 wait_factor = 0.5
             except Exception as error:  # pylint:disable=broad-except
-                flog.trace()
                 status = str(error)
 
             errors.append(status)

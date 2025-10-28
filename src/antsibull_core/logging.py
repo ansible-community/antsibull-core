@@ -18,7 +18,7 @@ initializing it for application usage when a set of functions are called.
 
 .. seealso::
 
-    * :mod:`antsibull.config` to see how the antsibull scripts allow user defined configuration
+    * :mod:`antsibull_core.config` to see how the antsibull scripts allow user defined configuration
         to configure logging after the bootstrap phase is over.  This is the primary way that end
         users interact with the logging subsystem.
 
@@ -31,32 +31,31 @@ Merely importing this file sets up logging to be used as a library.  Essentially
 logging output is disabled.  That way the library doesn't spam the user's screen with log messages.
 
 An application that wishes to use the log must import the log and then call
-antsibull.logging.initialize_app_logging() before any other parts of antsibull are imported.  See
-the :ref:`Application Logging <application_logging>`_ section for more details.
+antsibull_core.logging.initialize_app_logging() before any other parts of antsibull are imported.
+See the :ref:`Application Logging <application_logging>`_ section for more details.
 
 
 Usage within a module
 =====================
 
 Our convention for logging with twiggy is that the name field reflects the Python package that the
-code is coming from (in this case, it is already set to ``antsibull`` by :mod:`antsibull.logging`.)
+code is coming from (in this case, it is already set to ``antsibull`` by
+:mod:`antsibull_core.logging`.)
 At the toplevel of a module, set up a logger which has a field named ``mod`` which reflects the
 module name:
 
 .. code-block:: python
 
     # The antsibull log object with the name already set to `antsibull`.
-    from logging import log
+    from logging import get_module_logger
 
-    # mlog stands for module log.  It's our convention to create a logger from the
-    # antsibull.logging.log object in each module.  `fields()` takes an arbitrary set of keyword
-    # args and returns a new log object.  Any log messages we emit with this log object (or its
-    # children) will include the fields which were set on it.  Our convention is to create mlog with
-    # `fields(mod=__name__)` so that messages we make from mlog (or its children) have a field named
-    # `mod` containing the name of the module.
+    # mlog stands for module log.  It's our convention to create a logger in each module.
+    # The logger will containt the module name as the `mod` field.
+    mlog = get_module_logger(__name__)
 
-    # `mod` and the value set to the module name.
-    mlog = log.fields(mod=__name__)
+    # `fields()` takes an arbitrary set of keyword args and returns a new log object.
+    # Any log messages we emit with this log object (or its children) will include the fields
+    # which were set on it.
 
     TRICKY_COMPUTED_GLOBAL = [a**a for a in range(1, 4)]
     # Use mlog for logging interesting things that happen at the module level.  Notice that we send
@@ -74,31 +73,31 @@ method names:
 
 .. code-block:: python
 
-def test_function(argument1):
-    # flog stands for function log.  It's our convention to use this name.
-    # Create a new one in any function you want to log from.
-    # By creating this from mlog, we copy any fields and other settings that we made to mlog.
-    # Our convention is to use the `func` field to hold the name of the function we're in.
-    flog = mlog.fields(func='test_function')
+    def test_function(argument1):
+        # flog stands for function log.  It's our convention to use this name.
+        # Create a new one in any function you want to log from.
+        # By creating this from mlog, we copy any fields and other settings that we made to mlog.
+        # Our convention is to use the `func` field to hold the name of the function we're in.
+        flog = mlog.fields(func='test_function')
 
-    # This would output:
-    # DEBUG:antsibull:func=test_function:mod=__main__|Enter
-    flog.debug('Enter')
-    value = do_something(argument1)
-
-    flog.debug('Leave')
-
-class FooBar:
-    def __init__(self):
-        flog = mlog.fields(func='FooBar.__init__')
+        # This would output:
+        # DEBUG:antsibull:func=test_function:mod=__main__|Enter
         flog.debug('Enter')
-
-        self._x = initialize_x()
-        self._y = initialize_y()
-
-        self.position = self.calculate_position(self._x, self._y)
+        value = do_something(argument1)
 
         flog.debug('Leave')
+
+    class FooBar:
+        def __init__(self):
+            flog = mlog.fields(func='FooBar.__init__')
+            flog.debug('Enter')
+
+            self._x = initialize_x()
+            self._y = initialize_y()
+
+            self.position = self.calculate_position(self._x, self._y)
+
+            flog.debug('Leave')
 
 
 .. _logging_levels::
@@ -144,29 +143,28 @@ Logging from the application point of view
 Logging Setup
 =============
 
-An antsibull command (:file:`antsibull/cli/*.py`) should import the ``log`` object from this module.
+An antsibull command (:file:`antsibull_*/cli/*.py`) should import this module.
 The log object will be configured for use within the library at first (silent) so the application
-should call :func:`antsibull.logging.initialize_app_logging` as soon as possible to tell the ``log``
-that it is okay to emit messages.
+should call :func:`antsibull_core.logging.initialize_app_logging` as soon as possible to tell the
+``log`` that it is okay to emit messages.
 
 The initial application logging configuration will log to stderr at the ``WARNING`` level or
 higher.  If the :envvar:`ANTIBULL_EARLY_DEBUG` environment variable is set, then  it will log at
 the ``DEBUG`` level rather than ``WARNING``.
 
 The antsibull command should read the configuration settings, which may include user specified
-logging configuration and application defaults, and then call :twiggy:func:`twiggy.dict_config` to
-finish the setup.  At that point, logging calls will emit logs according to the user's
-configuration.
+logging configuration and application defaults, and then call
+:func:`antsibull_core.logging.configure_logger` to finish the setup.
+At that point, logging calls will emit logs according to the user's configuration.
 
 Here's a sample of the relevant portions of an antsibull command to show how this will look:
 
 .. code-block:: python
 
     # File is antsibull/cli/antsibull_command.py
-    import twiggy
     # log is the toplevel log object.  It is important to import this and initialize it prior to
     # using the log so that sane defaults can be set.
-    from ..logging import log, initialize_app_logging
+    from antsibull_core.logging import configure_logger, get_module_logger, initialize_app_logging
 
     # By default, the log is configured to be useful within a library where the user may not have
     # been given the chance to configure the log.  Calling initialize_app_logging() reconfigures
@@ -178,7 +176,7 @@ Here's a sample of the relevant portions of an antsibull command to show how thi
     from ..config import load_config
 
 
-    mlog = log.fields(mod=__name__)
+    mlog = get_module_logger(__name__)
 
     def run(args):
         flog = mlog.fields(func='run')
@@ -189,12 +187,12 @@ Here's a sample of the relevant portions of an antsibull command to show how thi
         with app_context.app_and_lib_context(context_data) as (app_ctx, dummy_):
             # initialize_app_logging() sets the log's configuration with defaults appropriate for
             # an application but this call takes that one step further. It takes the logging
-            # configuration from the user's config file and hands it to twiggy.dict_config() so
+            # configuration from the user's config file and hands it to configure_logger() so
             # that the user has ultimate control over what log level, what format, and which file
             # the log is output as.  See the twiggy documentation for information on the format of
-            # the logging config.  See the antsibull.app_context documentation if you want more
+            # the logging config.  See the antsibull_core.app_context documentation if you want more
             # information on the context object.
-            twiggy.dict_config(app_ctx.logging_cfg.model_dump())
+            configure_logger(app_ctx)
 
 
 Once those steps are taken, any further logging calls will obey the user's configuration.
@@ -203,10 +201,22 @@ Once those steps are taken, any further logging calls will obey the user's confi
 
 from __future__ import annotations
 
+import abc
+import datetime
+import logging as python_logging
 import os
+import sys
+import traceback
+import typing as t
+from dataclasses import dataclass
 
 import twiggy  # type: ignore[import]
 import twiggy.levels  # type: ignore[import]
+
+if t.TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
+    from .schemas.context import AppContext
 
 #: The standard log to use everywhere.  The name of the logger for all of the antsibull libraries
 #: is antsibull so that it is easy to setup an emitter for all of antsibull.  For those used to
@@ -229,7 +239,7 @@ def initialize_app_logging() -> None:
     """
     Change log settings to make sense for an application.
 
-    Merely importing the :mod:`antsibull.logging` module sets up the logger for use as part of
+    Merely importing the :mod:`antsibull_core.logging` module sets up the logger for use as part of
     a library.  Calling this function will initialize the logger for use in an application.
     """
     # We want to see logs from the antsibull library, so the very first thing we do is turn the log
@@ -243,4 +253,155 @@ def initialize_app_logging() -> None:
     twiggy.quick_setup(min_level=_level)
 
 
-__all__ = ("log", "initialize_app_logging")
+class Logger(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def debug(self, format_spec: str, *args, **kwargs) -> None:
+        pass
+
+    @abc.abstractmethod
+    def info(self, format_spec: str, *args, **kwargs) -> None:
+        pass
+
+    @abc.abstractmethod
+    def notice(self, format_spec: str, *args, **kwargs) -> None:
+        pass
+
+    @abc.abstractmethod
+    def warning(self, format_spec: str, *args, **kwargs) -> None:
+        pass
+
+    @abc.abstractmethod
+    def error(self, format_spec: str, *args, **kwargs) -> None:
+        pass
+
+    @abc.abstractmethod
+    def critical(self, format_spec: str, *args, **kwargs) -> None:
+        pass
+
+    @abc.abstractmethod
+    def fields(self, **kwargs) -> Logger:
+        pass
+
+
+class TwiggyLogger(Logger):
+    def __init__(self, logger: twiggy.logger.Logger) -> None:
+        self.logger = logger
+
+    def debug(self, format_spec: str, *args, **kwargs) -> None:
+        self.logger.debug(format_spec, *args, **kwargs)
+
+    def info(self, format_spec: str, *args, **kwargs) -> None:
+        self.logger.info(format_spec, *args, **kwargs)
+
+    def notice(self, format_spec: str, *args, **kwargs) -> None:
+        self.logger.notice(format_spec, *args, **kwargs)
+
+    def warning(self, format_spec: str, *args, **kwargs) -> None:
+        self.logger.warning(format_spec, *args, **kwargs)
+
+    def error(self, format_spec: str, *args, **kwargs) -> None:
+        self.logger.error(format_spec, *args, **kwargs)
+
+    def critical(self, format_spec: str, *args, **kwargs) -> None:
+        self.logger.critical(format_spec, *args, **kwargs)
+
+    def fields(self, **kwargs) -> Logger:
+        return TwiggyLogger(self.logger.fields(**kwargs))
+
+
+@dataclass
+class _LogMessage:
+    level: str
+    message: str
+    fields: dict[str, t.Any]
+    timestamp: datetime.datetime
+    trace: str | None
+
+    def as_string(self, *, with_trace: bool = True) -> str:
+        parts: list[str] = []
+        parts.append(self.timestamp.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+        parts.append(self.level)
+        parts.append("antsibull")
+        for key, value in sorted(self.fields.items()):
+            parts.append(f"{key}={value}")
+        if self.message:
+            parts.append(self.message)
+        result = ":".join(parts)
+        if self.trace is None or not with_trace:
+            return result
+        trace = "\n".join(f"TRACE {line}" for line in self.trace.splitlines())
+        return f"{result}\n{trace}\n"
+
+    def __str__(self) -> str:
+        return self.as_string()
+
+
+class PythonLogger(Logger):
+    def __init__(
+        self, logger: python_logging.Logger, *, fields: dict[str, t.Any] | None = None
+    ) -> None:
+        self._logger = logger
+        self._fields = {} if fields is None else fields
+
+    def _create_message(
+        self,
+        level: str,
+        format_spec: str,
+        args: Sequence[t.Any],
+        kwargs: Mapping[str, t.Any],
+    ) -> _LogMessage:
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+        trace = None if sys.exc_info()[0] is None else traceback.format_exc()
+        f_args = tuple(v() if callable(v) else v for v in args)
+        f_kwargs = {k: v() if callable(v) else v for k, v in kwargs.items()}
+        message = format_spec.format(*f_args, **f_kwargs) if format_spec else ""
+        return _LogMessage(
+            level=level,
+            message=message,
+            fields={k: v() if callable(v) else v for k, v in self._fields.items()},
+            timestamp=timestamp,
+            trace=trace,
+        )
+
+    def debug(self, format_spec: str, *args, **kwargs) -> None:
+        if self._logger.isEnabledFor(python_logging.DEBUG):
+            self._logger.debug(self._create_message("DEBUG", format_spec, args, kwargs))
+
+    def info(self, format_spec: str, *args, **kwargs) -> None:
+        if self._logger.isEnabledFor(python_logging.INFO):
+            self._logger.info(self._create_message("INFO", format_spec, args, kwargs))
+
+    def notice(self, format_spec: str, *args, **kwargs) -> None:
+        if self._logger.isEnabledFor(python_logging.INFO):
+            self._logger.info(self._create_message("NOTICE", format_spec, args, kwargs))
+
+    def warning(self, format_spec: str, *args, **kwargs) -> None:
+        if self._logger.isEnabledFor(python_logging.WARNING):
+            self._logger.warning(
+                self._create_message("WARNING", format_spec, args, kwargs)
+            )
+
+    def error(self, format_spec: str, *args, **kwargs) -> None:
+        if self._logger.isEnabledFor(python_logging.ERROR):
+            self._logger.error(self._create_message("ERROR", format_spec, args, kwargs))
+
+    def critical(self, format_spec: str, *args, **kwargs) -> None:
+        if self._logger.isEnabledFor(python_logging.CRITICAL):
+            self._logger.critical(
+                self._create_message("CRITICAL", format_spec, args, kwargs)
+            )
+
+    def fields(self, **kwargs) -> Logger:
+        new_fields = self._fields | kwargs
+        return PythonLogger(self._logger, fields=new_fields)
+
+
+def get_module_logger(module_name: str) -> Logger:
+    return TwiggyLogger(log.fields(mod=module_name))
+
+
+def configure_logger(app_ctx: AppContext) -> None:
+    twiggy.dict_config(app_ctx.logging_cfg.model_dump())
+
+
+__all__ = ("log", "initialize_app_logging", "get_module_logger", "Logger")
