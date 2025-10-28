@@ -372,3 +372,16 @@ releases:
       - 3.4.0.yml
       - python-3.13.yml
     release_date: '2024-11-15'
+  3.5.0:
+    changes:
+      minor_changes:
+        - Add logging wrapper classes to simplify switch from twiggy to the standard
+          logging framework (https://github.com/ansible-community/antsibull-core/issues/39,
+          https://github.com/ansible-community/antsibull-core/pull/188).
+        - Declare support for Python 3.14 (https://github.com/ansible-community/antsibull-core/pull/191).
+      release_summary: Feature and maintenance release.
+    fragments:
+      - 188-logging.yml
+      - 191-python.yml
+      - 3.5.0.yml
+    release_date: '2025-10-28'

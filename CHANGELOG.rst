@@ -4,6 +4,20 @@ antsibull-core Release Notes
 
 .. contents:: Topics
 
+v3.5.0
+======
+
+Release Summary
+---------------
+
+Feature and maintenance release.
+
+Minor Changes
+-------------
+
+- Add logging wrapper classes to simplify switch from twiggy to the standard logging framework (https://github.com/ansible-community/antsibull-core/issues/39, https://github.com/ansible-community/antsibull-core/pull/188).
+- Declare support for Python 3.14 (https://github.com/ansible-community/antsibull-core/pull/191).
+
 v3.4.0
 ======
 
