@@ -63,7 +63,7 @@ email = "maxwell@gtmx.me"
 
 [project.urls]
 "Source code" = "https://github.com/ansible-community/antsibull-core"
-"Code of Conduct" = "https://docs.ansible.com/ansible/latest/community/code_of_conduct.html"
+"Code of Conduct" = "https://docs.ansible.com/projects/ansible/latest/community/code_of_conduct.html"
 "Bug tracker" = "https://github.com/ansible-community/antsibull-core/issues"
 
 [project.optional-dependencies]
