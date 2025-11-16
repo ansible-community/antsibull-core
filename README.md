@@ -17,7 +17,7 @@ You can find a list of changes in [the antsibull-core changelog](./CHANGELOG.rst
 Unless otherwise noted in the code, it is licensed under the terms of the GNU
 General Public License v3 or, at your option, later.
 
-antsibull-core is covered by the [Ansible Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html).
+antsibull-core is covered by the [Ansible Code of Conduct](https://docs.ansible.com/projects/ansible/latest/community/code_of_conduct.html).
 
 ## Versioning and compatibility
 
