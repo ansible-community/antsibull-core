@@ -26,13 +26,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out antsibull-core
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: antsibull-core
           persist-credentials: false
 
       - name: Checkout antsibull-docs-parser main
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: ansible-community/antsibull-docs-parser
           ref: main
@@ -40,7 +40,7 @@ jobs:
           persist-credentials: false
 
       - name: Check out dependent project antsibull-fileutils
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: ansible-community/antsibull-fileutils
           path: antsibull-fileutils
@@ -49,7 +49,7 @@ jobs:
       # nb: this is the first version of antsibull-docs that declares support
       # for antsibull-core v3.
       - name: Check out antsibull-docs main
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: ansible-community/antsibull-docs
           ref: 2.9.0
