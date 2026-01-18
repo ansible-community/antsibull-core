@@ -469,21 +469,17 @@ def test_collections_metadata_methods(tmp_path: Path):
 
     assert CollectionsMetadata.load_from(tmp_path).collections == {}
 
-    filename.write_text(
-        r"""---
+    filename.write_text(r"""---
 collections: {}
-"""
-    )
+""")
 
     assert CollectionsMetadata.load_from(tmp_path).collections == {}
 
-    filename.write_text(
-        r"""---
+    filename.write_text(r"""---
 collections:
   foo.bar:
     repository: https://github.com/ansible-collections/collection_template
-"""
-    )
+""")
 
     meta = CollectionsMetadata.load_from(tmp_path)
     assert meta.collections == {
