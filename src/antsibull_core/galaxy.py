@@ -170,7 +170,7 @@ class GalaxyClient:
                 results = collection_info["data"]
             else:
                 results = collection_info["results"]
-            next_link = collection_info["links"]["next"]
+            next_link = (collection_info.get("links") or {}).get("next")
             add_params = False
         for version_record in results:
             versions.append(version_record["version"])
