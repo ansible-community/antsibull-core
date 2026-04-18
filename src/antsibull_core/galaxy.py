@@ -170,7 +170,7 @@ class GalaxyClient:
                 results = collection_info["data"]
             else:
                 results = collection_info["results"]
-            next_link = collection_info["links"]["next"]
+            next_link = (collection_info.get("links") or {}).get("next")
             add_params = False
         for version_record in results:
             versions.append(version_record["version"])
@@ -394,9 +394,9 @@ class CollectionDownloader(GalaxyClient):
         release_info = await self.get_release_info(f"{namespace}/{name}", version)
         release_url = release_info["download_url"]
 
-        sha256sum = release_info["artifact"]["sha256"]
+        sha256sum = (release_info.get("artifact") or {}).get("sha256")
 
-        if self.collection_cache:
+        if sha256sum is not None and self.collection_cache:
             cached_copy = os.path.join(self.collection_cache, filename)
             if os.path.isfile(cached_copy):
                 lib_ctx = app_context.lib_ctx.get()
@@ -424,7 +424,7 @@ class CollectionDownloader(GalaxyClient):
                     await f.write(chunk)
 
         # Verify the download
-        if not await verify_hash(
+        if sha256sum is not None and not await verify_hash(
             download_filename, sha256sum, chunksize=lib_ctx.chunksize
         ):
             raise DownloadFailure(
