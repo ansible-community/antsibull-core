@@ -364,6 +364,8 @@ class CollectionDownloader(GalaxyClient):
         self,
         collection: str,
         version: str | semver.Version,
+        *,
+        require_checksum: bool = True,
     ) -> str:
         """
         Download a collection.
@@ -395,6 +397,11 @@ class CollectionDownloader(GalaxyClient):
         release_url = release_info["download_url"]
 
         sha256sum = (release_info.get("artifact") or {}).get("sha256")
+        if sha256sum is None and require_checksum:
+            raise DownloadFailure(
+                "The release information does not contain a SHA256 checksum"
+                " for the collection artifact."
+            )
 
         if sha256sum is not None and self.collection_cache:
             cached_copy = os.path.join(self.collection_cache, filename)
@@ -446,7 +453,11 @@ class CollectionDownloader(GalaxyClient):
         return download_filename
 
     async def download_latest_matching(
-        self, collection: str, version_spec: str
+        self,
+        collection: str,
+        version_spec: str,
+        *,
+        require_checksum: bool = True,
     ) -> DownloadResults:
         """
         Download the latest version of a collection that matches a specification.
@@ -460,5 +471,7 @@ class CollectionDownloader(GalaxyClient):
             of :obj:`semantic_version.SimpleSpec`
         """
         version = await self.get_latest_matching_version(collection, version_spec)
-        download_path = await self.download(collection, version)
+        download_path = await self.download(
+            collection, version, require_checksum=require_checksum
+        )
         return DownloadResults(version=version, download_path=download_path)
