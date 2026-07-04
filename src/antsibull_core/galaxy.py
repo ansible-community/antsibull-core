@@ -360,6 +360,27 @@ class CollectionDownloader(GalaxyClient):
             trust_collection_cache = lib_ctx.trust_collection_cache
         self.trust_collection_cache: t.Final[bool] = trust_collection_cache
 
+    def _find_checksum(
+        self, release_info: dict[str, t.Any], *, require_checksum: bool
+    ) -> tuple[str | None, str, dict[str, t.Any] | None, str]:
+        """
+        Extract checksum and check whether it is present, if ``require_checksum == True``.
+
+        The checksum, the algorithm identifier, the algorithm's kwargs,
+        and the algorithm's name are returned.
+        """
+        artifact_info = release_info.get("artifact") or {}
+        # Right now, the only supported checksum by Galaxy is SHA-256.
+        # If other Galaxy implementations (or Galaxy itself) provide other
+        # (secure) checksums, we could also verify them instead.
+        sha256sum = artifact_info.get("sha256")
+        if sha256sum is None and require_checksum:
+            raise DownloadFailure(
+                "The release information does not contain a SHA-256 checksum"
+                " for the collection artifact."
+            )
+        return sha256sum, "sha256", None, "SHA-256"
+
     async def download(
         self,
         collection: str,
@@ -396,19 +417,20 @@ class CollectionDownloader(GalaxyClient):
         release_info = await self.get_release_info(f"{namespace}/{name}", version)
         release_url = release_info["download_url"]
 
-        sha256sum = (release_info.get("artifact") or {}).get("sha256")
-        if sha256sum is None and require_checksum:
-            raise DownloadFailure(
-                "The release information does not contain a SHA256 checksum"
-                " for the collection artifact."
-            )
+        checksum, checksum_algorithm, checksum_kwargs, checksum_name = (
+            self._find_checksum(release_info, require_checksum=require_checksum)
+        )
 
-        if sha256sum is not None and self.collection_cache:
+        if checksum is not None and self.collection_cache:
             cached_copy = os.path.join(self.collection_cache, filename)
             if os.path.isfile(cached_copy):
                 lib_ctx = app_context.lib_ctx.get()
                 if await verify_hash(
-                    cached_copy, sha256sum, chunksize=lib_ctx.chunksize
+                    cached_copy,
+                    checksum,
+                    algorithm=checksum_algorithm,
+                    algorithm_kwargs=checksum_kwargs,
+                    chunksize=lib_ctx.chunksize,
                 ):
                     await copy_file(
                         cached_copy,
@@ -431,12 +453,16 @@ class CollectionDownloader(GalaxyClient):
                     await f.write(chunk)
 
         # Verify the download
-        if sha256sum is not None and not await verify_hash(
-            download_filename, sha256sum, chunksize=lib_ctx.chunksize
+        if checksum is not None and not await verify_hash(
+            download_filename,
+            checksum,
+            algorithm=checksum_algorithm,
+            algorithm_kwargs=checksum_kwargs,
+            chunksize=lib_ctx.chunksize,
         ):
             raise DownloadFailure(
                 f"{release_url} failed to download correctly."
-                f" Expected checksum: {sha256sum}"
+                f" Expected {checksum_name} checksum: {checksum}"
             )
 
         # Copy downloaded collection into cache
