@@ -80,6 +80,9 @@ class LibContext(BaseModel):
         cache contains an artifact, it is the current one available on PyPI. This avoids making a
         request to PyPI to figure out the artifact's checksum and comparing it before trusting
         the cached artifact.
+    :ivar require_galaxy_checksums: If set to ``True``, will reqiure that all Galaxy
+        implementations provide secure checksums for artifacts.  Clients can override this
+        when downloading a file.
     """
 
     chunksize: int = 4096
@@ -95,6 +98,7 @@ class LibContext(BaseModel):
     trust_collection_cache: bool = False
     ansible_core_cache: t.Optional[str] = None
     trust_ansible_core_cache: bool = False
+    require_galaxy_checksums: bool = False
 
     # pylint: disable-next=unused-private-member
     __convert_nones = p.field_validator("process_max", mode="before")(convert_none)
@@ -104,5 +108,8 @@ class LibContext(BaseModel):
     )(convert_path)
     # pylint: disable-next=unused-private-member
     __convert_bools = p.field_validator(
-        "trust_ansible_core_cache", "trust_collection_cache", mode="before"
+        "trust_ansible_core_cache",
+        "trust_collection_cache",
+        "require_galaxy_checksums",
+        mode="before",
     )(convert_bool)

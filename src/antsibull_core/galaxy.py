@@ -386,7 +386,7 @@ class CollectionDownloader(GalaxyClient):
         collection: str,
         version: str | semver.Version,
         *,
-        require_checksum: bool = True,
+        require_checksum: bool | None = True,
     ) -> str:
         """
         Download a collection.
@@ -395,6 +395,12 @@ class CollectionDownloader(GalaxyClient):
 
         :arg collection: Namespace.collection identifying the collection.
         :arg version: Version of the collection to download.
+        :kwarg require_checksum: Whether to require checksums being provided by
+            Galaxy when downloading artifacts.  If set to ``None``, use the
+            global setting from the library context.  For backwards compatibility,
+            this is set to ``True``.
+
+            The default will change in 4.0.0 to ``None``.
         :returns: The full path to the downloaded collection.
         """
         namespace, name = collection.split(".", 1)
@@ -418,7 +424,14 @@ class CollectionDownloader(GalaxyClient):
         release_url = release_info["download_url"]
 
         checksum, checksum_algorithm, checksum_kwargs, checksum_name = (
-            self._find_checksum(release_info, require_checksum=require_checksum)
+            self._find_checksum(
+                release_info,
+                require_checksum=(
+                    lib_ctx.require_galaxy_checksums
+                    if require_checksum is None
+                    else require_checksum
+                ),
+            )
         )
 
         if checksum is not None and self.collection_cache:
