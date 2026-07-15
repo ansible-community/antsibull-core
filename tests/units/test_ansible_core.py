@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: Ansible Project
 
+from __future__ import annotations
+
 import ast
 
 import pytest
