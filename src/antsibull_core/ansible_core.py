@@ -204,6 +204,21 @@ class AnsibleCorePyPiClient:
         return tar_path
 
 
+def _extract_source_version(root: ast.Module) -> str | None:
+    # Find the version of the source.
+
+    # Iterate backwards in case __version__ is assigned to multiple times
+    for node in reversed(root.body):
+        if isinstance(node, ast.Assign) and isinstance(node.value, ast.Constant):
+            value = node.value.value
+            if value and isinstance(value, str):
+                for name in node.targets:
+                    if isinstance(name, ast.Name) and name.id == "__version__":
+                        return value
+
+    return None
+
+
 def _get_source_version(ansible_core_source: StrPath) -> PypiVer:
     with open(
         os.path.join(ansible_core_source, "lib", "ansible", "release.py"),
@@ -212,20 +227,7 @@ def _get_source_version(ansible_core_source: StrPath) -> PypiVer:
     ) as f:
         root = ast.parse(f.read())
 
-    # Find the version of the source
-    source_version = None
-    # Iterate backwards in case __version__ is assigned to multiple times
-    for node in reversed(root.body):
-        if isinstance(node, ast.Assign):
-            for name in node.targets:
-                # These attributes are dynamic so pyre cannot check them
-                if name.id == "__version__":  # type: ignore[attr-defined] # pyre-ignore[16]
-                    source_version = node.value.s  # type: ignore[attr-defined] # pyre-ignore[16]
-                    break
-
-        if source_version:
-            break
-
+    source_version = _extract_source_version(root)
     if not source_version:
         raise ValueError("Version was not found")
 

@@ -1,0 +1,3 @@
+bugfixes:
+  - "Make ansible-core version from source tree extraction more robust, and make it work with Python 3.14 as well
+     (https://github.com/ansible-community/antsibull-core/pull/202)."
