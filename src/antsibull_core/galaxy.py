@@ -491,8 +491,9 @@ class CollectionDownloader(GalaxyClient):
                 f" Expected {checksum.algorithm_name} checksum: {checksum.checksum}"
             )
 
-        # Copy downloaded collection into cache
-        if self.collection_cache:
+        # Copy downloaded collection into cache, but only if a checksum is present
+        # (and thus the download verified)
+        if self.collection_cache and checksum is not None:
             cached_copy = os.path.join(self.collection_cache, filename)
             await copy_file(
                 download_filename,
