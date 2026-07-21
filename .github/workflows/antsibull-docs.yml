@@ -65,7 +65,7 @@ jobs:
       # TODO: use Python 3.14 once using a more modern antsibull-docs version!
       - name: Set up Python 3.13
         id: python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.13'
 
