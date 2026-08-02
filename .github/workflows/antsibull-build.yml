@@ -26,13 +26,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out antsibull-core
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           path: antsibull-core
           persist-credentials: false
 
       - name: Check out dependent project antsibull-fileutils
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           repository: ansible-community/antsibull-fileutils
           path: antsibull-fileutils
@@ -40,7 +40,7 @@ jobs:
 
       # antsibull 0.61.0 depends on antsibull-changelog >= 0.24.0 as well, so install 0.24.0 of that
       - name: Check out antsibull-changelog 0.24.0
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           repository: ansible-community/antsibull-changelog
           ref: 0.24.0
@@ -50,7 +50,7 @@ jobs:
       # nb: this is the first version of antsibull-build that declares support
       # for antsibull-core v3.
       - name: Check out antsibull-build 0.61.0
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           repository: ansible-community/antsibull-build
           ref: 0.61.0
@@ -77,7 +77,7 @@ jobs:
 
       - name: Set up Python 3.14
         id: python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
           python-version: '3.14'
 
