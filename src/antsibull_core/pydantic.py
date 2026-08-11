@@ -19,6 +19,17 @@ if t.TYPE_CHECKING:
     from typing_extensions import TypeGuard
 
 
+def _get_pydantic_version() -> tuple[int, ...]:
+    try:
+        return tuple(int(part) for part in p.VERSION.split(".", 2)[:2])
+    except Exception:  # pylint: disable=broad-exception-caught
+        # Return something that's bigger than any explicit comparison we do.
+        return (2, 999)
+
+
+_PYDANTIC_VERSION = _get_pydantic_version()
+
+
 def _is_basemodel(a_type: t.Any) -> TypeGuard[type[p.BaseModel]]:
     try:
         return issubclass(a_type, p.BaseModel)
@@ -57,6 +68,8 @@ def _modify_config(
     return change
 
 
+# This should eventually be deprecated and removed, once we require pydantic >= 2.12
+# (https://github.com/pydantic/pydantic/discussions/2652#discussioncomment-17853656)
 def set_extras(
     models: type[p.BaseModel] | Collection[type[p.BaseModel]],
     value: t.Literal["allow", "ignore", "forbid"],
@@ -75,6 +88,8 @@ def set_extras(
         _modify_config(models, processed_classes, change_config)
 
 
+# This should eventually be deprecated and removed, once we require pydantic >= 2.12
+# (https://github.com/pydantic/pydantic/discussions/2652#discussioncomment-17853656)
 def forbid_extras(models: type[p.BaseModel] | Collection[type[p.BaseModel]]) -> None:
     set_extras(models, "forbid")
 

@@ -19,7 +19,7 @@ import pydantic as p
 from antsibull_fileutils.yaml import load_yaml_file
 from packaging.version import Version as PypiVer
 
-from .pydantic import forbid_extras, get_formatted_error_messages
+from .pydantic import _PYDANTIC_VERSION, forbid_extras, get_formatted_error_messages
 from .schemas.collection_meta import (
     BaseRemovalInformation,
     CollectionMetadata,
@@ -289,10 +289,12 @@ def lint_collection_meta(
         major_release=major_release,
     )
 
-    forbid_extras(CollectionsMetadata)
-
     try:
-        parsed_data = CollectionsMetadata.model_validate(data)
+        if _PYDANTIC_VERSION < (2, 12):
+            forbid_extras(CollectionsMetadata)
+            parsed_data = CollectionsMetadata.model_validate(data)
+        else:
+            parsed_data = CollectionsMetadata.model_validate(data, extra="forbid")
         validator.validate(parsed_data)
     except p.ValidationError as exc:
         validator.errors.extend(get_formatted_error_messages(exc))
