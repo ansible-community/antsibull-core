@@ -1,0 +1,4 @@
+deprecated_features:
+  - "The ``antsibull_core.pydantic.set_extras`` and ``antsibull_core.pydantic.forbid_extras`` functions are deprecated
+     and will be removed from antsibull-core 4.0.0. Use the ``extra`` keyword added to ``model_validate()``
+     in pydantic 2.12 instead (https://github.com/ansible-community/antsibull-core/pull/206)."
