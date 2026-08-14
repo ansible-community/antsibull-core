@@ -1,2 +1,2 @@
 minor_changes:
-  - "Expose Pydantic version as an integer tuple, and use new Pydantic validation feature when linting collection metadata if available (https://github.com/ansible-community/antsibull-core/pull/205)."
+  - "Use new Pydantic validation feature when linting collection metadata if available (https://github.com/ansible-community/antsibull-core/pull/205)."
