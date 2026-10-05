@@ -12,9 +12,7 @@ import sys
 
 BooleanOptionalAction: type[argparse.BooleanOptionalAction]
 
-if sys.version_info < (3, 9, 11) or (
-    sys.version_info >= (3, 10, 0) and sys.version_info < (3, 10, 3)
-):
+if sys.version_info < (3, 9, 11) or ((3, 10, 0) <= sys.version_info < (3, 10, 3)):
     # https://bugs.python.org/issue46080 was fixed in Python 3.11.0 alpha 5
     # (https://docs.python.org/3/whatsnew/changelog.html#python-3-11-0-alpha-5)
     # and backported to Python 3.10.3
