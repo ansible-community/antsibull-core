@@ -11,6 +11,7 @@ Helpers for pydantic.
 from __future__ import annotations
 
 import typing as t
+import warnings
 from collections.abc import Callable, Collection
 
 import pydantic as p
@@ -74,6 +75,13 @@ def set_extras(
     models: type[p.BaseModel] | Collection[type[p.BaseModel]],
     value: t.Literal["allow", "ignore", "forbid"],
 ) -> None:
+    warnings.warn(
+        "antsibull_core.pydantic.set_extras() is deprecated"
+        " and will be removed from antsibull-core 4.0.0."
+        " Use the 'extra' keyword for model_validate() added in pydantic 2.12.",
+        DeprecationWarning,
+    )
+
     def change_config(model_config: p.ConfigDict) -> bool:
         if model_config.get("extra") == value:
             return False
@@ -91,7 +99,15 @@ def set_extras(
 # This should eventually be deprecated and removed, once we require pydantic >= 2.12
 # (https://github.com/pydantic/pydantic/discussions/2652#discussioncomment-17853656)
 def forbid_extras(models: type[p.BaseModel] | Collection[type[p.BaseModel]]) -> None:
-    set_extras(models, "forbid")
+    warnings.warn(
+        "antsibull_core.pydantic.forbid_extras() is deprecated"
+        " and will be removed from antsibull-core 4.0.0."
+        " Use the 'extra' keyword for model_validate() added in pydantic 2.12.",
+        DeprecationWarning,
+    )
+
+    with warnings.catch_warnings(category=DeprecationWarning):
+        set_extras(models, "forbid")
 
 
 def get_formatted_error_messages(error: p.ValidationError) -> list[str]:
