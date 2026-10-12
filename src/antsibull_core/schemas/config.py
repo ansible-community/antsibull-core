@@ -50,7 +50,7 @@ class LogOutputModel(BaseModel):
     format: t.Union[str, Callable] = twiggy.formats.line_format
     kwargs: Mapping[str, t.Any] = {}
 
-    @p.field_validator("args", mode="after")
+    @p.field_validator("args", mode="after")  # pyre-ignore[56]
     @classmethod
     def expand_home_dir_args(
         cls, args_field: MutableSequence[t.Any], info: p.ValidationInfo
@@ -62,7 +62,7 @@ class LogOutputModel(BaseModel):
                 args_field[0] = os.path.expanduser(args_field[0])
         return args_field
 
-    @p.field_validator("kwargs", mode="after")
+    @p.field_validator("kwargs", mode="after")  # pyre-ignore[56]
     @classmethod
     def expand_home_dir_kwargs(
         cls, kwargs_field: MutableMapping[str, t.Any], info: p.ValidationInfo
