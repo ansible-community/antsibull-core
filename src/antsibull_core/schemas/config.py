@@ -44,16 +44,17 @@ class LogEmitterModel(BaseModel):
 
 
 class LogOutputModel(BaseModel):
+    # Note: output must come *before* args and kwargsg
     output: t.Union[str, Callable]
     args: Sequence[t.Any] = []
     format: t.Union[str, Callable] = twiggy.formats.line_format
     kwargs: Mapping[str, t.Any] = {}
 
-    @p.field_validator("args")
-    # pylint:disable=no-self-argument
+    @p.field_validator("args", mode="after")
+    @classmethod
     def expand_home_dir_args(
-        cls, args_field: MutableSequence, info: p.ValidationInfo
-    ) -> MutableSequence:
+        cls, args_field: MutableSequence[t.Any], info: p.ValidationInfo
+    ) -> MutableSequence[t.Any]:
         """Expand tilde in the arguments of specific outputs."""
         values = info.data
         if values["output"] in ("twiggy.outputs.FileOutput", twiggy.outputs.FileOutput):
@@ -61,11 +62,11 @@ class LogOutputModel(BaseModel):
                 args_field[0] = os.path.expanduser(args_field[0])
         return args_field
 
-    @p.field_validator("kwargs")
-    # pylint:disable=no-self-argument
+    @p.field_validator("kwargs", mode="after")
+    @classmethod
     def expand_home_dir_kwargs(
-        cls, kwargs_field: MutableMapping, info: p.ValidationInfo
-    ) -> MutableMapping:
+        cls, kwargs_field: MutableMapping[str, t.Any], info: p.ValidationInfo
+    ) -> MutableMapping[str, t.Any]:
         """Expand tilde in the keyword arguments of specific outputs."""
         values = info.data
         if values["output"] in ("twiggy.outputs.FileOutput", twiggy.outputs.FileOutput):
