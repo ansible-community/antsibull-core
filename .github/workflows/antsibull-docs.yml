@@ -62,7 +62,7 @@ jobs:
           sed -i pyproject.toml -e 's/    "mypy",/    "mypy<1.16.0",/g'
         working-directory: antsibull-docs
 
-      # TODO: use Python 3.14 once using a more modern antsibull-docs version!
+      # TODO: use Python 3.15 once using a more modern antsibull-docs version!
       - name: Set up Python 3.13
         id: python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
