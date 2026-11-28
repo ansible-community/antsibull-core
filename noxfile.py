@@ -73,7 +73,11 @@ def other_antsibull(
 def test(session: nox.Session):
     install(
         session,
-        ".[test, coverage]",
+        ".",
+        "--group",
+        "test",
+        "--group",
+        "coverage",
         *other_antsibull(),
         editable=True,
     )
@@ -95,7 +99,7 @@ def test(session: nox.Session):
 
 @nox.session
 def coverage(session: nox.Session):
-    install(session, ".[coverage]", *other_antsibull(), editable=True)
+    install(session, ".", "--group", "coverage", *other_antsibull(), editable=True)
     combined = map(str, Path().glob(".nox/*/tmp/.coverage"))
     # Combine the results into a single .coverage file in the root
     session.run("coverage", "combine", "--keep", *combined)
@@ -112,7 +116,7 @@ def lint(session: nox.Session):
 
 @nox.session(allow_parallel=IN_CI)
 def formatters(session: nox.Session):
-    install(session, ".[formatters]", *other_antsibull())
+    install(session, ".", "--group", "formatters", *other_antsibull())
     posargs = list(session.posargs)
     if IN_CI:
         posargs.append("--check")
@@ -122,7 +126,7 @@ def formatters(session: nox.Session):
 
 @nox.session(allow_parallel=True)
 def codeqa(session: nox.Session):
-    install(session, ".[codeqa]", *other_antsibull(), editable=True)
+    install(session, ".", "--group", "codeqa", *other_antsibull(), editable=True)
     session.run("flake8", "src", *session.posargs)
     session.run("pylint", "--rcfile", ".pylintrc.automated", "src/antsibull_core")
     session.run("reuse", "lint")
@@ -133,7 +137,7 @@ def codeqa(session: nox.Session):
 def typing(session: nox.Session):
     # pyre does not work when we don't install ourself in editable mode 🙄.
     others = other_antsibull()
-    install(session, "-e", ".[typing]", *others)
+    install(session, "-e", ".", "--group", "typing", *others)
     session.run("mypy", "src/antsibull_core")
 
     additional_libraries = []

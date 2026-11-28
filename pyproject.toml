@@ -67,7 +67,7 @@ email = "maxwell@gtmx.me"
 "Code of Conduct" = "https://docs.ansible.com/projects/ansible/latest/community/code_of_conduct.html"
 "Bug tracker" = "https://github.com/ansible-community/antsibull-core/issues"
 
-[project.optional-dependencies]
+[dependency-groups]
 codeqa = [
     "antsibull-changelog",
     "flake8 >= 6.0.0",
@@ -100,11 +100,11 @@ typing = [
 ]
 dev = [
     # Used by nox sessions
-    "antsibull-core[codeqa]",
-    "antsibull_core[coverage]",
-    "antsibull-core[formatters]",
-    "antsibull-core[test]",
-    "antsibull-core[typing]",
+    {include-group = "codeqa"},
+    {include-group = "coverage"},
+    {include-group = "formatters"},
+    {include-group = "test"},
+    {include-group = "typing"},
     # misc
     "nox",
 
